@@ -1,0 +1,21 @@
+{
+  "apiVersion": "cloudplus.io/v1alpha3",
+  "kind": "VirtualMachine",
+  "metadata": {
+    "name": "magic11"
+  },
+  "spec": {
+    "lifecycle": {
+      "createAndStartVMFromISO": {
+        "virt_type": "kvm",
+        "memory": "1024",
+        "vcpus": "1",
+        "cdrom": "/var/lib/libvirt/iso/centos7-minimal-1511.iso",
+        "disk": "/var/lib/libvirt/images/650646e8c17a49d0b83c1c797811e084.qcow2,format=qcow2",
+        "network": "type=bridge,source=cni0",
+        "graphics": "vnc,listen=0.0.0.0",
+        "noautoconsole": true
+      }
+    }
+  }
+}
