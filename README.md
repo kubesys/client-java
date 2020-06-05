@@ -32,9 +32,12 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
+  <systemPath>${basedir}/libs/kubernetes-client-0.2.jar</systemPath>  
 </dependency>
 ```
+
+Not that you can get kubernetes-client-0.2.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.2/kubernetes-client-0.2.jar)
 
 ## Usage
 
@@ -97,10 +100,13 @@ client.deleteResource("Pod", "default", "busybox")
 
 ### work-with-other-sdks
 
-Unlike [fabric8](https://github.com/fabric8io/kubernetes-client), you need to learn fabric8 framework to support customized Kubernetes resources, we only provide JSON structure.
+Unlike [fabric8](https://github.com/fabric8io/kubernetes-client), which need to learn fabric8 framework to support customized Kubernetes resources. Deveolpers use this SDK just need to focus on how to write JSON.
 
-Our novel design can automatically detect customized Kubernetes resources during runtime, and if you want to use object (not JSON) to program .
-You just need to write JavaBean or reused it from the other SDKs. Let take fabric8 for example.
+It means that our novel design can automatically detect customized Kubernetes resources during runtime.
+In addition, if you want to use object (not JSON) to program, 
+you need to write JavaBean or reused it from the other SDKs. 
+
+Let take fabric8 for example.
 
 
 ```java
