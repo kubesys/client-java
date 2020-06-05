@@ -65,6 +65,13 @@ public class KubernetesConfig {
 	public void addName(String kind, String name) {
 		this.kind2NameMapping.put(kind, name);
 	}
+	
+	/**
+	 * @param kind                   kind
+	 */
+	public void removeNameBy(String kind) {
+		this.kind2NameMapping.remove(kind);
+	}
 
 	/**
 	 * @param kind                   kind
@@ -85,8 +92,16 @@ public class KubernetesConfig {
 	/**
 	 * @param kind                   kind
 	 * @return                       version
+	 */     
+	public String removeVersionBy(String kind) {
+		return kind2VersionMapping.remove(kind);
+	}
+	
+	/**
+	 * @param kind                   kind
+	 * @return                       version
 	 */
-	public String get2Group(String kind) {
+	public String getGroup(String kind) {
 		return kind2GroupMapping.get(kind);
 	}
 
@@ -97,7 +112,15 @@ public class KubernetesConfig {
 	public void addGroup(String kind, String group) {
 		this.kind2GroupMapping.put(kind, group);
 	}
-
+	
+	/**
+	 * @param kind                   kind
+	 * @return                       version
+	 */
+	public String removeGroupBy(String kind) {
+		return kind2GroupMapping.remove(kind);
+	}
+	
 	/**
 	 * @param kind                   kind
 	 * @return                       namespaced
@@ -116,6 +139,14 @@ public class KubernetesConfig {
 
 	/**
 	 * @param kind                   kind
+	 * @return                       namespaced
+	 */
+	public Boolean removeNamespacedBy(String kind) {
+		return kind2NamespacedMapping.remove(kind);
+	}
+	
+	/**
+	 * @param kind                   kind
 	 * @return                       apiPrefix
 	 */
 	public String getApiPrefix(String kind) {
@@ -130,6 +161,14 @@ public class KubernetesConfig {
 		this.kind2ApiPrefixMapping.put(kind, apiPrefix);
 	}
 
+	/**
+	 * @param kind                   kind
+	 * @return                       apiPrefix
+	 */
+	public String removeApiPrefixBy(String kind) {
+		return kind2ApiPrefixMapping.remove(kind);
+	}
+	
 	/**
 	 * @return                       kind2NameMapping
 	 */

@@ -42,7 +42,7 @@ public class KubernetesParser {
 			
 			// we just find and register Kubernetes native kinds
 			// it means this kind cannot be undeployed
-			if (path.split(KubernetesConstants.HTTP_PATH_SEPARTOR).length == 4 
+			if (path.split(KubernetesConstants.KUBEAPI_PATHSEPARTOR_PATTERN).length == 4 
 					|| path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
 
 				// register it

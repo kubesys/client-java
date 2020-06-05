@@ -358,9 +358,9 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		Builder builder = new Request.Builder()
-				.header(KubernetesConstants.HTTP_HEADER_KEY
-						, KubernetesConstants.HTTP_HEADER_VALUE)
-				.addHeader(KubernetesConstants.HTTP_ORIGIN, url)
+				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
+						, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
+				.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
 				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
 		clone.newWebSocket(builder.url(uri).build(), listener);
 		clone.dispatcher().executorService();
@@ -378,9 +378,9 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		Builder builder = new Request.Builder()
-				.header(KubernetesConstants.HTTP_HEADER_KEY
-						, KubernetesConstants.HTTP_HEADER_VALUE)
-				.addHeader(KubernetesConstants.HTTP_ORIGIN, url)
+				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
+						, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
+				.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
 				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
 		clone.newWebSocket(builder.url(uri).build(), listener);
 		clone.dispatcher().executorService();
@@ -415,7 +415,7 @@ public class KubernetesClient {
 			response = client.newCall(request).execute();
 			return new ObjectMapper().readTree(response.body().byteStream());
 		} catch (Exception ex) {
-			throw new Exception(ex);
+			throw new KubernetesException(ex);
 		} finally {
 			if (response != null) {
 				response.close();
@@ -452,7 +452,7 @@ public class KubernetesClient {
 	 * @return                                 full path
 	 */
 	public String getNamespace(boolean namespaced, String namespace) {
-		return (namespaced && namespace.length() != 0) ? KubernetesConstants.KUBE_NAMESPACES_PATTERN + namespace
+		return (namespaced && namespace.length() != 0) ? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
 						: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}
 	

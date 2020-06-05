@@ -7,7 +7,7 @@ We expect to provide a Java client:
 
 ## Comparison
 
-|                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | this project  | 
+|                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project]()  | 
 |---------------------------|------------------|------------------|-------------------|
 |        Compatibility                      |  provide different SDK version | provide different SDK version |  one version for all |
 |  Support customized Kubernetes resources  |  a lot of development          | a lot of development          |  zero-deployment     |
@@ -32,12 +32,12 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <systemPath>${basedir}/libs/kubernetes-client-0.2.jar</systemPath>  
 </dependency>
 ```
 
-Not that you can get kubernetes-client-0.2.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.2/kubernetes-client-0.2.jar)
+Not that you can get kubernetes-client-0.3.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.3/kubernetes-client-0.3.jar)
 
 ## Usage
 
