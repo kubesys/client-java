@@ -5,6 +5,8 @@ package io.github.kubesys;
 
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -16,6 +18,7 @@ import javax.net.ssl.X509TrustManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.github.kubesys.utils.URLUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -130,19 +133,219 @@ public class KubernetesClient {
 	 * 
 	 **********************************************************/
 	
+	/**
+	 * @param json                              json
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	@SuppressWarnings("deprecation")
+	public JsonNode createResource(JsonNode json) throws Exception {
+
+		final String kind = getKind(json);
+		
+		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
+				config.getKind2NamespacedMapping().get(kind), json), config.getName(kind));
+		
+		RequestBody requestBody = RequestBody.create(
+				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_POST, uri, requestBody);
+		
+		return getResponse(request);
+	}
+	
+	/**
+	 * @param json                              json
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	@SuppressWarnings("deprecation")
+	public JsonNode updateResource(JsonNode json) throws Exception {
+		
+		final String kind = getKind(json);
+		
+		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
+								config.getKind2NamespacedMapping().get(kind), json), 
+								config.getName(kind), getName(json));
+		
+		RequestBody requestBody = RequestBody.create(
+				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_PUT, uri, requestBody);
+		
+		return getResponse(request);
+	}
+	
+	
+	/**
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param name                              name
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	@SuppressWarnings("deprecation")
+	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
+
+		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
+				config.getKind2NamespacedMapping().get(kind), namespace), 
+				config.getName(kind), name);
+		
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("name", name);
+		
+		RequestBody requestBody = RequestBody.create(
+				kubernetesConstants.HTTP_MEDIA_TYPE, 
+				new ObjectMapper().writeValueAsString(map));
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_DELETE, uri, requestBody);
+		
+		return getResponse(request);
+	}
+	
+	/**
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param name                              name
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
+		
+		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
+											config.getKind2NamespacedMapping().get(kind), namespace), 
+											config.getName(kind), name);
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_GET, uri, null);
+		
+		return getResponse(request);
+	}
+	
+	/**
+	 * @param kind                            kind
+	 * @return                                json
+	 * @throws Exception                      exception
+	 */
+	public JsonNode listResources(String kind) throws Exception {
+		return listResources(kind, kubernetesConstants.KUBE_ALL_NAMESPACES, null, null, 0, null);
+	}
+	
+	/**
+	 * @param kind                            kind
+	 * @param namespace                       namespace
+	 * @return                                json
+	 * @throws Exception                      exception
+	 */
+	public JsonNode listResources(String kind, String namespace) throws Exception {
+		return listResources(kind, namespace, null, null, 0, null);
+	}
+	
+	/**
+	 * @param kind                            kind
+	 * @param namespace                       namespace
+	 * @return                                json
+	 * @throws Exception                      exception
+	 */
+	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector) throws Exception {
+		return listResources(kind, namespace, fieldSelector, labelSelector, 0, null);
+	}
+	
+	/**
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param fieldSelector                     fieldSelector
+	 * @param labelSelector                     labelSelector
+	 * @param limit                             limit
+	 * @param nextId                            nextId
+	 * @return
+	 * @throws Exception                        exception
+	 */
+	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit, String nextId) throws Exception {
+		StringBuffer fullUri = new StringBuffer();
+		
+		fullUri.append(URLUtils.join(config.getApiPrefix(kind), getNamespace(
+										config.getKind2NamespacedMapping().get(kind), namespace), 
+										config.getName(kind)));
+		fullUri.append(kubernetesConstants.HTTP_QUERY_KIND + kind);
+		
+		if (limit > 0) {
+			fullUri.append(kubernetesConstants.HTTP_QUERY_PAGELIMIT).append(limit);
+		}
+		
+		if (nextId != null) {
+			fullUri.append(kubernetesConstants.HTTP_QUERY_NEXTID).append(nextId);
+		}
+		
+		if (fieldSelector != null) {
+			fullUri.append(kubernetesConstants.HTTP_QUERY_FIELDSELECTOR).append(fieldSelector);
+		}
+		
+		if (labelSelector != null) {
+			fullUri.append(kubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
+		}
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_GET, fullUri.toString(), null);
+		
+		return getResponse(request);
+	}
+	
+	/**
+	 * @param json                              json
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	@SuppressWarnings("deprecation")
+	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
+		
+		final String kind = getKind(json);
+		
+		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
+						 	config.getKind2NamespacedMapping().get(kind), json), config.getName(kind), 
+							getName(json), kubernetesConstants.HTTP_RESPONSE_STATUS);
+		
+		RequestBody requestBody = RequestBody.create(
+				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		
+		Request request = createRequest(kubernetesConstants
+				.HTTP_REQUEST_PUT, uri, requestBody);
+		
+		return getResponse(request);
+	}
+	
+	/**********************************************************
+	 * 
+	 *               Request and Response
+	 * 
+	 **********************************************************/
+	
+	/**
+	 * @param type                             type
+	 * @param uri                              uri
+	 * @param requestBody                      body
+	 * @return                                 request
+	 */
 	protected Request createRequest(String type, final String uri, RequestBody requestBody) {
 		Builder builder = (token == null) ? new Builder() : 
 			new Builder().header("Authorization", "Bearer " + token);
 		return builder.method(type, requestBody).url(uri).build();
 	}
 	
+	/**
+	 * @param request                           request
+	 * @return                                  response
+	 * @throws Exception                        exception
+	 */
 	protected JsonNode getResponse(Request request) throws Exception {
 		Response response = null;
 		try {
 			response = client.newCall(request).execute();
 			return new ObjectMapper().readTree(response.body().byteStream());
 		} catch (Exception ex) {
-			System.out.println(ex);
 			throw new Exception(ex);
 		} finally {
 			if (response != null) {
@@ -157,18 +360,71 @@ public class KubernetesClient {
 	 * 
 	 **********************************************************/
 	
+	/**
+	 * @param json                             json
+	 * @return                                 kind
+	 */
+	public String getKind(JsonNode json) {
+		return json.get(kubernetesConstants.KUBE_KIND).asText();
+	}
+	
+	/**
+	 * @param json                             json
+	 * @return                                 name
+	 */
+	public String getName(JsonNode json) {
+		return json.get(kubernetesConstants.KUBE_METADATA)
+					.get(kubernetesConstants.KUBE_METADATA_NAME).asText();
+	}
+	
+	/**
+	 * @param namespaced                       bool
+	 * @param namespace                        ns
+	 * @return                                 full path
+	 */
+	public String getNamespace(boolean namespaced, String namespace) {
+		return (namespaced && namespace.length() != 0) ? kubernetesConstants.KUBE_NAMESPACES_PREFIX + namespace
+						: kubernetesConstants.KUBE_ALL_NAMESPACES;
+	}
+	
+	/**
+	 * @param namespaced                       bool
+	 * @param json                             json
+	 * @return                                 full path
+	 */
+	public String getNamespace(boolean namespaced, JsonNode json) {
+		JsonNode meta = json.get(kubernetesConstants.KUBE_METADATA);
+		String ns = meta.has(kubernetesConstants.KUBE_METADATA_NAMESPACE) 
+					? meta.get(kubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
+						: kubernetesConstants.DEFAULT_NAMESPACE;
+					
+		return getNamespace(namespaced, ns);
+	}
+	
+	/**
+	 * @return                                  url
+	 */
 	public String getUrl() {
 		return url;
 	}
 
+	/**
+	 * @return                                  token
+	 */
 	public String getToken() {
 		return token;
 	}
 
+	/**
+	 * @return                                  client
+	 */
 	public OkHttpClient getClient() {
 		return client;
 	}
 
+	/**
+	 * @return                                  config
+	 */
 	public kubernetesConfig getConfig() {
 		return config;
 	}

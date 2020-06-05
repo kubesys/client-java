@@ -28,27 +28,27 @@ public class kubernetesConfig {
 	/**
 	 * kind2Name
 	 */
-	protected Map<String, String> kind2NameMapping        = new HashMap<String, String>();
+	protected final Map<String, String> kind2NameMapping        = new HashMap<String, String>();
 	
 	/**
 	 * kind2Version
 	 */
-	protected Map<String, String> kind2VersionMapping     = new HashMap<String, String>();
+	protected final Map<String, String> kind2VersionMapping     = new HashMap<String, String>();
 	
 	/**
 	 * kind2Group
 	 */
-	protected Map<String, String> kind2GroupMapping       = new HashMap<String, String>();
+	protected final Map<String, String> kind2GroupMapping       = new HashMap<String, String>();
 
 	/**
 	 * kind2Namespace
 	 */
-	protected Map<String, Boolean> kind2NamespacedMapping = new HashMap<String, Boolean>();
+	protected final Map<String, Boolean> kind2NamespacedMapping = new HashMap<String, Boolean>();
 
 	/**
 	 * kind2ApiPrefix
 	 */
-	protected Map<String, String> kind2ApiPrefixMapping   = new HashMap<String, String>();
+	protected final Map<String, String> kind2ApiPrefixMapping   = new HashMap<String, String>();
 
 	/**
 	 * @param kind                   kind
@@ -128,6 +128,41 @@ public class kubernetesConfig {
 	 */
 	public void addApiPrefix(String kind, String apiPrefix) {
 		this.kind2ApiPrefixMapping.put(kind, apiPrefix);
+	}
+
+	/**
+	 * @return                       kind2NameMapping
+	 */
+	public Map<String, String> getKind2NameMapping() {
+		return kind2NameMapping;
+	}
+
+	/**
+	 * @return                       kind2VersionMapping
+	 */
+	public Map<String, String> getKind2VersionMapping() {
+		return kind2VersionMapping;
+	}
+
+	/**
+	 * @return                       kind2GroupMapping
+	 */
+	public Map<String, String> getKind2GroupMapping() {
+		return kind2GroupMapping;
+	}
+
+	/**
+	 * @return                       kind2NamespacedMapping
+	 */
+	public Map<String, Boolean> getKind2NamespacedMapping() {
+		return kind2NamespacedMapping;
+	}
+
+	/**
+	 * @return                       kind2ApiPrefixMapping
+	 */
+	public Map<String, String> getKind2ApiPrefixMapping() {
+		return kind2ApiPrefixMapping;
 	}
 
 }
