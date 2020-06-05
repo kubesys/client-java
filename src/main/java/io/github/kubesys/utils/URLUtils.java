@@ -15,6 +15,10 @@ import java.net.URISyntaxException;
  * Just copy io.fabric8.kubernetes.client.utils.URLUtils
  **/
 public class URLUtils {
+	
+	private URLUtils() {
+		super();
+	}
 
 	/**
 	 * @param parts          path

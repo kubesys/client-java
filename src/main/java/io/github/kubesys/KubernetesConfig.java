@@ -23,32 +23,32 @@ import java.util.Map;
  * namespaces                        ns                                          false        Namespace             <br>
  * nodes                             no                                          false        Node                  <br>
  */
-public class kubernetesConfig {
+public class KubernetesConfig {
 
 	/**
 	 * kind2Name
 	 */
-	protected final Map<String, String> kind2NameMapping        = new HashMap<String, String>();
+	protected final Map<String, String> kind2NameMapping        = new HashMap<>();
 	
 	/**
 	 * kind2Version
 	 */
-	protected final Map<String, String> kind2VersionMapping     = new HashMap<String, String>();
+	protected final Map<String, String> kind2VersionMapping     = new HashMap<>();
 	
 	/**
 	 * kind2Group
 	 */
-	protected final Map<String, String> kind2GroupMapping       = new HashMap<String, String>();
+	protected final Map<String, String> kind2GroupMapping       = new HashMap<>();
 
 	/**
 	 * kind2Namespace
 	 */
-	protected final Map<String, Boolean> kind2NamespacedMapping = new HashMap<String, Boolean>();
+	protected final Map<String, Boolean> kind2NamespacedMapping = new HashMap<>();
 
 	/**
 	 * kind2ApiPrefix
 	 */
-	protected final Map<String, String> kind2ApiPrefixMapping   = new HashMap<String, String>();
+	protected final Map<String, String> kind2ApiPrefixMapping   = new HashMap<>();
 
 	/**
 	 * @param kind                   kind

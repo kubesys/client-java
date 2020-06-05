@@ -4,9 +4,11 @@
 package io.github.kubesys;
 
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -50,7 +52,7 @@ public class KubernetesClient {
 	/**
 	 * config
 	 */
-	protected final kubernetesConfig config;
+	protected final KubernetesConfig config;
 	
 
 	
@@ -93,35 +95,53 @@ public class KubernetesClient {
 	 * @throws Exception                        exception
 	 */
 	private static SSLSocketFactory getSocketFactory() throws Exception {
-		TrustManager[] managers = new TrustManager[] { new X509TrustManager() {
-			public X509Certificate[] getAcceptedIssuers() {
-				X509CertImpl xc =  new X509CertImpl();
-				return new X509Certificate[] {xc};
-			}
-
-			public void checkClientTrusted(X509Certificate[] arg0, String arg1) {
-			}
-
-			public void checkServerTrusted(X509Certificate[] arg0, String arg1) {
-			}
-			
-		} };
-
+		TrustManager[] managers = new TrustManager[] {
+								new TrustAllManager()};
 		SSLContext sc = SSLContext.getInstance("TLS");
 		sc.init(null, managers, new SecureRandom());
 		return sc.getSocketFactory();
 	}
 	
+	
+	/**
+	 * 
+	 * @author wuheng09@gmail.com
+	 *
+	 */
+	private static class TrustAllManager implements X509TrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			// ignore here
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			// ignore here
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			X509CertImpl xc =  new X509CertImpl();
+			return new X509Certificate[] {xc};
+		}
+				
+	}
+	
 	/**
 	 * @return                                  HostnameVerifier
-	 * @throws Exception                        exception
 	 */
-	private HostnameVerifier getHostnameVerifier() throws Exception {
+	private HostnameVerifier getHostnameVerifier() {
 		return new HostnameVerifier() {
+			
+			@Override
+			public String toString() {
+				return super.toString();
+			}
 
 			@Override
 			public boolean verify(String hostname, SSLSession session) {
-				return true;
+				return (hostname != null);
 			}
 
 		};
@@ -147,9 +167,9 @@ public class KubernetesClient {
 				config.getKind2NamespacedMapping().get(kind), json), config.getName(kind));
 		
 		RequestBody requestBody = RequestBody.create(
-				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_POST, uri, requestBody);
 		
 		return getResponse(request);
@@ -170,9 +190,9 @@ public class KubernetesClient {
 								config.getName(kind), getName(json));
 		
 		RequestBody requestBody = RequestBody.create(
-				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_PUT, uri, requestBody);
 		
 		return getResponse(request);
@@ -197,10 +217,10 @@ public class KubernetesClient {
 		map.put("name", name);
 		
 		RequestBody requestBody = RequestBody.create(
-				kubernetesConstants.HTTP_MEDIA_TYPE, 
+				KubernetesConstants.HTTP_MEDIA_TYPE, 
 				new ObjectMapper().writeValueAsString(map));
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_DELETE, uri, requestBody);
 		
 		return getResponse(request);
@@ -219,7 +239,7 @@ public class KubernetesClient {
 											config.getKind2NamespacedMapping().get(kind), namespace), 
 											config.getName(kind), name);
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, uri, null);
 		
 		return getResponse(request);
@@ -231,7 +251,7 @@ public class KubernetesClient {
 	 * @throws Exception                      exception
 	 */
 	public JsonNode listResources(String kind) throws Exception {
-		return listResources(kind, kubernetesConstants.KUBE_ALL_NAMESPACES, null, null, 0, null);
+		return listResources(kind, KubernetesConstants.KUBE_ALL_NAMESPACES, null, null, 0, null);
 	}
 	
 	/**
@@ -265,30 +285,30 @@ public class KubernetesClient {
 	 * @throws Exception                        exception
 	 */
 	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit, String nextId) throws Exception {
-		StringBuffer fullUri = new StringBuffer();
+		StringBuilder fullUri = new StringBuilder();
 		
 		fullUri.append(URLUtils.join(config.getApiPrefix(kind), getNamespace(
 										config.getKind2NamespacedMapping().get(kind), namespace), 
 										config.getName(kind)));
-		fullUri.append(kubernetesConstants.HTTP_QUERY_KIND + kind);
+		fullUri.append(KubernetesConstants.HTTP_QUERY_KIND + kind);
 		
 		if (limit > 0) {
-			fullUri.append(kubernetesConstants.HTTP_QUERY_PAGELIMIT).append(limit);
+			fullUri.append(KubernetesConstants.HTTP_QUERY_PAGELIMIT).append(limit);
 		}
 		
 		if (nextId != null) {
-			fullUri.append(kubernetesConstants.HTTP_QUERY_NEXTID).append(nextId);
+			fullUri.append(KubernetesConstants.HTTP_QUERY_NEXTID).append(nextId);
 		}
 		
 		if (fieldSelector != null) {
-			fullUri.append(kubernetesConstants.HTTP_QUERY_FIELDSELECTOR).append(fieldSelector);
+			fullUri.append(KubernetesConstants.HTTP_QUERY_FIELDSELECTOR).append(fieldSelector);
 		}
 		
 		if (labelSelector != null) {
-			fullUri.append(kubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
+			fullUri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, fullUri.toString(), null);
 		
 		return getResponse(request);
@@ -306,12 +326,12 @@ public class KubernetesClient {
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
 						 	config.getKind2NamespacedMapping().get(kind), json), config.getName(kind), 
-							getName(json), kubernetesConstants.HTTP_RESPONSE_STATUS);
+							getName(json), KubernetesConstants.HTTP_RESPONSE_STATUS);
 		
 		RequestBody requestBody = RequestBody.create(
-				kubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
 		
-		Request request = createRequest(kubernetesConstants
+		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_PUT, uri, requestBody);
 		
 		return getResponse(request);
@@ -365,7 +385,7 @@ public class KubernetesClient {
 	 * @return                                 kind
 	 */
 	public String getKind(JsonNode json) {
-		return json.get(kubernetesConstants.KUBE_KIND).asText();
+		return json.get(KubernetesConstants.KUBE_KIND).asText();
 	}
 	
 	/**
@@ -373,8 +393,8 @@ public class KubernetesClient {
 	 * @return                                 name
 	 */
 	public String getName(JsonNode json) {
-		return json.get(kubernetesConstants.KUBE_METADATA)
-					.get(kubernetesConstants.KUBE_METADATA_NAME).asText();
+		return json.get(KubernetesConstants.KUBE_METADATA)
+					.get(KubernetesConstants.KUBE_METADATA_NAME).asText();
 	}
 	
 	/**
@@ -383,8 +403,8 @@ public class KubernetesClient {
 	 * @return                                 full path
 	 */
 	public String getNamespace(boolean namespaced, String namespace) {
-		return (namespaced && namespace.length() != 0) ? kubernetesConstants.KUBE_NAMESPACES_PREFIX + namespace
-						: kubernetesConstants.KUBE_ALL_NAMESPACES;
+		return (namespaced && namespace.length() != 0) ? KubernetesConstants.KUBE_NAMESPACES_PREFIX + namespace
+						: KubernetesConstants.KUBE_ALL_NAMESPACES;
 	}
 	
 	/**
@@ -393,10 +413,10 @@ public class KubernetesClient {
 	 * @return                                 full path
 	 */
 	public String getNamespace(boolean namespaced, JsonNode json) {
-		JsonNode meta = json.get(kubernetesConstants.KUBE_METADATA);
-		String ns = meta.has(kubernetesConstants.KUBE_METADATA_NAMESPACE) 
-					? meta.get(kubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
-						: kubernetesConstants.DEFAULT_NAMESPACE;
+		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
+		String ns = meta.has(KubernetesConstants.KUBE_METADATA_NAMESPACE) 
+					? meta.get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
+						: KubernetesConstants.DEFAULT_NAMESPACE;
 					
 		return getNamespace(namespaced, ns);
 	}
@@ -425,7 +445,7 @@ public class KubernetesClient {
 	/**
 	 * @return                                  config
 	 */
-	public kubernetesConfig getConfig() {
+	public KubernetesConfig getConfig() {
 		return config;
 	}
 	
