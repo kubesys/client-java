@@ -1,15 +1,13 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package com.github.jkubefrk.v3;
+package io.github.kubesys;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.github.kubesys.KubernetesClient;
 
 /**
  * @author wuheng09@gmail.com
@@ -43,8 +41,44 @@ public class KubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = new KubernetesClient("http://www.cloudplus.io:8888/");
 		System.out.println(client.getConfig().getKind2ApiPrefixMapping());
-//		
-//		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
+		
+		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
+		ObjectNode status = node.get("status").deepCopy();
+		status.put("phase", "Pending");
+		node.put("status", status);
+		System.out.println(client.updateResourceStatus(node));
+//		create(client);
+//		update(client);
+//		get(client);
+//		delete(client);
+//		list(client);
+		
+	}
+
+
+	protected static void list(KubernetesClient client) throws Exception {
+		System.out.println(client.listResources("Pod"));
+	}
+
+
+	protected static void delete(KubernetesClient client) throws Exception {
+		System.out.println(client.deleteResource("Pod", "default", "busybox"));
+	}
+
+
+	protected static void get(KubernetesClient client) throws Exception {
+		System.out.println(client.getResource("Pod", "default", "busybox"));
+	}
+
+
+	protected static void create(KubernetesClient client)
+			throws Exception, JsonProcessingException, JsonMappingException {
+		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
+	}
+
+
+	protected static void update(KubernetesClient client)
+			throws Exception, JsonProcessingException, JsonMappingException {
 		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
 		ObjectNode meta = node.get("metadata").deepCopy();
 		ObjectNode labels = new ObjectMapper().createObjectNode();
@@ -52,10 +86,5 @@ public class KubernetesClientTest {
 		meta.put("labels", labels);
 		node.put("metadata", meta);
 		System.out.println(client.updateResource(new ObjectMapper().readTree(node.toString())));
-//		System.out.println(client.getResource("Pod", "default", "busybox"));
-//		System.out.println(client.deleteResource("Pod", "default", "busybox"));
-//		
-//		System.out.println(client.listResources("Pod"));
-		
 	}
 }
