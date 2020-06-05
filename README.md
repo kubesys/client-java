@@ -33,7 +33,7 @@ Add this dependency to your project's POM:
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
   <version>0.3</version>
-  <systemPath>${basedir}/libs/kubernetes-client-0.2.jar</systemPath>  
+  <systemPath>${basedir}/libs/kubernetes-client-0.3.jar</systemPath>  
 </dependency>
 ```
 
@@ -53,6 +53,9 @@ The easiest way to create a client is:
 
 ```java
 KubernetesClient client = new KubernetesClient(url);
+client.watchResources(AutoDiscoverCustomizedResourcesWacther.TARGET_KIND, 
+								AutoDiscoverCustomizedResourcesWacther.TARGET_NAMESPACE, 
+								new AutoDiscoverCustomizedResourcesWacther(client));
 ```
 
 ### simple-example
@@ -116,7 +119,13 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 0.1: support create, update, get, delete and list operations using the HTTP protocol.
-- 0.2: support update status, watch operations using the HTTP protocol.
-- 0.3: support automatically detect customized Kubernetes resources during runtime.
-- 0.4: support HTTPs protocol.
+- Prototype
+  - 0.1: support create, update, get, delete and list operations using the HTTP protocol.
+  - 0.2: support update status, watch operations using the HTTP protocol.
+  - 0.3: support automatically detect customized Kubernetes resources during runtime.
+  - 0.4: support HTTPs protocol.
+  - 0.5: improve logger
+  
+- Develop
+
+- Production
