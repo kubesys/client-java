@@ -30,7 +30,7 @@ public class KubernetesWatcherTest {
 			}
 			
 		};
-		client.watchResource("Pod", "default", "busybox", listener );
+		client.watchResources("Pod", "default", listener );
 		
 	}
 }

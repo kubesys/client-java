@@ -342,11 +342,31 @@ public class KubernetesClient {
 	 * @param kind                              kind
 	 * @param namespace                         namespace
 	 * @param name                              name
-	 * @param listener                          listener
+	 * @param listener                          listenerm
 	 */
 	public void watchResource(String kind, String namespace, String name, WebSocketListener listener) {
 		final String uri = URLUtils.join(config.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
 											getNamespace(config.isNamespaced(kind), namespace), config.getName(kind), name, 
+											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+		
+		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		Builder builder = new Request.Builder()
+				.header(KubernetesConstants.HTTP_HEADER_KEY
+						, KubernetesConstants.HTTP_HEADER_VALUE)
+				.addHeader(KubernetesConstants.HTTP_ORIGIN, url)
+				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
+		clone.newWebSocket(builder.url(uri).build(), listener);
+		clone.dispatcher().executorService();
+	}
+	
+	/**
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param listener                          listenerm
+	 */
+	public void watchResources(String kind, String namespace, WebSocketListener listener) {
+		final String uri = URLUtils.join(config.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+											getNamespace(config.isNamespaced(kind), namespace), config.getName(kind),  
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
