@@ -69,14 +69,17 @@ public class KubernetesConstants {
 	
 	public static final String KUBE_KIND                    = "kind";
 	
-	
-	
 	public static final String KUBE_METADATA                = "metadata";
 	
 	public static final String KUBE_METADATA_NAMESPACE      = "namespace";
 	
 	public static final String KUBE_METADATA_NAME           = "name";
 	
+	public static final String KUBE_STATUS                  = "status";
+
+	public static final String KUBE_APIVERSION              = "apiVersion";
+	
+	public static final String KUBE_SPEC                    = "spec";
 	
 	public static final String KUBE_RESOURCES_NAMESPACED    = "namespaced";
 	

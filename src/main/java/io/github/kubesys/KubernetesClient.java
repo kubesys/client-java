@@ -19,6 +19,7 @@ import javax.net.ssl.X509TrustManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.utils.URLUtils;
 import okhttp3.OkHttpClient;
@@ -190,8 +191,14 @@ public class KubernetesClient {
 								config.isNamespaced(kind), json), 
 								config.getName(kind), getName(json));
 		
+		ObjectNode node = json.deepCopy();
+		
+		if (json.has(KubernetesConstants.KUBE_STATUS)) {
+			node.remove(KubernetesConstants.KUBE_STATUS);
+		} 
+		
 		RequestBody requestBody = RequestBody.create(
-				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+				KubernetesConstants.HTTP_MEDIA_TYPE, node.toString());
 		
 		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_PUT, uri, requestBody);
