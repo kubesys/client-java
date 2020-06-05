@@ -39,13 +39,13 @@ public class KubernetesClientTest {
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = new KubernetesClient("http://www.cloudplus.io:8888/");
-		System.out.println(client.getConfig().getKind2ApiPrefixMapping());
-		
+//		System.out.println(client.getConfig().getKind2ApiPrefixMapping());
+//		
 		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
-		System.out.println(client.getResource("Pod", "default", "busybox"));
-		System.out.println(client.deleteResource("Pod", "default", "busybox"));
-		
-		System.out.println(client.listResources("Pod"));
+//		System.out.println(client.getResource("Pod", "default", "busybox"));
+//		System.out.println(client.deleteResource("Pod", "default", "busybox"));
+//		
+//		System.out.println(client.listResources("Pod"));
 		
 	}
 }

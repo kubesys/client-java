@@ -8,7 +8,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -26,6 +26,7 @@ import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.WebSocketListener;
 import sun.security.x509.X509CertImpl;
 
 /**
@@ -164,7 +165,7 @@ public class KubernetesClient {
 		final String kind = getKind(json);
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
-				config.getKind2NamespacedMapping().get(kind), json), config.getName(kind));
+							config.isNamespaced(kind), json), config.getName(kind));
 		
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
@@ -186,7 +187,7 @@ public class KubernetesClient {
 		final String kind = getKind(json);
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
-								config.getKind2NamespacedMapping().get(kind), json), 
+								config.isNamespaced(kind), json), 
 								config.getName(kind), getName(json));
 		
 		RequestBody requestBody = RequestBody.create(
@@ -210,10 +211,10 @@ public class KubernetesClient {
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
-				config.getKind2NamespacedMapping().get(kind), namespace), 
+				config.isNamespaced(kind), namespace), 
 				config.getName(kind), name);
 		
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		map.put("name", name);
 		
 		RequestBody requestBody = RequestBody.create(
@@ -236,7 +237,7 @@ public class KubernetesClient {
 	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
-											config.getKind2NamespacedMapping().get(kind), namespace), 
+											config.isNamespaced(kind), namespace), 
 											config.getName(kind), name);
 		
 		Request request = createRequest(KubernetesConstants
@@ -251,7 +252,7 @@ public class KubernetesClient {
 	 * @throws Exception                      exception
 	 */
 	public JsonNode listResources(String kind) throws Exception {
-		return listResources(kind, KubernetesConstants.KUBE_ALL_NAMESPACES, null, null, 0, null);
+		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null);
 	}
 	
 	/**
@@ -288,7 +289,7 @@ public class KubernetesClient {
 		StringBuilder fullUri = new StringBuilder();
 		
 		fullUri.append(URLUtils.join(config.getApiPrefix(kind), getNamespace(
-										config.getKind2NamespacedMapping().get(kind), namespace), 
+										config.isNamespaced(kind), namespace), 
 										config.getName(kind)));
 		fullUri.append(KubernetesConstants.HTTP_QUERY_KIND + kind);
 		
@@ -325,7 +326,7 @@ public class KubernetesClient {
 		final String kind = getKind(json);
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
-						 	config.getKind2NamespacedMapping().get(kind), json), config.getName(kind), 
+							config.isNamespaced(kind), json), config.getName(kind), 
 							getName(json), KubernetesConstants.HTTP_RESPONSE_STATUS);
 		
 		RequestBody requestBody = RequestBody.create(
@@ -335,6 +336,27 @@ public class KubernetesClient {
 				.HTTP_REQUEST_PUT, uri, requestBody);
 		
 		return getResponse(request);
+	}
+	
+	/**
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param name                              name
+	 * @param listener                          listener
+	 */
+	public void watchResource(String kind, String namespace, String name, WebSocketListener listener) {
+		final String uri = URLUtils.join(config.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+											getNamespace(config.isNamespaced(kind), namespace), config.getName(kind), name, 
+											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+		
+		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		Builder builder = new Request.Builder()
+				.header(KubernetesConstants.HTTP_HEADER_KEY
+						, KubernetesConstants.HTTP_HEADER_VALUE)
+				.addHeader(KubernetesConstants.HTTP_ORIGIN, url)
+				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
+		clone.newWebSocket(builder.url(uri).build(), listener);
+		clone.dispatcher().executorService();
 	}
 	
 	/**********************************************************
@@ -403,8 +425,8 @@ public class KubernetesClient {
 	 * @return                                 full path
 	 */
 	public String getNamespace(boolean namespaced, String namespace) {
-		return (namespaced && namespace.length() != 0) ? KubernetesConstants.KUBE_NAMESPACES_PREFIX + namespace
-						: KubernetesConstants.KUBE_ALL_NAMESPACES;
+		return (namespaced && namespace.length() != 0) ? KubernetesConstants.KUBE_NAMESPACES_PATTERN + namespace
+						: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}
 	
 	/**
@@ -416,7 +438,7 @@ public class KubernetesClient {
 		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
 		String ns = meta.has(KubernetesConstants.KUBE_METADATA_NAMESPACE) 
 					? meta.get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
-						: KubernetesConstants.DEFAULT_NAMESPACE;
+						: KubernetesConstants.VALUE_DEFAULT_NAMESPACE;
 					
 		return getNamespace(namespaced, ns);
 	}

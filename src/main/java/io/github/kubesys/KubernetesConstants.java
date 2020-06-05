@@ -45,6 +45,7 @@ public class KubernetesConstants {
 	
 	public static final String HTTP_QUERY_NEXTID             = "&continue=";
 	
+	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true";
 	
 	public static final MediaType HTTP_MEDIA_TYPE           = MediaType.parse("application/json");
 	
@@ -56,7 +57,9 @@ public class KubernetesConstants {
 	 * 
 	 *************************************/
 	
-	public static final String DEFAULT_NAMESPACE            = "default";
+	public static final String VALUE_DEFAULT_NAMESPACE       = "default";
+	
+	public static final String VALUE_ALL_NAMESPACES          = "";
 	
 	/*************************************
 	 * 
@@ -89,11 +92,10 @@ public class KubernetesConstants {
 	public static final String KUBEAPI_CORE_PATTERN          = "/api/v1";
 	
 	public static final String KUBEAPI_CORE_PREFIX_PATTERN   = "/api";
-	
-	public static final String KUBE_NAMESPACES_PREFIX        = "namespaces/";
 
-	public static final String KUBE_ALL_NAMESPACES           = "";
+	public static final String KUBEAPI_WATCHER_PATTERN       = "watch";
 	
+	public static final String KUBE_NAMESPACES_PATTERN       = "namespaces/";
 	
 	
 
@@ -110,11 +112,7 @@ public class KubernetesConstants {
 	public static final String HTTP_HEADER_VALUE = "v4.channel.k8s.io";
 
 
-	public static final String KUBE_NAMESPACE_PREFIX = "namespaces/";
 
-	public static final String KUBE_WATCHER_PATH = "watch";
-
-	public static final String KUBE_WATCHER_ENABLE = "?watch=true";
 	
 	
 	
