@@ -14,7 +14,7 @@ import okhttp3.Request;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesParser {
+public class KubernetesAnalyzer {
 
 	/**
 	 * config
@@ -26,11 +26,17 @@ public class KubernetesParser {
 	 * @param client              client
 	 * @throws Exception          exception 
 	 */
-	protected KubernetesParser(KubernetesClient client) throws Exception {
+	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
+		
 		Request request = client.createRequest(
 								KubernetesConstants.HTTP_REQUEST_GET, 
 								client.getUrl(), null);
 		JsonNode node = client.getResponse(request);
+		
+		if (!node.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
+			throw new KubernetesException("Fail to init HTTP(s) client, please check url and/or token.");
+		}
+		
 		Iterator<JsonNode> iterator = node.get(KubernetesConstants.HTTP_RESPONSE_PATHS).iterator();
 		
 		// traverse all paths in key 'paths' 
@@ -121,18 +127,18 @@ public class KubernetesParser {
 	/**
 	 * singleton
 	 */
-	protected static KubernetesParser parser;
+	protected static KubernetesAnalyzer analyzer;
 	
 	/**
 	 * @param client               client
 	 * @return                     KubernetesParser
 	 * @throws Exception           exception
 	 */ 
-	public static KubernetesParser getParser(KubernetesClient client) throws Exception {
-		if (parser == null) {
-			parser = new KubernetesParser(client);
+	public static KubernetesAnalyzer getParser(KubernetesClient client) throws Exception {
+		if (analyzer == null) {
+			analyzer = new KubernetesAnalyzer(client);
 		}
-		return parser;
+		return analyzer;
 	}
 	
 }

@@ -3,8 +3,8 @@
  */
 package io.github.kubesys;
 
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -18,22 +18,17 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.conscrypt.Conscrypt;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.utils.URLUtils;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.WebSocketListener;
-
-import static java.util.Arrays.asList;
 
 /**
  * @author wuheng09@gmail.com
@@ -90,14 +85,76 @@ public class KubernetesClient {
 		super();
 		this.url = url;
 		this.token = token;
-		if (token == null) {
-			this.client = new OkHttpClient.Builder().build();
-		} else {
-			Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager().build(), 1);
-			this.client = new OkHttpClient.Builder().connectionSpecs(asList(ConnectionSpec.RESTRICTED_TLS)).build();
-		}
-		this.config = KubernetesParser
+		this.client = (token == null) 
+				?  new OkHttpClient.Builder().build()
+						: new OkHttpClient.Builder()
+								.sslSocketFactory(initSslSocketFactory(
+                    							initTrustManager()))
+								.hostnameVerifier(initHostnameVerifier())
+								.build();
+		this.config = KubernetesAnalyzer
 				.getParser(this).getConfig();
+	}
+
+	/**
+	 * @param trustManager                    trustManager
+	 * @return                                SSLSocketFactory
+	 * @throws NoSuchAlgorithmException       NoSuchAlgorithmException
+	 * @throws KeyManagementException         KeyManagementException
+	 */
+	protected SSLSocketFactory initSslSocketFactory(X509TrustManager trustManager)
+			throws NoSuchAlgorithmException, KeyManagementException {
+		SSLContext sslContext = SSLContext.getInstance("TLS");
+		sslContext.init(null, new TrustManager[]{trustManager}, null);
+		return sslContext.getSocketFactory();
+	}
+
+	/**
+	 * @return                                X509TrustManager  
+	 */
+	protected X509TrustManager initTrustManager() {
+		return new X509TrustManager() {
+
+			@Override
+		    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		    	// Do nothing
+				if (chain == null) {
+		    		throw new CertificateException("Client is not using tls");
+		    	}
+		    }
+
+		    @Override
+		    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+		    	// Do nothing
+		    	if (chain == null) {
+		    		throw new CertificateException("Server is not using tls");
+		    	}
+		    }
+
+		    @Override
+		    public X509Certificate[] getAcceptedIssuers() {
+		        return new X509Certificate[0];
+		    }
+		};
+	}
+
+	/**
+	 * @return                                hostnameVerifier   
+	 */
+	protected HostnameVerifier initHostnameVerifier() {
+		return new HostnameVerifier() {
+
+			@Override
+			public String toString() {
+				return super.toString();
+			}
+
+			@Override
+			public boolean verify(String hostname, SSLSession arg1) {
+				return hostname != null;
+			}
+			
+		};
 	}
 	
 
