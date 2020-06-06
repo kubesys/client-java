@@ -149,7 +149,7 @@
 				<version>1.5</version>
 				<executions>
 					<execution>
-						<id>sign-artifacts</id>
+						<id>8D5E4A04</id>
 						<phase>verify</phase>
 						<goals>
 							<goal>sign</goal>
