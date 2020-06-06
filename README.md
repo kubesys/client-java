@@ -7,7 +7,7 @@ We expect to provide a Java client:
 
 ## Comparison
 
-|                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project]()  | 
+|                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project](https://github.com/kubesys/kubernetes-client)  | 
 |---------------------------|------------------|------------------|-------------------|
 |        Compatibility                      |  provide different SDK version | provide different SDK version |  one version for all |
 |  Support customized Kubernetes resources  |  a lot of development          | a lot of development          |  zero-deployment     |
@@ -32,12 +32,12 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>0.3</version>
-  <systemPath>${basedir}/libs/kubernetes-client-0.3.jar</systemPath>  
+  <version>0.4</version>
+  <systemPath>${basedir}/libs/kubernetes-client-0.4.jar</systemPath>  
 </dependency>
 ```
 
-Not that you can get kubernetes-client-0.3.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.3/kubernetes-client-0.3.jar)
+Not that you can get kubernetes-client-0.4.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.4/kubernetes-client-0.4.jar)
 
 ## Usage
 
@@ -52,11 +52,27 @@ Not that you can get kubernetes-client-0.3.jar from this [web](https://github.co
 The easiest way to create a client is:
 
 ```java
-KubernetesClient client = new KubernetesClient(url);
+KubernetesClient client = new KubernetesClient(url, eyJhbGciOiJSUzI1NiIsImtpZCI6IjZMbjZOUGxaZHZBamRfY2tPSUlCOGhoRXBwcWpvQjlFQ1RPU3NzZzhmeXcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudC10b2tlbi00N2Y2ZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImYzZjRkYjRlLTUzNDYtNDc0NS1iOWM1LTdhMTJmMzk5MDI5YyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTprdWJlcm5ldGVzLWNsaWVudCJ9.Kt31obAmLePHJWO1Y_krp-h3KRDQFd34bunG_5u-mrDk5YP7EBJ87HbNSzNpZJe-_wZQDE_ZNMprpabfz19K3D5VrZjuq1g1pwcYTpxyaN_QjzVRBx7B2lPJmKNXeA-godT8yfbQDMtiMw9uyksLg8qDMUHP5VI-CH2KSTkRgqbaU5OoAkwy2niR3S9atsVcaPCzp1ab36XLvTLckgGSTJt5uHnFfGSmWS4Ako8aM5HVVox6Hz55OgiyRUbc7c-ED39itQHDkUOgKNUXkX9saW38l5Xn9OG_MWkpyJD7GQxbQJf2I36tgM0io1c08IGTFRLcSDB_YflDeyFqJT5aDA);
 client.watchResources(AutoDiscoverCustomizedResourcesWacther.TARGET_KIND, 
 								AutoDiscoverCustomizedResourcesWacther.TARGET_NAMESPACE, 
 								new AutoDiscoverCustomizedResourcesWacther(client));
 ```
+
+Here, the token can be created and get by following commands:
+
+1. create token
+
+```yaml
+kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client/master/account.yaml
+```
+2. get token
+
+```kubectl
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
+
+```
+
+
 
 ### simple-example
 
