@@ -4,6 +4,7 @@
 package io.github.kubesys;
 
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -17,18 +18,22 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.conscrypt.Conscrypt;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.utils.URLUtils;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.WebSocketListener;
-import sun.security.x509.X509CertImpl;
+
+import static java.util.Arrays.asList;
 
 /**
  * @author wuheng09@gmail.com
@@ -73,6 +78,9 @@ public class KubernetesClient {
 	}
 	
 	/**
+	 * create token: kubectl apply -f account.yaml ()
+	 * get token: kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
+	 * 
 	 * @param url                              url
 	 * @param token                            token
 	 * @throws Exception                       exception
@@ -82,72 +90,16 @@ public class KubernetesClient {
 		super();
 		this.url = url;
 		this.token = token;
-		this.client = (token == null) ? 
-				new OkHttpClient.Builder().build() 
-				: new OkHttpClient.Builder()
-						.hostnameVerifier(getHostnameVerifier())
-						.sslSocketFactory(getSocketFactory())
-						.build();
+		if (token == null) {
+			this.client = new OkHttpClient.Builder().build();
+		} else {
+			Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager().build(), 1);
+			this.client = new OkHttpClient.Builder().connectionSpecs(asList(ConnectionSpec.RESTRICTED_TLS)).build();
+		}
 		this.config = KubernetesParser
 				.getParser(this).getConfig();
 	}
 	
-	/**
-	 * @return                                  SocketFactory
-	 * @throws Exception                        exception
-	 */
-	private static SSLSocketFactory getSocketFactory() throws Exception {
-		TrustManager[] managers = new TrustManager[] {
-								new TrustAllManager()};
-		SSLContext sc = SSLContext.getInstance("TLS");
-		sc.init(null, managers, new SecureRandom());
-		return sc.getSocketFactory();
-	}
-	
-	
-	/**
-	 * 
-	 * @author wuheng09@gmail.com
-	 *
-	 */
-	private static class TrustAllManager implements X509TrustManager {
-
-		@Override
-		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-			// ignore here
-		}
-
-		@Override
-		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-			// ignore here
-		}
-
-		@Override
-		public X509Certificate[] getAcceptedIssuers() {
-			X509CertImpl xc =  new X509CertImpl();
-			return new X509Certificate[] {xc};
-		}
-				
-	}
-	
-	/**
-	 * @return                                  HostnameVerifier
-	 */
-	private HostnameVerifier getHostnameVerifier() {
-		return new HostnameVerifier() {
-			
-			@Override
-			public String toString() {
-				return super.toString();
-			}
-
-			@Override
-			public boolean verify(String hostname, SSLSession session) {
-				return (hostname != null);
-			}
-
-		};
-	}
 
 	/**********************************************************
 	 * 
