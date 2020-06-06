@@ -284,6 +284,8 @@ public class KubernetesClient {
 	/**
 	 * @param kind                            kind
 	 * @param namespace                       namespace
+	 * @param fieldSelector                   fieldSelector
+	 * @param labelSelector                   labelSelector
 	 * @return                                json
 	 * @throws Exception                      exception
 	 */
@@ -298,7 +300,7 @@ public class KubernetesClient {
 	 * @param labelSelector                     labelSelector
 	 * @param limit                             limit
 	 * @param nextId                            nextId
-	 * @return
+	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
 	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit, String nextId) throws Exception {
