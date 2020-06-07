@@ -141,6 +141,7 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
   - 0.3: support automatically detect customized Kubernetes resources during runtime.
   - 0.4: support HTTPs protocol.
   - 0.5: improve logger
+  - 0.6: release to Maven
   
 - Develop
 
