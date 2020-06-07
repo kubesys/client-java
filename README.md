@@ -145,3 +145,7 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - Develop
 
 - Production
+
+## Others
+
+- mvn -Dgpg.passphrase='pwd' clean deploy

@@ -142,8 +142,5 @@ public class KubernetesConstants {
 	public static final String JSON_TYPE_MODIFIED            = "MODIFIED";
 	
 	public static final String JSON_TYPE_DELETED             = "DELETED";
-
-	
-
 	
 }

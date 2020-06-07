@@ -147,7 +147,7 @@
 				</executions>
 			</plugin>
 			<!-- gpg plugin,用于签名认证 -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.6</version>
@@ -160,7 +160,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<!--staging puglin,用于自动执行发布阶段(免手动) -->
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
@@ -177,7 +177,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.0</version>
 				<configuration>
 					<useReleaseProfile>false</useReleaseProfile>
 					<releaseProfiles>release</releaseProfiles>
