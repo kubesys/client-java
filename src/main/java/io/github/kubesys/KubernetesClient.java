@@ -390,12 +390,7 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
-		Builder builder = new Request.Builder()
-				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
-						, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
-				.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
-				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
-		clone.newWebSocket(builder.url(uri).build(), listener);
+		clone.newWebSocket(getBuilder().url(uri).build(), listener);
 		clone.dispatcher().executorService();
 	}
 	
@@ -412,13 +407,28 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
-		Builder builder = new Request.Builder()
+		clone.newWebSocket(getBuilder().url(uri).build(), listener);
+		clone.dispatcher().executorService();
+	}
+
+	/**
+	 * @return                                  builder
+	 */
+	protected Builder getBuilder() {
+		if (token == null) {
+			return new Request.Builder()
 				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
 						, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
 				.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
 				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
-		clone.newWebSocket(builder.url(uri).build(), listener);
-		clone.dispatcher().executorService();
+		} else {
+			return new Request.Builder()
+					.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
+							, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
+					.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
+					.addHeader(KubernetesConstants.HTTP_REQUEST_AUTHORIZATION, "Bearer " + token)
+					.method(KubernetesConstants.HTTP_REQUEST_GET, null);
+		}
 	}
 	
 	/**********************************************************

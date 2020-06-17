@@ -28,6 +28,8 @@ public class KubernetesConstants {
 	public static final String HTTP_REQUEST_PUT             = "PUT";
 	
 	public static final String HTTP_REQUEST_ORIGIN          = "Origin";
+	
+	public static final String HTTP_REQUEST_AUTHORIZATION   = "Authorization";
 
 	public static final String HTTP_REQUEST_HEADER_KEY      = "Sec-WebSocket-Protocol";
 
