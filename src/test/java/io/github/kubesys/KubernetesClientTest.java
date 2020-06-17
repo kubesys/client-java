@@ -6,10 +6,8 @@ package io.github.kubesys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.github.kubesys.watchers.AutoDiscoverCustomizedResourcesWacther;
 
 /**
  * @author wuheng09@gmail.com
@@ -59,6 +57,7 @@ public class KubernetesClientTest {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	protected static void updateStatus(KubernetesClient client) throws Exception {
 		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
 		ObjectNode status = node.get("status").deepCopy();
@@ -89,6 +88,7 @@ public class KubernetesClientTest {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	protected static void update(KubernetesClient client)
 			throws Exception, JsonProcessingException, JsonMappingException {
 		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();

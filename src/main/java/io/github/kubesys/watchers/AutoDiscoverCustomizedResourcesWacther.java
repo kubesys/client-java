@@ -3,6 +3,8 @@
  */
 package io.github.kubesys.watchers;
 
+import java.util.logging.Logger;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.KubernetesClient;
@@ -21,6 +23,10 @@ import io.github.kubesys.utils.URLUtils;
  **/
 public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
+	/**
+	 * m_logger
+	 */
+	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
 	/**
 	 * kind
 	 */
@@ -72,6 +78,10 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		config.addGroup(kind, group);
 		config.addVersion(kind, version);
 		config.addApiPrefix(kind, url);
+		m_logger.info("register " + kind + ": <" + group + "," 
+											+ version + ","
+											+ namespaced + ","
+											+ url + ">");
 	}
 
 
@@ -85,6 +95,8 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		config.removeVersionBy(kind);
 		config.removeNamespacedBy(kind);
 		config.removeApiPrefixBy(kind);
+		
+		m_logger.info("unregister " + kind);
 	}
 
 	@Override

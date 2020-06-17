@@ -10,6 +10,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -36,6 +37,11 @@ import okhttp3.WebSocketListener;
  */
 public class KubernetesClient {
 
+	/**
+	 * m_logger
+	 */
+	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
+	
 	/**
 	 * Kubernetes' leader API
 	 */
@@ -164,6 +170,8 @@ public class KubernetesClient {
 	 * 
 	 **********************************************************/
 	
+	public static final String URL = "url: ";
+	
 	/**
 	 * @param json                              json
 	 * @return                                  json
@@ -176,6 +184,8 @@ public class KubernetesClient {
 		
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
 							config.isNamespaced(kind), json), config.getName(kind));
+		
+		m_logger.info(URL + uri);
 		
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
@@ -199,6 +209,8 @@ public class KubernetesClient {
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
 								config.isNamespaced(kind), json), 
 								config.getName(kind), getName(json));
+		
+		m_logger.info(URL + uri);
 		
 		ObjectNode node = json.deepCopy();
 		
@@ -230,6 +242,8 @@ public class KubernetesClient {
 				config.isNamespaced(kind), namespace), 
 				config.getName(kind), name);
 		
+		m_logger.info(URL + uri);
+		
 		Map<String, String> map = new HashMap<>();
 		map.put("name", name);
 		
@@ -255,6 +269,8 @@ public class KubernetesClient {
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
 											config.isNamespaced(kind), namespace), 
 											config.getName(kind), name);
+		
+		m_logger.info(URL + uri);
 		
 		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, uri, null);
@@ -327,6 +343,8 @@ public class KubernetesClient {
 			fullUri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 		
+		m_logger.info(URL + fullUri.toString());
+		
 		Request request = createRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, fullUri.toString(), null);
 		
@@ -346,6 +364,8 @@ public class KubernetesClient {
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
 							config.isNamespaced(kind), json), config.getName(kind), 
 							getName(json), KubernetesConstants.HTTP_RESPONSE_STATUS);
+		
+		m_logger.info(URL + uri);
 		
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
@@ -367,6 +387,8 @@ public class KubernetesClient {
 											getNamespace(config.isNamespaced(kind), namespace), config.getName(kind), name, 
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
+		m_logger.info(URL + uri);
+		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		Builder builder = new Request.Builder()
 				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
@@ -386,6 +408,8 @@ public class KubernetesClient {
 		final String uri = URLUtils.join(config.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
 											getNamespace(config.isNamespaced(kind), namespace), config.getName(kind),  
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+		
+		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		Builder builder = new Request.Builder()
@@ -426,6 +450,7 @@ public class KubernetesClient {
 			response = client.newCall(request).execute();
 			return new ObjectMapper().readTree(response.body().byteStream());
 		} catch (Exception ex) {
+			m_logger.severe(ex.toString());
 			throw new KubernetesException(ex);
 		} finally {
 			if (response != null) {

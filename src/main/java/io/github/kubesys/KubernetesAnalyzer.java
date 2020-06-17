@@ -4,6 +4,7 @@
 package io.github.kubesys;
 
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -15,6 +16,11 @@ import okhttp3.Request;
  *
  */
 public class KubernetesAnalyzer {
+
+	/**
+	 * m_logger
+	 */
+	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
 	/**
 	 * config
@@ -89,6 +95,11 @@ public class KubernetesAnalyzer {
 							KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asBoolean());
 			config.getKind2VersionMapping().put(thisKind, response.get(
 							KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText());
+			
+			m_logger.info("register " + thisKind + ": <" + getGroupFrom(path) + "," 
+					+ response.get(KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText() + ","
+					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED) + ","
+					+ fullUrl + ">");
 		}
 	}
 	
