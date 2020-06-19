@@ -91,11 +91,12 @@ public class KubernetesClient {
 		super();
 		this.url = url;
 		this.token = token;
+		X509TrustManager initTrustManager = initTrustManager();
 		this.client = (token == null) 
 				?  new OkHttpClient.Builder().build()
 						: new OkHttpClient.Builder()
 								.sslSocketFactory(initSslSocketFactory(
-                    							initTrustManager()))
+                    							initTrustManager), initTrustManager)
 								.hostnameVerifier(initHostnameVerifier())
 								.build();
 		this.config = KubernetesAnalyzer

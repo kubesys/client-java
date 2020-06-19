@@ -33,11 +33,11 @@ Add this dependency to your project's POM:
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
   <version>0.5</version>
-  <systemPath>${basedir}/libs/kubernetes-client-0.5.jar</systemPath>  
+  <systemPath>${basedir}/libs/kubernetes-client-0.6.jar</systemPath>  
 </dependency>
 ```
 
-Not that you can get kubernetes-client-0.5.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.5/kubernetes-client-0.5.jar)
+Not that you can get kubernetes-client-0.6.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.6/kubernetes-client-0.6.jar)
 
 ## Usage
 
