@@ -5,6 +5,8 @@ We expect to provide a Java client:
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
 
+This project is based on [okHttp3](https://github.com/square/okhttp) and [jackson](https://github.com/FasterXML/jackson-databind).
+
 ## Comparison
 
 |                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project](https://github.com/kubesys/kubernetes-client)  | 
