@@ -455,7 +455,7 @@ public class KubernetesClient {
 	 * @return                                  response
 	 * @throws Exception                        exception
 	 */
-	protected JsonNode getResponse(Request request) throws Exception {
+	protected synchronized JsonNode getResponse(Request request) throws Exception {
 		Response response = null;
 		try {
 			response = client.newCall(request).execute();
