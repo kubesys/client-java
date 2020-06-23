@@ -86,7 +86,6 @@ public class KubernetesClient {
 	 * @param token                            token
 	 * @throws Exception                       exception
 	 */
-	@SuppressWarnings("deprecation")
 	public KubernetesClient(String url, String token) throws Exception {
 		super();
 		this.url = url;
