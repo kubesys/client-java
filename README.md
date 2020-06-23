@@ -34,12 +34,12 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>0.5</version>
-  <systemPath>${basedir}/libs/kubernetes-client-0.6.jar</systemPath>  
+  <version>0.7</version>
+  <systemPath>${basedir}/libs/kubernetes-client-0.7.jar</systemPath>  
 </dependency>
 ```
 
-Not that you can get kubernetes-client-0.6.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.6/kubernetes-client-0.6.jar)
+Not that you can get kubernetes-client-0.7.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.6/kubernetes-client-0.6.jar)
 
 ## Usage
 
@@ -146,6 +146,9 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
   - 0.6: release to Maven
   
 - Develop
+  - 1.0: support OpenJDK
+  - 1.1: performance optmization
+  - 1.2: stability
 
 - Production
 
