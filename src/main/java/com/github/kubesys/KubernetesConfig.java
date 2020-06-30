@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys;
+package com.github.kubesys;
 
 import java.util.HashMap;
 import java.util.Map;

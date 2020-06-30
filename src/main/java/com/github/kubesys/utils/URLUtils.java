@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.utils;
+package com.github.kubesys.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;

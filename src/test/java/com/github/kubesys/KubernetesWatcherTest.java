@@ -1,9 +1,10 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys;
+package com.github.kubesys;
 
-import io.github.kubesys.KubernetesClient;
+import com.github.kubesys.KubernetesClient;
+
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 

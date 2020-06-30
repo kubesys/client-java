@@ -1,14 +1,14 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys;
+package com.github.kubesys;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.kubesys.utils.URLUtils;
 
-import io.github.kubesys.utils.URLUtils;
 import okhttp3.Request;
 
 /**

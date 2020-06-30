@@ -1,18 +1,17 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.watchers;
+package com.github.kubesys.watchers;
 
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import io.github.kubesys.KubernetesClient;
-import io.github.kubesys.KubernetesConfig;
-import io.github.kubesys.KubernetesConstants;
-import io.github.kubesys.KubernetesException;
-import io.github.kubesys.KubernetesWatcher;
-import io.github.kubesys.utils.URLUtils;
+import com.github.kubesys.KubernetesClient;
+import com.github.kubesys.KubernetesConfig;
+import com.github.kubesys.KubernetesConstants;
+import com.github.kubesys.KubernetesException;
+import com.github.kubesys.KubernetesWatcher;
+import com.github.kubesys.utils.URLUtils;
 
 /**
  * @author wuheng@otcaix.iscas.ac.cn
