@@ -93,15 +93,13 @@ public class KubernetesClient {
 		X509TrustManager initTrustManager = initTrustManager();
 		this.client = (token == null) 
 				?  new OkHttpClient.Builder()
-							.connectTimeout(3650, TimeUnit.DAYS)
-							.readTimeout(3650, TimeUnit.DAYS)
+							.retryOnConnectionFailure(true)
 							.build()
 						: new OkHttpClient.Builder()
 								.sslSocketFactory(initSslSocketFactory(
                     							initTrustManager), initTrustManager)
 								.hostnameVerifier(initHostnameVerifier())
-								.connectTimeout(3650, TimeUnit.DAYS)
-								.readTimeout(3650, TimeUnit.DAYS)
+								.retryOnConnectionFailure(true)
 								.build();
 		this.config = KubernetesAnalyzer
 				.getParser(this).getConfig();
