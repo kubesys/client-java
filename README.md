@@ -34,12 +34,12 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>0.7</version>
-  <systemPath>${basedir}/libs/kubernetes-client-0.7.jar</systemPath>  
+  <version>1.0.0</version>
+  <systemPath>${basedir}/libs/kubernetes-client-1.0.0.jar</systemPath>  
 </dependency>
 ```
 
-Not that you can get kubernetes-client-0.7.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.7/kubernetes-client-0.7.jar)
+Not that you can get kubernetes-client-1.0.0.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.7/kubernetes-client-0.7.jar)
 
 ## Usage
 

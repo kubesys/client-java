@@ -99,6 +99,11 @@ public class KubernetesClient {
 								.sslSocketFactory(initSslSocketFactory(
                     							initTrustManager), initTrustManager)
 								.hostnameVerifier(initHostnameVerifier())
+								.pingInterval(30000, TimeUnit.MILLISECONDS)
+								.connectTimeout(10000, TimeUnit.MILLISECONDS)
+								.readTimeout(10000, TimeUnit.MILLISECONDS)
+								.followRedirects(true)
+								.followSslRedirects(true)
 								.retryOnConnectionFailure(true)
 								.build();
 		this.config = KubernetesAnalyzer
@@ -180,7 +185,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode createResource(JsonNode json) throws Exception {
 
 		final String kind = getKind(json);
@@ -204,7 +208,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode updateResource(JsonNode json) throws Exception {
 		
 		final String kind = getKind(json);
@@ -238,7 +241,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
@@ -359,7 +361,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 		
 		final String kind = getKind(json);
