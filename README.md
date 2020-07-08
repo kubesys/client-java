@@ -5,7 +5,7 @@ We expect to provide a Java client:
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
 
-This project is based on [okHttp3](https://github.com/square/okhttp) and [jackson](https://github.com/FasterXML/jackson-databind).
+This project is based on [fabric8](https://github.com/fabric8io/kubernetes-client) and [jackson](https://github.com/FasterXML/jackson-databind).
 
 ## Comparison
 
@@ -50,6 +50,14 @@ Not that you can get kubernetes-client-1.0.0.jar from this [web](https://github.
 
 
 ### Creating a client
+
+### if you use a new version >= 1.0.0
+
+```yaml
+KubernetesClient client = KubernetesClient.getKubeClient(new File(KubernetesClient.ADMIN_CONF));
+```
+
+### if you use an old version < 1.0.0 
 
 The easiest way to create a client is:
 
