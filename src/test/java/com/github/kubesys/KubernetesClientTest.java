@@ -3,11 +3,12 @@
  */
 package com.github.kubesys;
 
+import java.io.File;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.kubesys.KubernetesClient;
 
 
 /**
@@ -40,8 +41,7 @@ public class KubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = new KubernetesClient("https://www.cloudplus.io:6443/",
-				"XX");
+		KubernetesClient client = KubernetesClient.getKubeClient(new File("confs/admin.conf"));
 		
 		updateStatus(client);
 		create(client);

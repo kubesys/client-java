@@ -14,7 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jackson.version>2.11.0</jackson.version>
-		<okhttp.version>4.7.2</okhttp.version>
+		<kubeclient.version>4.9.0</kubeclient.version>
 	</properties>
 
 	<dependencies>
@@ -25,11 +25,11 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
 		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-client</artifactId>
+			<version>${kubeclient.version}</version>
 		</dependency>
 
 	</dependencies>

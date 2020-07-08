@@ -3,30 +3,27 @@
  */
 package com.github.kubesys;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.URLUtils;
 
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.utils.HttpClientUtils;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.WebSocketListener;
@@ -42,15 +39,29 @@ public class KubernetesClient {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 	
+	
+	/**
+	 * admin.conf
+	 */
+	public static final String ADMIN_CONF = "/etc/kubernetes/admin.conf";
+	
+	
+	public final static String HTTP_HEADER_KEY            = "Sec-WebSocket-Protocol";
+	
+	public final static String HTTP_HEADER_VALUE          = "v4.channel.k8s.io";
+	
+	public final static String HTTP_ORIGIN                = "Origin";
+	
+	public final static MediaType HTTP_MEDIA_TYPE         = MediaType.parse("application/json");
+	
+	public final static String HTTP_GET                   = "GET";
+	
+	
+	
 	/**
 	 * Kubernetes' leader API
 	 */
 	protected final String url;
-	
-	/**
-	 * Kubernetes's secret
-	 */
-	protected final String token;
 	
 	/**
 	 * http client
@@ -75,7 +86,34 @@ public class KubernetesClient {
 	 * @throws Exception                       exception
 	 */
 	public KubernetesClient(String url) throws Exception {
-		this(url, null);
+		this(new ConfigBuilder().withMasterUrl(url).build());
+	}
+	
+	public KubernetesClient(Config kubeconfig) throws Exception {
+		this.client = HttpClientUtils.createHttpClient(kubeconfig); 
+		this.url = kubeconfig.getMasterUrl();
+		this.config = KubernetesAnalyzer
+				.getParser(this).getConfig();
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static KubernetesClient getKubeClient(File token) throws Exception {
+
+		Map<String, Object> map = new Yaml().load(new FileInputStream(token));
+		
+
+		Map<String, Map<String, Object>> clusdata = (Map<String, Map<String, Object>>) ((List) map.get("clusters"))
+				.get(0);
+
+		Map<String, Map<String, Object>> userdata = (Map<String, Map<String, Object>>) ((List) map.get("users")).get(0);
+
+		Config config = new ConfigBuilder().withApiVersion("v1")
+				.withCaCertData((String) clusdata.get("cluster").get("certificate-authority-data"))
+				.withClientCertData((String) userdata.get("user").get("client-certificate-data"))
+				.withClientKeyData((String) userdata.get("user").get("client-key-data"))
+				.withMasterUrl((String) clusdata.get("cluster").get("server")).build();
+
+		return new KubernetesClient(config);
 	}
 	
 	/**
@@ -86,34 +124,34 @@ public class KubernetesClient {
 	 * @param token                            token
 	 * @throws Exception                       exception
 	 */
-	public KubernetesClient(String url, String token) throws Exception {
-		super();
-		this.url = url;
-		this.token = token;
-		X509TrustManager initTrustManager = initTrustManager();
-		this.client = (token == null) 
-				?  new OkHttpClient.Builder()
-							.retryOnConnectionFailure(true)
-							.pingInterval(30000, TimeUnit.MILLISECONDS)
-							.connectTimeout(0, TimeUnit.MILLISECONDS)
-							.readTimeout(0, TimeUnit.MILLISECONDS)
-							.followRedirects(true)
-							.followSslRedirects(true)
-							.build()
-						: new OkHttpClient.Builder()
-								.sslSocketFactory(initSslSocketFactory(
-                    							initTrustManager), initTrustManager)
-								.hostnameVerifier(initHostnameVerifier())
-								.pingInterval(30000, TimeUnit.MILLISECONDS)
-								.connectTimeout(0, TimeUnit.MILLISECONDS)
-								.readTimeout(0, TimeUnit.MILLISECONDS)
-								.followRedirects(true)
-								.followSslRedirects(true)
-								.retryOnConnectionFailure(true)
-								.build();
-		this.config = KubernetesAnalyzer
-				.getParser(this).getConfig();
-	}
+//	public KubernetesClient(String url, String token) throws Exception {
+//		super();
+//		this.url = url;
+//		this.token = token;
+//		X509TrustManager initTrustManager = initTrustManager();
+//		this.client = (token == null) 
+//				?  new OkHttpClient.Builder()
+//							.retryOnConnectionFailure(true)
+//							.pingInterval(30000, TimeUnit.MILLISECONDS)
+//							.connectTimeout(0, TimeUnit.MILLISECONDS)
+//							.readTimeout(0, TimeUnit.MILLISECONDS)
+//							.followRedirects(true)
+//							.followSslRedirects(true)
+//							.build()
+//						: new OkHttpClient.Builder()
+//								.sslSocketFactory(initSslSocketFactory(
+//                    							initTrustManager), initTrustManager)
+//								.hostnameVerifier(initHostnameVerifier())
+//								.pingInterval(30000, TimeUnit.MILLISECONDS)
+//								.connectTimeout(0, TimeUnit.MILLISECONDS)
+//								.readTimeout(0, TimeUnit.MILLISECONDS)
+//								.followRedirects(true)
+//								.followSslRedirects(true)
+//								.retryOnConnectionFailure(true)
+//								.build();
+//		this.config = KubernetesAnalyzer
+//				.getParser(this).getConfig();
+//	}
 
 	/**
 	 * @param trustManager                    trustManager
@@ -121,60 +159,47 @@ public class KubernetesClient {
 	 * @throws NoSuchAlgorithmException       NoSuchAlgorithmException
 	 * @throws KeyManagementException         KeyManagementException
 	 */
-	protected SSLSocketFactory initSslSocketFactory(X509TrustManager trustManager)
-			throws NoSuchAlgorithmException, KeyManagementException {
-		SSLContext sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(null, new TrustManager[]{trustManager}, null);
-		return sslContext.getSocketFactory();
-	}
+	/*
+	 * protected SSLSocketFactory initSslSocketFactory(X509TrustManager
+	 * trustManager) throws NoSuchAlgorithmException, KeyManagementException {
+	 * SSLContext sslContext = SSLContext.getInstance("TLS"); sslContext.init(null,
+	 * new TrustManager[]{trustManager}, null); return
+	 * sslContext.getSocketFactory(); }
+	 */
 
 	/**
 	 * @return                                X509TrustManager  
 	 */
-	protected X509TrustManager initTrustManager() {
-		return new X509TrustManager() {
-
-			@Override
-		    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-		    	// Do nothing
-				if (chain == null) {
-		    		throw new CertificateException("Client is not using tls");
-		    	}
-		    }
-
-		    @Override
-		    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-		    	// Do nothing
-		    	if (chain == null) {
-		    		throw new CertificateException("Server is not using tls");
-		    	}
-		    }
-
-		    @Override
-		    public X509Certificate[] getAcceptedIssuers() {
-		        return new X509Certificate[0];
-		    }
-		};
-	}
+	/*
+	 * protected X509TrustManager initTrustManager() { return new X509TrustManager()
+	 * {
+	 * 
+	 * @Override public void checkClientTrusted(X509Certificate[] chain, String
+	 * authType) throws CertificateException { // Do nothing if (chain == null) {
+	 * throw new CertificateException("Client is not using tls"); } }
+	 * 
+	 * @Override public void checkServerTrusted(X509Certificate[] chain, String
+	 * authType) throws CertificateException { // Do nothing if (chain == null) {
+	 * throw new CertificateException("Server is not using tls"); } }
+	 * 
+	 * @Override public X509Certificate[] getAcceptedIssuers() { return new
+	 * X509Certificate[0]; } }; }
+	 */
 
 	/**
 	 * @return                                hostnameVerifier   
 	 */
-	protected HostnameVerifier initHostnameVerifier() {
-		return new HostnameVerifier() {
-
-			@Override
-			public String toString() {
-				return super.toString();
-			}
-
-			@Override
-			public boolean verify(String hostname, SSLSession arg1) {
-				return hostname != null;
-			}
-			
-		};
-	}
+	/*
+	 * protected HostnameVerifier initHostnameVerifier() { return new
+	 * HostnameVerifier() {
+	 * 
+	 * @Override public String toString() { return super.toString(); }
+	 * 
+	 * @Override public boolean verify(String hostname, SSLSession arg1) { return
+	 * hostname != null; }
+	 * 
+	 * }; }
+	 */
 	
 
 	/**********************************************************
@@ -190,7 +215,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode createResource(JsonNode json) throws Exception {
 
 		final String kind = getKind(json);
@@ -214,7 +238,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode updateResource(JsonNode json) throws Exception {
 		
 		final String kind = getKind(json);
@@ -248,7 +271,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = URLUtils.join(config.getApiPrefix(kind), getNamespace(
@@ -369,7 +391,6 @@ public class KubernetesClient {
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
-	@SuppressWarnings("deprecation")
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 		
 		final String kind = getKind(json);
@@ -403,7 +424,7 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
-		clone.newWebSocket(getBuilder().url(uri).build(), listener);
+		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
 	
@@ -420,29 +441,32 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
-		clone.newWebSocket(getBuilder().url(uri).build(), listener);
+		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
 
+	
+	protected Request createWebSocket(String fullUrl) {
+		return new Request.Builder()
+				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+				.addHeader(HTTP_ORIGIN, this.url)
+				.method(HTTP_GET, null).url(fullUrl).build();
+	}
 	/**
 	 * @return                                  builder
 	 */
-	protected Builder getBuilder() {
-		if (token == null) {
-			return new Request.Builder()
-				.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
-						, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
-				.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
-				.method(KubernetesConstants.HTTP_REQUEST_GET, null);
-		} else {
-			return new Request.Builder()
-					.header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY
-							, KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
-					.addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
-					.addHeader(KubernetesConstants.HTTP_REQUEST_AUTHORIZATION, "Bearer " + token)
-					.method(KubernetesConstants.HTTP_REQUEST_GET, null);
-		}
-	}
+	/*
+	 * protected Builder getBuilder() { if (token == null) { return new
+	 * Request.Builder() .header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY ,
+	 * KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
+	 * .addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
+	 * .method(KubernetesConstants.HTTP_REQUEST_GET, null); } else { return new
+	 * Request.Builder() .header(KubernetesConstants.HTTP_REQUEST_HEADER_KEY ,
+	 * KubernetesConstants.HTTP_REQUEST_HEADER_VALUE)
+	 * .addHeader(KubernetesConstants.HTTP_REQUEST_ORIGIN, url)
+	 * .addHeader(KubernetesConstants.HTTP_REQUEST_AUTHORIZATION, "Bearer " + token)
+	 * .method(KubernetesConstants.HTTP_REQUEST_GET, null); } }
+	 */
 	
 	/**********************************************************
 	 * 
@@ -457,9 +481,17 @@ public class KubernetesClient {
 	 * @return                                 request
 	 */
 	protected Request createRequest(String type, final String uri, RequestBody requestBody) {
-		Builder builder = (token == null) ? new Builder() : 
-			new Builder().header("Authorization", "Bearer " + token);
-		return builder.method(type, requestBody).url(uri).build();
+		if (HTTP_GET.equals(type)) {
+			return new Request.Builder()
+				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+				.addHeader(HTTP_ORIGIN, this.url)
+				.method(HTTP_GET, null).url(uri).build();
+		} else {
+			return new Request.Builder()
+					.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+					.addHeader(HTTP_ORIGIN, this.url)
+					.method(type, requestBody).url(uri).build();
+		}
 	}
 	
 	/**
@@ -534,13 +566,6 @@ public class KubernetesClient {
 	 */
 	public String getUrl() {
 		return url;
-	}
-
-	/**
-	 * @return                                  token
-	 */
-	public String getToken() {
-		return token;
 	}
 
 	/**
