@@ -20,6 +20,7 @@ import com.github.kubesys.utils.URLUtils;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.utils.HttpClientUtils;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -32,7 +33,7 @@ import okhttp3.WebSocketListener;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesClient {
+public class KubernetesClient extends DefaultKubernetesClient {
 
 	/**
 	 * m_logger
@@ -64,11 +65,6 @@ public class KubernetesClient {
 	protected final String url;
 	
 	/**
-	 * http client
-	 */
-	protected final OkHttpClient client;
-	
-	/**
 	 * config
 	 */
 	protected final KubernetesConfig config;
@@ -90,7 +86,7 @@ public class KubernetesClient {
 	}
 	
 	public KubernetesClient(Config kubeconfig) throws Exception {
-		this.client = HttpClientUtils.createHttpClient(kubeconfig); 
+		super(kubeconfig);
 		this.url = kubeconfig.getMasterUrl();
 		this.config = KubernetesAnalyzer
 				.getParser(this).getConfig();
@@ -423,7 +419,7 @@ public class KubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		OkHttpClient clone = getHttpClient().newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
@@ -440,7 +436,7 @@ public class KubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = client.newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		OkHttpClient clone = getHttpClient().newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
@@ -502,7 +498,7 @@ public class KubernetesClient {
 	protected synchronized JsonNode getResponse(Request request) throws Exception {
 		Response response = null;
 		try {
-			response = client.newCall(request).execute();
+			response = getHttpClient().newCall(request).execute();
 			return new ObjectMapper().readTree(response.body().byteStream());
 		} catch (Exception ex) {
 			m_logger.severe(ex.toString());
@@ -566,13 +562,6 @@ public class KubernetesClient {
 	 */
 	public String getUrl() {
 		return url;
-	}
-
-	/**
-	 * @return                                  client
-	 */
-	public OkHttpClient getClient() {
-		return client;
 	}
 
 	/**
