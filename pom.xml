@@ -14,7 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jackson.version>2.11.0</jackson.version>
-		<kubeclient.version>4.9.0</kubeclient.version>
+		<kubeclient.version>4.10.2</kubeclient.version>
 	</properties>
 
 	<dependencies>
