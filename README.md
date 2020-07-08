@@ -154,7 +154,7 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
   - 0.6: release to Maven
   
 - Develop
-  - 1.0: support OpenJDK
+  - 1.0: use fabric8 instead of okhttp
   - 1.1: performance optmization
   - 1.2: stability
 
