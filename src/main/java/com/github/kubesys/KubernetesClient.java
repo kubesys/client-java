@@ -21,7 +21,6 @@ import com.github.kubesys.utils.URLUtils;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.utils.HttpClientUtils;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,15 +46,15 @@ public class KubernetesClient extends DefaultKubernetesClient {
 	public static final String ADMIN_CONF = "/etc/kubernetes/admin.conf";
 	
 	
-	public final static String HTTP_HEADER_KEY            = "Sec-WebSocket-Protocol";
+	public static final String HTTP_HEADER_KEY            = "Sec-WebSocket-Protocol";
 	
-	public final static String HTTP_HEADER_VALUE          = "v4.channel.k8s.io";
+	public static final String HTTP_HEADER_VALUE          = "v4.channel.k8s.io";
 	
-	public final static String HTTP_ORIGIN                = "Origin";
+	public static final String HTTP_ORIGIN                = "Origin";
 	
-	public final static MediaType HTTP_MEDIA_TYPE         = MediaType.parse("application/json");
+	public static final MediaType HTTP_MEDIA_TYPE         = MediaType.parse("application/json");
 	
-	public final static String HTTP_GET                   = "GET";
+	public static final String HTTP_GET                   = "GET";
 	
 	
 	
@@ -436,7 +435,11 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = getHttpClient().newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		OkHttpClient clone = getHttpClient().newBuilder()
+				.connectTimeout(0, TimeUnit.MILLISECONDS)
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.cache(null)
+				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
