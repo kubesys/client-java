@@ -5,6 +5,7 @@ package com.github.kubesys;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -422,6 +424,7 @@ public class KubernetesClient extends DefaultKubernetesClient {
 				.connectTimeout(0, TimeUnit.MILLISECONDS)
 				.readTimeout(0, TimeUnit.MILLISECONDS)
 				.pingInterval(30000, TimeUnit.SECONDS)
+				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
 				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
@@ -443,7 +446,8 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		OkHttpClient clone = getHttpClient().newBuilder()
 				.connectTimeout(0, TimeUnit.MILLISECONDS)
 				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.pingInterval(30000, TimeUnit.SECONDS)
+				.pingInterval(30000, TimeUnit.MILLISECONDS)
+				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
 				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
