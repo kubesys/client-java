@@ -418,7 +418,12 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = getHttpClient().newBuilder().readTimeout(0, TimeUnit.MILLISECONDS).build();
+		OkHttpClient clone = getHttpClient().newBuilder()
+				.connectTimeout(0, TimeUnit.MILLISECONDS)
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.pingInterval(30000, TimeUnit.SECONDS)
+				.cache(null)
+				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
 	}
@@ -438,6 +443,7 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		OkHttpClient clone = getHttpClient().newBuilder()
 				.connectTimeout(0, TimeUnit.MILLISECONDS)
 				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.pingInterval(30000, TimeUnit.SECONDS)
 				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
