@@ -421,9 +421,9 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = getHttpClient().newBuilder()
-				.connectTimeout(0, TimeUnit.MILLISECONDS)
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.pingInterval(30000, TimeUnit.SECONDS)
+				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
+				.pingInterval(30000, TimeUnit.MILLISECONDS)
 				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
 				.cache(null)
 				.build();
@@ -444,8 +444,8 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = getHttpClient().newBuilder()
-				.connectTimeout(0, TimeUnit.MILLISECONDS)
-				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
 				.pingInterval(30000, TimeUnit.MILLISECONDS)
 				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
 				.cache(null)
