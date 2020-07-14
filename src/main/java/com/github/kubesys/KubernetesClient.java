@@ -5,7 +5,6 @@ package com.github.kubesys;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +20,9 @@ import com.github.kubesys.utils.URLUtils;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.utils.HttpClientUtils;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -34,7 +32,7 @@ import okhttp3.WebSocketListener;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesClient extends DefaultKubernetesClient {
+public class KubernetesClient {
 
 	/**
 	 * m_logger
@@ -70,6 +68,11 @@ public class KubernetesClient extends DefaultKubernetesClient {
 	 */
 	protected final KubernetesConfig config;
 	
+	/**
+	 * client
+	 */
+	protected final OkHttpClient client;
+	
 
 	
 	/**********************************************************
@@ -87,10 +90,11 @@ public class KubernetesClient extends DefaultKubernetesClient {
 	}
 	
 	public KubernetesClient(Config kubeconfig) throws Exception {
-		super(kubeconfig);
 		this.url = kubeconfig.getMasterUrl();
+		this.client = HttpClientUtils.createHttpClient(kubeconfig);
 		this.config = KubernetesAnalyzer
 				.getParser(this).getConfig();
+		
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -420,12 +424,13 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = getHttpClient().newBuilder()
-				.connectTimeout(10000, TimeUnit.MILLISECONDS)
-				.readTimeout(5000, TimeUnit.MILLISECONDS)
-				.pingInterval(30000, TimeUnit.MILLISECONDS)
-				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
-				.cache(null)
+		OkHttpClient clone = client.newBuilder()
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+//				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+//				.readTimeout(5000, TimeUnit.MILLISECONDS)
+//				.pingInterval(30000, TimeUnit.MILLISECONDS)
+//				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
+//				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
@@ -443,12 +448,13 @@ public class KubernetesClient extends DefaultKubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		OkHttpClient clone = getHttpClient().newBuilder()
-				.connectTimeout(10000, TimeUnit.MILLISECONDS)
-				.readTimeout(5000, TimeUnit.MILLISECONDS)
-				.pingInterval(30000, TimeUnit.MILLISECONDS)
-				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
-				.cache(null)
+		OkHttpClient clone = client.newBuilder()
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+//				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+//				.readTimeout(5000, TimeUnit.MILLISECONDS)
+//				.pingInterval(30000, TimeUnit.MILLISECONDS)
+//				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
+//				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
 		clone.dispatcher().executorService();
@@ -511,7 +517,7 @@ public class KubernetesClient extends DefaultKubernetesClient {
 	protected synchronized JsonNode getResponse(Request request) throws Exception {
 		Response response = null;
 		try {
-			response = getHttpClient().newCall(request).execute();
+			response = client.newCall(request).execute();
 			return new ObjectMapper().readTree(response.body().byteStream());
 		} catch (Exception ex) {
 			m_logger.severe(ex.toString());
