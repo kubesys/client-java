@@ -228,7 +228,7 @@ public class KubernetesClient {
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_POST, uri, requestBody);
 		
 		return getResponse(request);
@@ -258,7 +258,7 @@ public class KubernetesClient {
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, node.toString());
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_PUT, uri, requestBody);
 		
 		return getResponse(request);
@@ -287,7 +287,7 @@ public class KubernetesClient {
 				KubernetesConstants.HTTP_MEDIA_TYPE, 
 				new ObjectMapper().writeValueAsString(map));
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_DELETE, uri, requestBody);
 		
 		return getResponse(request);
@@ -308,7 +308,7 @@ public class KubernetesClient {
 		
 		m_logger.info(URL + uri);
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, uri, null);
 		
 		return getResponse(request);
@@ -381,7 +381,7 @@ public class KubernetesClient {
 		
 		m_logger.info(URL + fullUri.toString());
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_GET, fullUri.toString(), null);
 		
 		return getResponse(request);
@@ -405,7 +405,7 @@ public class KubernetesClient {
 		RequestBody requestBody = RequestBody.create(
 				KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
 		
-		Request request = createRequest(KubernetesConstants
+		Request request = createNormalRequest(KubernetesConstants
 				.HTTP_REQUEST_PUT, uri, requestBody);
 		
 		return getResponse(request);
@@ -495,16 +495,16 @@ public class KubernetesClient {
 	 * @param requestBody                      body
 	 * @return                                 request
 	 */
-	protected Request createRequest(String type, final String uri, RequestBody requestBody) {
+	protected Request createNormalRequest(String type, final String uri, RequestBody requestBody) {
 		if (HTTP_GET.equals(type)) {
 			return new Request.Builder()
-				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
-				.addHeader(HTTP_ORIGIN, this.url)
+//				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+//				.addHeader(HTTP_ORIGIN, this.url)
 				.method(HTTP_GET, null).url(uri).build();
 		} else {
 			return new Request.Builder()
-					.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
-					.addHeader(HTTP_ORIGIN, this.url)
+//					.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+//					.addHeader(HTTP_ORIGIN, this.url)
 					.method(type, requestBody).url(uri).build();
 		}
 	}

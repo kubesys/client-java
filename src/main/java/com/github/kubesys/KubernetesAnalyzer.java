@@ -34,7 +34,7 @@ public class KubernetesAnalyzer {
 	 */
 	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		
-		Request request = client.createRequest(
+		Request request = client.createNormalRequest(
 								KubernetesConstants.HTTP_REQUEST_GET, 
 								client.getUrl(), null);
 		JsonNode node = client.getResponse(request);
@@ -72,7 +72,7 @@ public class KubernetesAnalyzer {
 	protected void registerKinds(KubernetesClient client, String path) throws Exception {
 		
 		String   fullUrl   = URLUtils.join(client.getUrl(), path);
-		Request  request   = client.createRequest(KubernetesConstants
+		Request  request   = client.createNormalRequest(KubernetesConstants
 								.HTTP_REQUEST_GET, fullUrl, null);
 		JsonNode response  = client.getResponse(request);
 		JsonNode resources = response.get(KubernetesConstants
