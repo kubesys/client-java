@@ -425,15 +425,14 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder()
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-//				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
 //				.readTimeout(5000, TimeUnit.MILLISECONDS)
 //				.pingInterval(30000, TimeUnit.MILLISECONDS)
 //				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
 //				.cache(null)
 				.build();
 		clone.newWebSocket(createWebSocket(uri), listener);
-		clone.dispatcher().executorService();
+//		clone.dispatcher().executorService();
 	}
 	
 	/**
@@ -449,8 +448,7 @@ public class KubernetesClient {
 		m_logger.info(URL + uri);
 		
 		OkHttpClient clone = client.newBuilder()
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-//				.connectTimeout(10000, TimeUnit.MILLISECONDS)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
 //				.readTimeout(5000, TimeUnit.MILLISECONDS)
 //				.pingInterval(30000, TimeUnit.MILLISECONDS)
 //				.protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
@@ -463,9 +461,11 @@ public class KubernetesClient {
 	
 	protected Request createWebSocket(String fullUrl) {
 		return new Request.Builder()
-				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+				.get()
+//				.header(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
 				.addHeader(HTTP_ORIGIN, this.url)
-				.method(HTTP_GET, null).url(fullUrl).build();
+//				.method(HTTP_GET, null)
+				.url(fullUrl).build();
 	}
 	/**
 	 * @return                                  builder

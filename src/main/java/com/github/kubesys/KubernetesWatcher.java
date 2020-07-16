@@ -33,6 +33,7 @@ public abstract class KubernetesWatcher extends WebSocketListener {
 				doDeleted(obj);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new KubernetesException(e);
 		}
 		

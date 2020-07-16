@@ -18,7 +18,6 @@ public class KubernetesWatcherTest {
 
 	
 	public static void main(String[] args) throws Exception {
-//		KubernetesClient client = new KubernetesClient("http://www.cloudplus.io:8888/");
 
 		KubernetesClient client = KubernetesClient.getKubeClient(new File("confs/admin.conf"));
 		WebSocketListener listener = new WebSocketListener() {
