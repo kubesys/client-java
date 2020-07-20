@@ -33,17 +33,11 @@ public abstract class KubernetesWatcher extends WebSocketListener {
 				doDeleted(obj);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new KubernetesException(e);
 		}
 		
 	}
 	
-	@Override
-	public void onClosed(WebSocket webSocket, int code, String reason) {
-		doOnClose(new KubernetesException(reason));
-	}
-
 	/**
 	 * @param node                  node
 	 */
@@ -58,10 +52,5 @@ public abstract class KubernetesWatcher extends WebSocketListener {
 	 * @param node                  node
 	 */
 	public abstract void doDeleted(JsonNode node);
-	
-	/**
-	 * @param exception             exception
-	 */
-	public abstract void doOnClose(KubernetesException exception);
 	
 }

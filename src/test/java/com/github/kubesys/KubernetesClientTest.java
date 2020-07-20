@@ -68,6 +68,7 @@ public class KubernetesClientTest {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	protected static void delete(KubernetesClient client) throws Exception {
 		System.out.println(client.deleteResource("Pod", "default", "busybox"));
 	}

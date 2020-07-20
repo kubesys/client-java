@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.kubesys.KubernetesClient;
 import com.github.kubesys.KubernetesConfig;
 import com.github.kubesys.KubernetesConstants;
-import com.github.kubesys.KubernetesException;
 import com.github.kubesys.KubernetesWatcher;
-import com.github.kubesys.utils.URLUtils;
+
+import io.fabric8.kubernetes.client.utils.URLUtils;
 
 /**
  * @author wuheng@otcaix.iscas.ac.cn
@@ -26,6 +26,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 	 * m_logger
 	 */
 	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
+	
 	/**
 	 * kind
 	 */
@@ -69,7 +70,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtils.join(client.getUrl(), KubernetesConstants
+		String url = URLUtils.join(client.getMasterUrl(), KubernetesConstants
 							.VALUE_APIS, group, version);
 		
 		config.addName(kind, name);
@@ -77,6 +78,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		config.addGroup(kind, group);
 		config.addVersion(kind, version);
 		config.addApiPrefix(kind, url);
+		
 		m_logger.info("register " + kind + ": <" + group + "," 
 											+ version + ","
 											+ namespaced + ","
@@ -100,12 +102,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	@Override
 	public void doModified(JsonNode node) {
-		// Do nothing 
 
 	}
 
-	@Override
-	public void doOnClose(KubernetesException execption) {
-		this.client.watchResources(TARGET_KIND, TARGET_NAMESPACE, new AutoDiscoverCustomizedResourcesWacther(client));
-	}
 }

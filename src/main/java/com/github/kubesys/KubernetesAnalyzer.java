@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.kubesys.utils.URLUtils;
 
+import io.fabric8.kubernetes.client.utils.URLUtils;
 import okhttp3.Request;
 
 /**
@@ -34,28 +34,29 @@ public class KubernetesAnalyzer {
 	 */
 	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		
-		Request request = client.createNormalRequest(
+		Request request = client.createRequest(
 								KubernetesConstants.HTTP_REQUEST_GET, 
-								client.getUrl(), null);
-		JsonNode node = client.getResponse(request);
+								client.getMasterUrl(), null);
 		
-		if (!node.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
+		JsonNode resp = client.getResponse(request);
+		
+		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
 			throw new KubernetesException("Fail to init HTTP(s) client, please check url and/or token.");
 		}
 		
-		Iterator<JsonNode> iterator = node.get(KubernetesConstants.HTTP_RESPONSE_PATHS).iterator();
+		Iterator<JsonNode> iterator = resp.get(
+				KubernetesConstants.HTTP_RESPONSE_PATHS).iterator();
 		
 		// traverse all paths in key 'paths' 
 		while (iterator.hasNext()) {
+			
 			String path = iterator.next().asText();
-			if (!path.startsWith(KubernetesConstants.KUBEAPI_CORE_PREFIX_PATTERN)) {
-				continue;
-			}
 			
 			// we just find and register Kubernetes native kinds
-			// it means this kind cannot be undeployed
-			if (path.split(KubernetesConstants.KUBEAPI_PATHSEPARTOR_PATTERN).length == 4 
-					|| path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
+			// which cannot be undeployed
+			if (path.startsWith(KubernetesConstants.KUBEAPI_CORE_PREFIX_PATTERN) && 
+					(path.split(KubernetesConstants.KUBEAPI_PATHSEPARTOR_PATTERN).length == 4 
+						|| path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN))) {
 
 				// register it
 				registerKinds(client, path);
@@ -71,24 +72,27 @@ public class KubernetesAnalyzer {
 	 */
 	protected void registerKinds(KubernetesClient client, String path) throws Exception {
 		
-		String   fullUrl   = URLUtils.join(client.getUrl(), path);
-		Request  request   = client.createNormalRequest(KubernetesConstants
-								.HTTP_REQUEST_GET, fullUrl, null);
-		JsonNode response  = client.getResponse(request);
+		String   uri   = URLUtils.join(client.getMasterUrl(), path);
+		
+		JsonNode response  = client.getResponse(
+				client.createRequest(KubernetesConstants.HTTP_REQUEST_GET, uri, null));
+		
 		JsonNode resources = response.get(KubernetesConstants
 								.HTTP_RESPONSE_RESOURCES);
 		
 		for (int i = 0; i < resources.size(); i++) {
 			
 			JsonNode resource = resources.get(i);
+			
 			String  thisKind  = resource.get(KubernetesConstants.KUBE_KIND).asText();
 			
+			// we only support a version for each resources
 			if (config.getKind2NameMapping().containsKey(thisKind)) {
 				continue;
 			}
 			
-			config.getKind2ApiPrefixMapping().put(thisKind, fullUrl);
-			config.getKind2GroupMapping().put(thisKind, getGroupFrom(path));
+			config.getKind2ApiPrefixMapping().put(thisKind, uri);
+			config.getKind2GroupMapping().put(thisKind, getGroup(path));
 			config.getKind2NameMapping().put(thisKind, resource.get(
 							KubernetesConstants.KUBE_METADATA_NAME).asText());
 			config.getKind2NamespacedMapping().put(thisKind, resource.get(
@@ -96,10 +100,10 @@ public class KubernetesAnalyzer {
 			config.getKind2VersionMapping().put(thisKind, response.get(
 							KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText());
 			
-			m_logger.info("register " + thisKind + ": <" + getGroupFrom(path) + "," 
+			m_logger.info("register " + thisKind + ": <" + getGroup(path) + "," 
 					+ response.get(KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText() + ","
-					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED) + ","
-					+ fullUrl + ">");
+					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asText() + ","
+					+ uri + ">");
 		}
 	}
 	
@@ -113,7 +117,7 @@ public class KubernetesAnalyzer {
 	 * @param path               path
 	 * @return                   group
 	 */
-	public String getGroupFrom(String path) {
+	public String getGroup(String path) {
 		if (path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
 			return "";
 		}
