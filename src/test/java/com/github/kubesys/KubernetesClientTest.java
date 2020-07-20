@@ -43,8 +43,8 @@ public class KubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = KubernetesClient.getKubeClient(new File("confs/admin.conf"));
 		
-		updateStatus(client);
 		create(client);
+		updateStatus(client);
 		update(client);
 		get(client);
 		delete(client);
@@ -53,7 +53,6 @@ public class KubernetesClientTest {
 	}
 
 
-	@SuppressWarnings("deprecation")
 	protected static void updateStatus(KubernetesClient client) throws Exception {
 		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
 		ObjectNode status = node.get("status").deepCopy();
@@ -84,16 +83,14 @@ public class KubernetesClientTest {
 		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
 	}
 
-
-	@SuppressWarnings("deprecation")
 	protected static void update(KubernetesClient client)
 			throws Exception, JsonProcessingException, JsonMappingException {
 		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
 		ObjectNode meta = node.get("metadata").deepCopy();
 		ObjectNode labels = new ObjectMapper().createObjectNode();
 		labels.put("test", "test");
-		meta.put("labels", labels);
-		node.put("metadata", meta);
+		meta.set("labels", labels);
+		node.set("metadata", meta);
 		System.out.println(client.updateResource(new ObjectMapper().readTree(node.toString())));
 	}
 }
