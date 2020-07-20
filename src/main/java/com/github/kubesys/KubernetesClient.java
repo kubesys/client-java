@@ -289,6 +289,7 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = httpClient.newBuilder()
 				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.retryOnConnectionFailure(true)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 //		clone.dispatcher().executorService();
@@ -308,6 +309,7 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = httpClient.newBuilder()
 				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.retryOnConnectionFailure(true)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 //		clone.dispatcher().executorService();
