@@ -302,13 +302,12 @@ public class KubernetesClient {
 	 * @param listener                          listenerm
 	 */
 	public void watchResources(String kind, String namespace, WebSocketListener listener) throws Exception {
-		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind),  
 											getNamespace(kubeConfig.isNamespaced(kind), namespace), kubeConfig.getName(kind),  
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
 		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.retryOnConnectionFailure(true)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 //		clone.dispatcher().executorService();
