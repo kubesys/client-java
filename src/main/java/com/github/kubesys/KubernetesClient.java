@@ -288,8 +288,7 @@ public class KubernetesClient {
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
 		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.retryOnConnectionFailure(true)
+				.readTimeout(5000, TimeUnit.MILLISECONDS)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 //		clone.dispatcher().executorService();
@@ -381,9 +380,10 @@ public class KubernetesClient {
 	 * @return
 	 */
 	protected Request createWebSocketRequest(String uri) {
-		return new Request.Builder().get()
-				.addHeader(HTTP_ORIGIN, this.masterUrl)
-				.url(uri).build();
+		return new Request.Builder()
+				.get()
+				.url(uri)
+				.addHeader(HTTP_ORIGIN, this.masterUrl).build();
 	}
 	
 	/**
