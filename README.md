@@ -34,8 +34,8 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.0.0</version>
-  <systemPath>${basedir}/libs/kubernetes-client-1.0.0.jar</systemPath>  
+  <version>1.2.0</version>
+  <systemPath>${basedir}/libs/kubernetes-client-1.2.0.jar</systemPath>  
 </dependency>
 ```
 
