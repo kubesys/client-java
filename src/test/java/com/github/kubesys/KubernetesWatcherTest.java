@@ -42,7 +42,7 @@ public class KubernetesWatcherTest {
 			public void onClosed(WebSocket webSocket, int code, String reason) {
 				// TODO Auto-generated method stub
 				super.onClosed(webSocket, code, reason);
-				System.out.println("onClosed:" + reason);
+				System.out.println("onClosed:" + code + reason);
 			}
 
 			@Override

@@ -289,9 +289,11 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = httpClient.newBuilder()
 				.readTimeout(5000, TimeUnit.MILLISECONDS)
+				.pingInterval(5, TimeUnit.SECONDS)
+				.retryOnConnectionFailure(true)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
-//		clone.dispatcher().executorService();
+		clone.dispatcher().executorService().shutdown();
 	}
 	
 	/**
@@ -308,9 +310,11 @@ public class KubernetesClient {
 		
 		OkHttpClient clone = httpClient.newBuilder()
 				.readTimeout(5000, TimeUnit.MILLISECONDS)
+				.pingInterval(5, TimeUnit.SECONDS)
+				.retryOnConnectionFailure(true)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
-//		clone.dispatcher().executorService();
+		clone.dispatcher().executorService().shutdown();
 	}
 
 	/**
@@ -382,7 +386,10 @@ public class KubernetesClient {
 		return new Request.Builder()
 				.get()
 				.url(uri)
-				.addHeader(HTTP_ORIGIN, this.masterUrl).build();
+				.addHeader("connection", "keep-alive")
+				.addHeader(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
+				.addHeader(HTTP_ORIGIN, this.masterUrl)
+				.build();
 	}
 	
 	/**
@@ -392,7 +399,8 @@ public class KubernetesClient {
 	 * @return                                 request
 	 */
 	protected Request createRequest(String type, final String uri, RequestBody requestBody) {
-		return (HTTP_GET.equals(type)) ? new Request.Builder().method(HTTP_GET, null).url(uri).build()
+		return (HTTP_GET.equals(type)) 
+							? new Request.Builder().method(HTTP_GET, null).url(uri).build()
 							: new Request.Builder().method(type, requestBody).url(uri).build();
 	}
 	
