@@ -27,31 +27,9 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 	 */
 	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
 	
-	/**
-	 * kind
-	 */
-	public static final String TARGET_KIND = "CustomResourceDefinition";
-	
-	/**
-	 * default
-	 */
-	public static final String TARGET_NAMESPACE = "default";
-	
-	/**
-	 * client
-	 */
-	protected final KubernetesClient client;
-	
-	/**
-	 * config
-	 */
-	protected final KubernetesConfig config;
-
-	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client) {
-		this.client = client;
-		this.config = client.getConfig();
+	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client, String kind) {
+		super(client, kind);
 	}
-
 
 	@Override
 	public void doAdded(JsonNode node) {
@@ -59,6 +37,8 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		JsonNode names = spec.get(KubernetesConstants.KUBE_SPEC_NAMES);
 		
 		String kind = names.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
+		
+		KubernetesConfig config = kubeClient.getConfig();
 		if (config.getName(kind) != null) {
 			return;
 		}
@@ -70,7 +50,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtils.join(client.getMasterUrl(), KubernetesConstants
+		String url = URLUtils.join(kubeClient.getMasterUrl(), KubernetesConstants
 							.VALUE_APIS, group, version);
 		
 		config.addName(kind, name);
@@ -91,6 +71,8 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String kind = node.get(KubernetesConstants.KUBE_SPEC)
 						.get(KubernetesConstants.KUBE_SPEC_NAMES)
 						.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
+		
+		KubernetesConfig config = kubeClient.getConfig();
 		config.removeNameBy(kind);
 		config.removeGroupBy(kind);
 		config.removeVersionBy(kind);

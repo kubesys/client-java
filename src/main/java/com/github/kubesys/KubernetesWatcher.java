@@ -17,6 +17,21 @@ import okhttp3.WebSocketListener;
  **/
 public abstract class KubernetesWatcher extends WebSocketListener {
 
+	/**
+	 * client
+	 */
+	protected final KubernetesClient kubeClient;
+	
+	/**
+	 * kind
+	 */
+	protected final String kind;
+	
+	public KubernetesWatcher(KubernetesClient client, String kind) {
+		super();
+		this.kubeClient = client;
+		this.kind = kind;
+	}
 
 	@Override
 	public void onMessage(WebSocket webSocket, String text) {
@@ -52,5 +67,9 @@ public abstract class KubernetesWatcher extends WebSocketListener {
 	 * @param node                  node
 	 */
 	public abstract void doDeleted(JsonNode node);
+
+	@Override
+	public void onClosing(WebSocket webSocket, int code, String reason) {
+	}
 	
 }

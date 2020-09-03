@@ -288,9 +288,7 @@ public class KubernetesClient {
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
 		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(5000, TimeUnit.MILLISECONDS)
-				.pingInterval(5, TimeUnit.SECONDS)
-				.retryOnConnectionFailure(true)
+				.readTimeout(0, TimeUnit.MILLISECONDS)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 		clone.dispatcher().executorService().shutdown();
@@ -309,9 +307,7 @@ public class KubernetesClient {
 											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
 		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(5000, TimeUnit.MILLISECONDS)
-				.pingInterval(5, TimeUnit.SECONDS)
-				.retryOnConnectionFailure(true)
+				.readTimeout(0, TimeUnit.SECONDS)
 				.build();
 		clone.newWebSocket(createWebSocketRequest(uri), listener);
 		clone.dispatcher().executorService().shutdown();
