@@ -34,12 +34,17 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.2.0</version>
-  <systemPath>${basedir}/libs/kubernetes-client-1.2.0.jar</systemPath>  
+  <version>1.2.0</version> 
 </dependency>
-```
 
-Not that you can get kubernetes-client-1.0.0.jar from this [web](https://github.com/kubesys/kubernetes-client/releases/download/v0.7/kubernetes-client-0.7.jar)
+<repositories>
+   <repository>
+       <id>pdos-repos</id>
+       <name>PDOS Releases</name>
+       <url>http://39.106.40.190:8081/repository/maven-public/</url>
+    </repository>
+</repositories>
+```
 
 ## Usage
 
