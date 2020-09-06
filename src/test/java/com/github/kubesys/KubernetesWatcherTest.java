@@ -20,7 +20,7 @@ public class KubernetesWatcherTest {
 	
 	public static void main(String[] args) throws Exception {
 
-		KubernetesClient client = KubernetesClient.getKubeClient(new File("confs/admin.conf"));
+		KubernetesClient client = new KubernetesClient("http://39.106.40.190:8888/");
 		WebSocketListener listener = new WebSocketListener() {
 
 			@Override
@@ -57,6 +57,5 @@ public class KubernetesWatcherTest {
 		System.out.println(client.getResource("Pod", "default", "busybox"));
 		client.watchResources("Pod", "", listener );
 		System.out.println("Hello");
-		
 	}
 }

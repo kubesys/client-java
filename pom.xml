@@ -5,7 +5,7 @@
 
 	<groupId>com.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>1.2.0</version>
+	<version>1.3.0</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
@@ -14,7 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jackson.version>2.11.0</jackson.version>
-		<kubeclient.version>4.11.1</kubeclient.version>
+		<okhttp.version>4.8.1</okhttp.version>
 	</properties>
 
 	<dependencies>
@@ -25,11 +25,11 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
+		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
 		<dependency>
-			<groupId>io.fabric8</groupId>
-			<artifactId>kubernetes-client</artifactId>
-			<version>${kubeclient.version}</version>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -118,13 +118,13 @@
 			</plugin>
 
 
-	<!--source -->
-	<plugin>
-		<artifactId>maven-source-plugin</artifactId>
-		<version>3.0.1</version>
-		<executions>
-			<execution>
-				<id>attach-sources</id>
+			<!--source -->
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -158,18 +158,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
-	<distributionManagement>
-		<repository>
-			<id>pdos-release</id>
-			<url>http://39.106.40.190:8081/nexus/content/repositories/releases/</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>pdos-snapshot</id>
-			<url>http://39.106.40.190:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 </project>

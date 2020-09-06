@@ -41,7 +41,7 @@ public class KubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = KubernetesClient.getKubeClient(new File("confs/admin.conf"));
+		KubernetesClient client = null;
 		
 		create(client);
 		updateStatus(client);

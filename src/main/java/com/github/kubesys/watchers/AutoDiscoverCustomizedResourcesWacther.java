@@ -10,8 +10,8 @@ import com.github.kubesys.KubernetesClient;
 import com.github.kubesys.KubernetesConfig;
 import com.github.kubesys.KubernetesConstants;
 import com.github.kubesys.KubernetesWatcher;
+import com.github.kubesys.utils.URLUtils;
 
-import io.fabric8.kubernetes.client.utils.URLUtils;
 
 /**
  * @author wuheng@otcaix.iscas.ac.cn

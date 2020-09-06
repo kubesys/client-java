@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.kubesys.utils.URLUtils;
 
-import io.fabric8.kubernetes.client.utils.URLUtils;
 import okhttp3.Request;
 
 /**

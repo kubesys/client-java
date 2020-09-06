@@ -3,29 +3,33 @@
  */
 package com.github.kubesys;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import org.yaml.snakeyaml.Yaml;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.kubesys.utils.URLUtils;
 
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.utils.HttpClientUtils;
-import io.fabric8.kubernetes.client.utils.URLUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.WebSocketListener;
+import sun.security.x509.X509CertImpl;
 
 /**
  * @author wuheng@iscas.ac.cn
@@ -54,6 +58,11 @@ public class KubernetesClient {
 	protected final String masterUrl;
 	
 	/**
+	 * token
+	 */
+	protected final String token;
+	
+	/**
 	 * config
 	 */
 	protected final KubernetesConfig kubeConfig;
@@ -68,13 +77,83 @@ public class KubernetesClient {
 	 * @throws Exception
 	 */
 	public KubernetesClient(String masterUrl) throws Exception {
-		this(new ConfigBuilder().withMasterUrl(masterUrl).build());
+		this(masterUrl, null);
 	}
 	
-	public KubernetesClient(Config tokenConfig) throws Exception {
-		this.masterUrl = tokenConfig.getMasterUrl();
-		this.httpClient = HttpClientUtils.createHttpClient(tokenConfig);
+	@SuppressWarnings("deprecation")
+	public KubernetesClient(String masterUrl, String token) throws Exception {
+		super();
+		this.masterUrl = masterUrl;
+		this.token = token;
+		this.httpClient = (token == null) ? 
+				new OkHttpClient.Builder()
+						.readTimeout(0, TimeUnit.SECONDS)
+						.pingInterval(30, TimeUnit.SECONDS)
+						.build() 
+				: new OkHttpClient.Builder()
+						.readTimeout(0, TimeUnit.SECONDS)
+						.pingInterval(30, TimeUnit.SECONDS)
+						.hostnameVerifier(getHostnameVerifier())
+						.sslSocketFactory(getSocketFactory())
+						.build();
 		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
+	}
+	
+	/**
+	 * @return                                  SocketFactory
+	 * @throws Exception                        exception
+	 */
+	private static SSLSocketFactory getSocketFactory() throws Exception {
+		TrustManager[] managers = new TrustManager[] {
+								new TrustAllManager()};
+		SSLContext sc = SSLContext.getInstance("TLS");
+		sc.init(null, managers, new SecureRandom());
+		return sc.getSocketFactory();
+	}
+	
+	
+	/**
+	 * 
+	 * @author wuheng09@gmail.com
+	 *
+	 */
+	private static class TrustAllManager implements X509TrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			// ignore here
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+			// ignore here
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			X509CertImpl xc =  new X509CertImpl();
+			return new X509Certificate[] {xc};
+		}
+				
+	}
+	
+	/**
+	 * @return                                  HostnameVerifier
+	 */
+	private HostnameVerifier getHostnameVerifier() {
+		return new HostnameVerifier() {
+			
+			@Override
+			public String toString() {
+				return super.toString();
+			}
+
+			@Override
+			public boolean verify(String hostname, SSLSession session) {
+				return (hostname != null);
+			}
+
+		};
 	}
 	
 	/**********************************************************
@@ -341,32 +420,6 @@ public class KubernetesClient {
 		return getResponse(request);
 	}
 	
-	/**********************************************************
-	 * 
-	 *               Utils
-	 * 
-	 **********************************************************/
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static KubernetesClient getKubeClient(File token) throws Exception {
-
-		Map<String, Object> map = new Yaml().load(new FileInputStream(token));
-		
-
-		Map<String, Map<String, Object>> clusdata = (Map<String, Map<String, Object>>) 
-										((List) map.get("clusters")).get(0);
-
-		Map<String, Map<String, Object>> userdata = (Map<String, Map<String, Object>>) 
-										((List) map.get("users")).get(0);
-
-		Config config = new ConfigBuilder().withApiVersion("v1")
-				.withCaCertData((String) clusdata.get("cluster").get("certificate-authority-data"))
-				.withClientCertData((String) userdata.get("user").get("client-certificate-data"))
-				.withClientKeyData((String) userdata.get("user").get("client-key-data"))
-				.withMasterUrl((String) clusdata.get("cluster").get("server")).build();
-
-		return new KubernetesClient(config);
-	}
 	
 	/**********************************************************
 	 * 
