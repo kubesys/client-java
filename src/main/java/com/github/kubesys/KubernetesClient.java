@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -102,13 +103,16 @@ public class KubernetesClient {
 	 * @throws Exception                            exception
 	 */
 	protected CloseableHttpClient createHttpClient() throws Exception {
+		SocketConfig socketConfig = SocketConfig.custom()
+		        .setSoKeepAlive(true)
+		        .build();
 		HttpClientBuilder builder = HttpClients.custom();
 		if (this.token != null) {
 			builder.setSSLHostnameVerifier(getHostnameVerifier())
 					.setSSLSocketFactory(new org.apache.http.conn.ssl.SSLSocketFactory(
 							getSocketFactory(), new AllowAllHostnameVerifier()));
 		}
-		return builder.build();
+		return builder.setDefaultSocketConfig(socketConfig).build();
 	}
 	
 	/**
@@ -192,6 +196,7 @@ public class KubernetesClient {
 		HttpPost request = new HttpPost(uri);
 		request.setEntity(new StringEntity(json.toString(),
 						ContentType.APPLICATION_JSON));
+		
 		if (token != null) {
 			request.setHeader("Authorization", "Bearer " + token);
 		}
@@ -433,7 +438,6 @@ public class KubernetesClient {
 		if (token != null) {
 			request.setHeader("Authorization", "Bearer " + token);
 		}
-		
 		watcher.setHttpClient(cloneHttpClient);
 		watcher.setRequest(request);
 		watcher.start();
@@ -459,6 +463,7 @@ public class KubernetesClient {
 		if (token != null) {
 			request.setHeader("Authorization", "Bearer " + token);
 		}
+		
 		watcher.setHttpClient(cloneHttpClient);
 		watcher.setRequest(request);
 		watcher.start();

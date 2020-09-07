@@ -46,7 +46,7 @@ public class KubernetesConstants {
 	
 	public static final String HTTP_QUERY_NEXTID             = "&continue=";
 	
-	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true";
+	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=0";
 	
 	
 	
