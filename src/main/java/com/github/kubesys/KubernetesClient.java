@@ -77,13 +77,18 @@ public class KubernetesClient {
 	protected final CloseableHttpClient httpClient;
 	
 	/**
-	 * @param masterUrl                             
-	 * @throws Exception
+	 * @param masterUrl                             masterUrl                 
+	 * @throws Exception                            exception
 	 */
 	public KubernetesClient(String masterUrl) throws Exception {
 		this(masterUrl, null);
 	}
 	
+	/**
+	 * @param masterUrl                             masterUrl
+	 * @param token                                 token
+	 * @throws Exception                            exception
+	 */
 	public KubernetesClient(String masterUrl, String token) throws Exception {
 		super();
 		this.masterUrl = masterUrl;
@@ -92,6 +97,10 @@ public class KubernetesClient {
 		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
 	}
 
+	/**
+	 * @return                                      httpClient
+	 * @throws Exception                            exception
+	 */
 	protected CloseableHttpClient createHttpClient() throws Exception {
 		HttpClientBuilder builder = HttpClients.custom();
 		if (this.token != null) {
@@ -217,7 +226,9 @@ public class KubernetesClient {
 	/**
 	 * delete a Kubernetes resource using JSON
 	 * 
-	 * @param json                              json
+	 * @param kind                              kind
+	 * @param namespace                         namespace
+	 * @param name                              name
 	 * @return                                  json
 	 * @throws Exception                        exception
 	 */
@@ -407,7 +418,8 @@ public class KubernetesClient {
 	 * @param kind                              kind
 	 * @param namespace                         namespace
 	 * @param name                              name
-	 * @param listener                          listenerm
+	 * @param watcher                           watcher
+	 * @throws Exception                        exception
 	 */
 	public void watchResource(String kind, String namespace, String name, KubernetesWatcher watcher) throws Exception {
 		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
@@ -432,7 +444,8 @@ public class KubernetesClient {
 	 * 
 	 * @param kind                              kind
 	 * @param namespace                         namespace
-	 * @param listener                          listenerm
+	 * @param watcher                           watcher
+	 * @throws Exception                        exception
 	 */
 	public void watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
@@ -460,7 +473,7 @@ public class KubernetesClient {
 	
 	
 	/**
-	 * @param request                           request
+	 * @param response                          response
 	 * @return                                  response
 	 * @throws Exception                        exception
 	 */
@@ -487,6 +500,7 @@ public class KubernetesClient {
 	/**
 	 * @param json                             json
 	 * @return                                 kind
+	 * @throws Exception                       exception
 	 */
 	public String getKind(JsonNode json) throws Exception {
 		return json.get(KubernetesConstants.KUBE_KIND).asText();
@@ -495,6 +509,7 @@ public class KubernetesClient {
 	/**
 	 * @param json                             json
 	 * @return                                 name
+	 * @throws Exception                       exception
 	 */
 	public String getName(JsonNode json) throws Exception {
 		return json.get(KubernetesConstants.KUBE_METADATA)
@@ -506,6 +521,7 @@ public class KubernetesClient {
 	 * @param namespaced                       bool
 	 * @param namespace                        ns
 	 * @return                                 full path
+	 * @throws Exception                        exception
 	 */
 	public String getNamespace(boolean namespaced, String namespace) throws Exception {
 		return (namespaced && namespace.length() != 0) 
@@ -517,6 +533,7 @@ public class KubernetesClient {
 	 * @param namespaced                       bool
 	 * @param json                             json
 	 * @return                                 full path
+	 * @throws Exception                        exception
 	 */
 	public String getNamespace(boolean namespaced, JsonNode json) throws Exception {
 		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
