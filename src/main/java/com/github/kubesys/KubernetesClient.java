@@ -84,20 +84,22 @@ public class KubernetesClient {
 		this(masterUrl, null);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public KubernetesClient(String masterUrl, String token) throws Exception {
 		super();
 		this.masterUrl = masterUrl;
 		this.token = token;
+		this.httpClient = createHttpClient(); 
+		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
+	}
+
+	protected CloseableHttpClient createHttpClient() throws Exception {
 		HttpClientBuilder builder = HttpClients.custom();
-		if (token != null) {
+		if (this.token != null) {
 			builder.setSSLHostnameVerifier(getHostnameVerifier())
 					.setSSLSocketFactory(new org.apache.http.conn.ssl.SSLSocketFactory(
 							getSocketFactory(), new AllowAllHostnameVerifier()));
 		}
-		this.httpClient = builder.build(); 
-		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
-		
+		return builder.build();
 	}
 	
 	/**
@@ -408,7 +410,21 @@ public class KubernetesClient {
 	 * @param listener                          listenerm
 	 */
 	public void watchResource(String kind, String namespace, String name, KubernetesWatcher watcher) throws Exception {
+		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
+										KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+										getNamespace(kubeConfig.isNamespaced(kind), namespace), 
+										kubeConfig.getName(kind), name, 
+										KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
+		CloseableHttpClient cloneHttpClient = createHttpClient();
+		HttpGet request = new HttpGet(uri.toString());
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
+		
+		watcher.setHttpClient(cloneHttpClient);
+		watcher.setRequest(request);
+		watcher.start();
 	}
 	
 	/**
@@ -419,8 +435,23 @@ public class KubernetesClient {
 	 * @param listener                          listenerm
 	 */
 	public void watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
+		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
+										KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+										getNamespace(kubeConfig.isNamespaced(kind), namespace), 
+										kubeConfig.getName(kind),  
+										KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+		
+		CloseableHttpClient cloneHttpClient = createHttpClient();
+		HttpGet request = new HttpGet(uri.toString());
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
+		watcher.setHttpClient(cloneHttpClient);
+		watcher.setRequest(request);
+		watcher.start();
+		
 	}
-
+	
 	/**********************************************************
 	 * 
 	 *               Request and Response

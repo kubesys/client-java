@@ -5,7 +5,7 @@ We expect to provide a Java client:
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
 
-This project is based on [fabric8](https://github.com/fabric8io/kubernetes-client) and [jackson](https://github.com/FasterXML/jackson-databind).
+This project is based on [httpclient](https://github.com/apache/httpcomponents-client) and [jackson](https://github.com/FasterXML/jackson-databind).
 
 ## Comparison
 
@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.2.0</version> 
+  <version>1.3.0</version> 
 </dependency>
 
 <repositories>
@@ -56,13 +56,8 @@ Add this dependency to your project's POM:
 
 ### Creating a client
 
-### if you use a new version >= 1.0.0
 
-```yaml
-KubernetesClient client = KubernetesClient.getKubeClient(new File(KubernetesClient.ADMIN_CONF));
-```
-
-### if you use an old version < 1.0.0 
+### if you use an old version >= 1.3.0 
 
 The easiest way to create a client is:
 
@@ -150,21 +145,4 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- Prototype
-  - 0.1: support create, update, get, delete and list operations using the HTTP protocol.
-  - 0.2: support update status, watch operations using the HTTP protocol.
-  - 0.3: support automatically detect customized Kubernetes resources during runtime.
-  - 0.4: support HTTPs protocol.
-  - 0.5: improve logger
-  - 0.6: release to Maven
-  
-- Develop
-  - 1.0: use fabric8 instead of okhttp
-  - 1.1: performance optmization
-  - 1.2: stability
-
-- Production
-
-## Others
-
-- mvn -Dgpg.passphrase='pwd' clean deploy
+- 1.3: support Keep-alive connections using Apache httpComponents

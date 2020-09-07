@@ -8,59 +8,45 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.kubesys.utils.URLUtils;
 
 /**
  * @author  wuheng09@gmail.com
  * 
  * 
  **/
-public abstract class KubernetesWatcher implements Runnable {
+public abstract class KubernetesWatcher extends Thread {
 
 	/**
 	 * client
 	 */
+	protected CloseableHttpClient httpClient;
+	
+	protected HttpGet request;
+
 	protected final KubernetesClient kubeClient;
 	
-	/**
-	 * kind
-	 */
-	protected final String kind;
-	
-	protected final String namespace;
-	
-	protected final String name;
-	
-	public KubernetesWatcher(KubernetesClient kubeClient, String kind) {
-		this(kubeClient, kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null);
-	}
-	
-	public KubernetesWatcher(KubernetesClient kubeClient, String kind, String namespace) {
-		this(kubeClient, kind, namespace, null);
-	}
-	
-	public KubernetesWatcher(KubernetesClient kubeClient, String kind, String namespace, String name) {
+	public KubernetesWatcher(KubernetesClient kubeClient) {
 		super();
 		this.kubeClient = kubeClient;
-		this.kind = kind;
-		this.namespace = namespace;
-		this.name = name;
+	}
+
+	public void setHttpClient(CloseableHttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
+
+	public void setRequest(HttpGet request) {
+		this.request = request;
 	}
 
 	@Override
 	public void run() {
 		try {
-			final String uri = URLUtils.join(kubeClient.kubeConfig.getApiPrefix(kind), 
-					KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
-					kubeClient.getNamespace(kubeClient.kubeConfig.isNamespaced(kind), namespace), 
-					kubeClient.kubeConfig.getName(kind), name, 
-					KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
-			HttpGet request = new HttpGet(uri);
-			
-			BufferedReader br = new BufferedReader(new InputStreamReader(kubeClient.httpClient.execute(request).getEntity().getContent()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+						httpClient.execute(request).getEntity().getContent()));
 		    String line = null;
 		    while ((line = br.readLine()) != null) {
 		    	JsonNode json = new ObjectMapper().readTree(line);

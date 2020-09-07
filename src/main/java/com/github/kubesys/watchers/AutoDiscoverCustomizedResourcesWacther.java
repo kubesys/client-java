@@ -27,8 +27,8 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 	 */
 	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
 	
-	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client, String kind) {
-		super(client, kind);
+	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client) {
+		super(client);
 	}
 
 	@Override
