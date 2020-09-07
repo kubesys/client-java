@@ -6,10 +6,10 @@ package com.github.kubesys;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import org.apache.http.client.methods.HttpGet;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.kubesys.utils.URLUtils;
-
-import okhttp3.Request;
 
 /**
  * @author wuheng09@gmail.com
@@ -34,11 +34,12 @@ public class KubernetesAnalyzer {
 	 */
 	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		
-		Request request = client.createRequest(
-								KubernetesConstants.HTTP_REQUEST_GET, 
-								client.getMasterUrl(), null);
+		HttpGet request = new HttpGet(client.getMasterUrl());
 		
-		JsonNode resp = client.getResponse(request);
+		if (client.token != null) {
+			request.setHeader("Authorization", "Bearer " + client.token);
+		}
+		JsonNode resp = client.getResponse(client.httpClient.execute(request));
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
 			throw new KubernetesException("Fail to init HTTP(s) client, please check url and/or token.");
@@ -74,11 +75,15 @@ public class KubernetesAnalyzer {
 		
 		String   uri   = URLUtils.join(client.getMasterUrl(), path);
 		
-		JsonNode response  = client.getResponse(
-				client.createRequest(KubernetesConstants.HTTP_REQUEST_GET, uri, null));
+		HttpGet request = new HttpGet(uri);
 		
-		JsonNode resources = response.get(KubernetesConstants
-								.HTTP_RESPONSE_RESOURCES);
+		if (client.token != null) {
+			request.setHeader("Authorization", "Bearer " + client.token);
+		}
+		
+		JsonNode response  = client.getResponse(client.httpClient.execute(request));
+		
+		JsonNode resources = response.get(KubernetesConstants.HTTP_RESPONSE_RESOURCES);
 		
 		for (int i = 0; i < resources.size(); i++) {
 			

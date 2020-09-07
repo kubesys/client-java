@@ -3,14 +3,10 @@
  */
 package com.github.kubesys;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -19,16 +15,23 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.URLUtils;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.WebSocketListener;
 import sun.security.x509.X509CertImpl;
 
 /**
@@ -38,6 +41,7 @@ import sun.security.x509.X509CertImpl;
  * by using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/) 
  * 
  */
+@SuppressWarnings("deprecation")
 public class KubernetesClient {
 
 	public static final Logger m_logger                   = Logger.getLogger(KubernetesClient.class.getName());
@@ -70,7 +74,7 @@ public class KubernetesClient {
 	/**
 	 * client
 	 */
-	protected final OkHttpClient httpClient;
+	protected final CloseableHttpClient httpClient;
 	
 	/**
 	 * @param masterUrl                             
@@ -85,18 +89,15 @@ public class KubernetesClient {
 		super();
 		this.masterUrl = masterUrl;
 		this.token = token;
-		this.httpClient = (token == null) ? 
-				new OkHttpClient.Builder()
-						.readTimeout(0, TimeUnit.SECONDS)
-						.pingInterval(30, TimeUnit.SECONDS)
-						.build() 
-				: new OkHttpClient.Builder()
-						.readTimeout(0, TimeUnit.SECONDS)
-						.pingInterval(30, TimeUnit.SECONDS)
-						.hostnameVerifier(getHostnameVerifier())
-						.sslSocketFactory(getSocketFactory())
-						.build();
+		HttpClientBuilder builder = HttpClients.custom();
+		if (token != null) {
+			builder.setSSLHostnameVerifier(getHostnameVerifier())
+					.setSSLSocketFactory(new org.apache.http.conn.ssl.SSLSocketFactory(
+							getSocketFactory(), new AllowAllHostnameVerifier()));
+		}
+		this.httpClient = builder.build(); 
 		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
+		
 	}
 	
 	/**
@@ -155,7 +156,6 @@ public class KubernetesClient {
 
 		};
 	}
-	
 	/**********************************************************
 	 * 
 	 *               Core
@@ -178,10 +178,14 @@ public class KubernetesClient {
 							getNamespace(kubeConfig.isNamespaced(kind), json), 
 							kubeConfig.getName(kind));
 		
-		RequestBody requestBody = RequestBody.create(
-						KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		HttpPost request = new HttpPost(uri);
+		request.setEntity(new StringEntity(json.toString(),
+						ContentType.APPLICATION_JSON));
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_POST, uri, requestBody));
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -200,10 +204,34 @@ public class KubernetesClient {
 							getNamespace(kubeConfig.isNamespaced(kind), json), 
 							kubeConfig.getName(kind), getName(json));
 		
-		RequestBody requestBody = RequestBody.create(
-						KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		HttpDelete request = new HttpDelete(uri);
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_DELETE, uri, requestBody));
+		return getResponse(httpClient.execute(request));
+	}
+	
+	/**
+	 * delete a Kubernetes resource using JSON
+	 * 
+	 * @param json                              json
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
+
+		final String uri = URLUtils.join(
+							kubeConfig.getApiPrefix(kind), 
+							getNamespace(kubeConfig.isNamespaced(kind), namespace), 
+							kubeConfig.getName(kind), name);
+		
+		HttpDelete request = new HttpDelete(uri);
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
+		
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -228,10 +256,14 @@ public class KubernetesClient {
 			node.remove(KubernetesConstants.KUBE_STATUS);
 		} 
 		
-		RequestBody requestBody = RequestBody.create(
-						KubernetesConstants.HTTP_MEDIA_TYPE, node.toString());
+		HttpPut request = new HttpPut(uri);
+		request.setEntity(new StringEntity(json.toString(),
+						ContentType.APPLICATION_JSON));
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_PUT, uri, requestBody));
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -250,7 +282,12 @@ public class KubernetesClient {
 								getNamespace(kubeConfig.isNamespaced(kind), namespace), 
 								kubeConfig.getName(kind), name);
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_GET, uri, null));
+		HttpGet request = new HttpGet(uri);
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
+		
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -328,7 +365,12 @@ public class KubernetesClient {
 			uri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_GET, uri.toString(), null));
+		HttpGet request = new HttpGet(uri.toString());
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
+		
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -347,10 +389,14 @@ public class KubernetesClient {
 							kubeConfig.isNamespaced(kind), json), kubeConfig.getName(kind), 
 							getName(json), KubernetesConstants.HTTP_RESPONSE_STATUS);
 		
-		RequestBody requestBody = RequestBody.create(
-						KubernetesConstants.HTTP_MEDIA_TYPE, json.toString());
+		HttpPut request = new HttpPut(uri);
+		request.setEntity(new StringEntity(json.toString(),
+						ContentType.APPLICATION_JSON));
+		if (token != null) {
+			request.setHeader("Authorization", "Bearer " + token);
+		}
 		
-		return getResponse(createRequest(KubernetesConstants.HTTP_REQUEST_PUT, uri, requestBody));
+		return getResponse(httpClient.execute(request));
 	}
 	
 	/**
@@ -361,16 +407,8 @@ public class KubernetesClient {
 	 * @param name                              name
 	 * @param listener                          listenerm
 	 */
-	public void watchResource(String kind, String namespace, String name, WebSocketListener listener) throws Exception {
-		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
-											getNamespace(kubeConfig.isNamespaced(kind), namespace), kubeConfig.getName(kind), name, 
-											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+	public void watchResource(String kind, String namespace, String name, KubernetesWatcher watcher) throws Exception {
 		
-		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(0, TimeUnit.MILLISECONDS)
-				.build();
-		clone.newWebSocket(createWebSocketRequest(uri), listener);
-		clone.dispatcher().executorService().shutdown();
 	}
 	
 	/**
@@ -380,90 +418,25 @@ public class KubernetesClient {
 	 * @param namespace                         namespace
 	 * @param listener                          listenerm
 	 */
-	public void watchResources(String kind, String namespace, WebSocketListener listener) throws Exception {
-		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind),  
-											getNamespace(kubeConfig.isNamespaced(kind), namespace), kubeConfig.getName(kind),  
-											KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
-		
-		OkHttpClient clone = httpClient.newBuilder()
-				.readTimeout(0, TimeUnit.SECONDS)
-				.build();
-		clone.newWebSocket(createWebSocketRequest(uri), listener);
-		clone.dispatcher().executorService().shutdown();
+	public void watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 	}
 
-	/**
-	 * @param kind                              kind
-	 * @param namespace                         namespace
-	 * @param name                              name
-	 * @return                                  json
-	 * @throws Exception                        exception
-	 */
-	@Deprecated
-	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
-
-		final String uri = URLUtils.join(
-							kubeConfig.getApiPrefix(kind), 
-							getNamespace(kubeConfig.isNamespaced(kind), namespace), 
-							kubeConfig.getName(kind), name);
-		
-		Map<String, String> map = new HashMap<>();
-		map.put("name", name);
-		
-		RequestBody requestBody = RequestBody.create(
-				KubernetesConstants.HTTP_MEDIA_TYPE, 
-				new ObjectMapper().writeValueAsString(map));
-		
-		Request request = createRequest(KubernetesConstants
-				.HTTP_REQUEST_DELETE, uri, requestBody);
-		
-		return getResponse(request);
-	}
-	
-	
 	/**********************************************************
 	 * 
 	 *               Request and Response
 	 * 
 	 **********************************************************/
 	
-	/**
-	 * @param uri
-	 * @return
-	 */
-	protected Request createWebSocketRequest(String uri) {
-		return new Request.Builder()
-				.get()
-				.url(uri)
-				.addHeader("connection", "keep-alive")
-				.addHeader(HTTP_HEADER_KEY, HTTP_HEADER_VALUE)
-				.addHeader(HTTP_ORIGIN, this.masterUrl)
-				.build();
-	}
-	
-	/**
-	 * @param type                             type
-	 * @param uri                              uri
-	 * @param requestBody                      body
-	 * @return                                 request
-	 */
-	protected Request createRequest(String type, final String uri, RequestBody requestBody) {
-		return (HTTP_GET.equals(type)) 
-							? new Request.Builder().method(HTTP_GET, null).url(uri).build()
-							: new Request.Builder().method(type, requestBody).url(uri).build();
-	}
 	
 	/**
 	 * @param request                           request
 	 * @return                                  response
 	 * @throws Exception                        exception
 	 */
-	protected synchronized JsonNode getResponse(Request request) throws Exception {
+	protected synchronized JsonNode getResponse(CloseableHttpResponse response) throws Exception {
 		
-		Response response = null;
 		try {
-			response = httpClient.newCall(request).execute();
-			return new ObjectMapper().readTree(response.body().byteStream());
+			return new ObjectMapper().readTree(response.getEntity().getContent());
 		} catch (Exception ex) {
 			m_logger.severe(ex.toString());
 			throw new KubernetesException(ex);

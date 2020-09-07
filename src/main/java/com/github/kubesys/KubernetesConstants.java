@@ -3,8 +3,6 @@
  */
 package com.github.kubesys;
 
-import okhttp3.MediaType;
-
 /**
  * @author wuheng09@gmail.com
  *
@@ -21,11 +19,6 @@ public class KubernetesConstants {
 	 * 
 	 *************************************/
 
-	public static final String HTTP_REQUEST_GET             = "GET";
-
-	public static final String HTTP_REQUEST_POST            = "POST";
-	
-	public static final String HTTP_REQUEST_PUT             = "PUT";
 	
 	public static final String HTTP_REQUEST_ORIGIN          = "Origin";
 	
@@ -55,7 +48,6 @@ public class KubernetesConstants {
 	
 	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true";
 	
-	public static final MediaType HTTP_MEDIA_TYPE            = MediaType.parse("application/json");
 	
 	
 	/*************************************
