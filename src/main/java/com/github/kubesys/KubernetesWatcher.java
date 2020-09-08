@@ -63,6 +63,7 @@ public abstract class KubernetesWatcher extends Thread {
 		} catch (Exception ex) {
 			
 		}
+		
 	}
 
 
@@ -81,6 +82,12 @@ public abstract class KubernetesWatcher extends Thread {
 	 * @param node                  node
 	 */
 	public abstract void doDeleted(JsonNode node);
-
 	
+	/**
+	 * 
+	 */
+	public void doClose() {
+		System.out.println("Closing");
+	};
+
 }

@@ -87,4 +87,5 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	}
 
+
 }

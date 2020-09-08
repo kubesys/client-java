@@ -32,6 +32,7 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 			public void doAdded(JsonNode node) {
 				System.out.println(node);
 			}
+
 		};
 		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
