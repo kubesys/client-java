@@ -87,5 +87,19 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	}
 
+	@Override
+	public void doClose() {
+		try {
+			this.kubeClient.watchResources("CustomResourceDefinition", 
+					KubernetesConstants.VALUE_ALL_NAMESPACES, 
+					new AutoDiscoverCustomizedResourcesWacther(kubeClient));
+		} catch (Exception e) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				doClose();
+			}
+		}
+	}
 
 }
