@@ -4,48 +4,68 @@
 package com.github.kubesys;
 
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 
 /**
  * @author  wuheng09@gmail.com
  * 
  * 
  **/
-public abstract class KubernetesWatcher extends WebSocketListener {
+public abstract class KubernetesWatcher extends Thread {
 
 	/**
 	 * client
 	 */
-	protected final KubernetesClient client;
+	protected CloseableHttpClient httpClient;
 	
-	public KubernetesWatcher(KubernetesClient client) {
+	protected HttpGet request;
+
+	protected final KubernetesClient kubeClient;
+	
+	public KubernetesWatcher(KubernetesClient kubeClient) {
 		super();
-		this.client = client;
+		this.kubeClient = kubeClient;
+	}
+
+	public void setHttpClient(CloseableHttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
+
+	public void setRequest(HttpGet request) {
+		this.request = request;
 	}
 
 	@Override
-	public void onMessage(WebSocket webSocket, String text) {
-		super.onMessage(webSocket, text);
+	public void run() {
 		try {
-			JsonNode json = new ObjectMapper().readTree(text);
-			String type = json.get(KubernetesConstants.KUBE_TYPE).asText();
-			JsonNode obj = json.get(KubernetesConstants.KUBE_OBJECT);
-			if (type.equals(KubernetesConstants.JSON_TYPE_ADDED)) {
-				doAdded(obj);
-			} else if (type.equals(KubernetesConstants.JSON_TYPE_MODIFIED)) {
-				doModified(obj);
-			} else if (type.equals(KubernetesConstants.JSON_TYPE_DELETED)) {
-				doDeleted(obj);
-			}
-		} catch (Exception e) {
-			throw new KubernetesException(e);
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+						httpClient.execute(request).getEntity().getContent()));
+		    String line = null;
+		    while ((line = br.readLine()) != null) {
+		    	JsonNode json = new ObjectMapper().readTree(line);
+				String type = json.get(KubernetesConstants.KUBE_TYPE).asText();
+				JsonNode obj = json.get(KubernetesConstants.KUBE_OBJECT);
+				if (type.equals(KubernetesConstants.JSON_TYPE_ADDED)) {
+					doAdded(obj);
+				} else if (type.equals(KubernetesConstants.JSON_TYPE_MODIFIED)) {
+					doModified(obj);
+				} else if (type.equals(KubernetesConstants.JSON_TYPE_DELETED)) {
+					doDeleted(obj);
+				}
+		    }
+		} catch (Exception ex) {
+			
 		}
-		
 	}
+
+
 	
 	/**
 	 * @param node                  node
@@ -61,6 +81,6 @@ public abstract class KubernetesWatcher extends WebSocketListener {
 	 * @param node                  node
 	 */
 	public abstract void doDeleted(JsonNode node);
-	
+
 	
 }

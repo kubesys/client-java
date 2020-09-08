@@ -5,7 +5,7 @@ We expect to provide a Java client:
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
 
-This project is based on [okhttp](https://github.com/square/okhttp) and [jackson](https://github.com/FasterXML/jackson-databind).
+This project is based on [httpclient](https://github.com/apache/httpcomponents-client) and [jackson](https://github.com/FasterXML/jackson-databind).
 
 ## Comparison
 
@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.5.0</version> 
+  <version>1.6.0</version> 
 </dependency>
 
 <repositories>
@@ -147,4 +147,4 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 - 1.3: using Apache httpComponents
 - 1.4: support keep-alive connections
-- 1.3: use okhttp instead of Apache httpComponents
+- 1.6: support daemon
