@@ -45,9 +45,9 @@ public class KubernetesClientBasicTest {
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = new KubernetesClient(URL, TOKEN);
 		
-		create(client);
+//		create(client);
 //		updateStatus(client);
-//		update(client);
+		update(client);
 //		get(client);
 //		delete(client);
 //		list(client);

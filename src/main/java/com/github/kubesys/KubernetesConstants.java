@@ -3,6 +3,8 @@
  */
 package com.github.kubesys;
 
+import okhttp3.MediaType;
+
 /**
  * @author wuheng09@gmail.com
  *
@@ -19,6 +21,13 @@ public class KubernetesConstants {
 	 * 
 	 *************************************/
 
+	public static final String HTTP_REQUEST_GET             = "GET";
+
+	public static final String HTTP_REQUEST_POST            = "POST";
+	
+	public static final String HTTP_REQUEST_PUT             = "PUT";
+	
+	public static final String HTTP_REQUEST_DELETE          = "DELETE";
 	
 	public static final String HTTP_REQUEST_ORIGIN          = "Origin";
 	
@@ -28,8 +37,6 @@ public class KubernetesConstants {
 
 	public static final String HTTP_REQUEST_HEADER_VALUE    = "v4.channel.k8s.io";
 	
-	public static final String HTTP_REQUEST_DELETE          = "DELETE";
-
 	public static final String HTTP_RESPONSE_PATHS          = "paths";
 	
 	public static final String HTTP_RESPONSE_STATUS         = "status";
@@ -49,7 +56,7 @@ public class KubernetesConstants {
 	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=0";
 	
 	
-	
+	public static final MediaType HTTP_MEDIA_TYPE            = MediaType.parse("application/json");
 	/*************************************
 	 * 
 	 * Default values

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.kubesys.KubernetesClient;
 import com.github.kubesys.KubernetesConfig;
 import com.github.kubesys.KubernetesConstants;
+import com.github.kubesys.KubernetesException;
 import com.github.kubesys.KubernetesWatcher;
 import com.github.kubesys.utils.URLUtils;
 
@@ -26,10 +27,21 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 	 * m_logger
 	 */
 	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
+	/**
+	 * kind
+	 */
+	public static final String TARGET_KIND = "CustomResourceDefinition";
 	
+	/**
+	 * config
+	 */
+	protected final KubernetesConfig config;
+
 	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client) {
 		super(client);
+		this.config = client.getConfig();
 	}
+
 
 	@Override
 	public void doAdded(JsonNode node) {
@@ -37,8 +49,6 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		JsonNode names = spec.get(KubernetesConstants.KUBE_SPEC_NAMES);
 		
 		String kind = names.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
-		
-		KubernetesConfig config = kubeClient.getConfig();
 		if (config.getName(kind) != null) {
 			return;
 		}
@@ -50,7 +60,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtils.join(kubeClient.getMasterUrl(), KubernetesConstants
+		String url = URLUtils.join(client.getUrl(), KubernetesConstants
 							.VALUE_APIS, group, version);
 		
 		config.addName(kind, name);
@@ -58,7 +68,6 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		config.addGroup(kind, group);
 		config.addVersion(kind, version);
 		config.addApiPrefix(kind, url);
-		
 		m_logger.info("register " + kind + ": <" + group + "," 
 											+ version + ","
 											+ namespaced + ","
@@ -71,8 +80,6 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String kind = node.get(KubernetesConstants.KUBE_SPEC)
 						.get(KubernetesConstants.KUBE_SPEC_NAMES)
 						.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
-		
-		KubernetesConfig config = kubeClient.getConfig();
 		config.removeNameBy(kind);
 		config.removeGroupBy(kind);
 		config.removeVersionBy(kind);
@@ -84,7 +91,12 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	@Override
 	public void doModified(JsonNode node) {
+		// Do nothing 
 
 	}
 
+	public void doOnClose(KubernetesException execption) {
+		this.client.watchResources(TARGET_KIND, KubernetesConstants.VALUE_ALL_NAMESPACES, 
+									new AutoDiscoverCustomizedResourcesWacther(client));
+	}
 }
