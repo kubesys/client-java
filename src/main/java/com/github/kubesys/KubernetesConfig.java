@@ -23,7 +23,7 @@ import java.util.Map;
  * namespaces                        ns                                          false        Namespace             <br>
  * nodes                             no                                          false        Node                  <br>
  */
-public class KubernetesConfig {
+public final class KubernetesConfig {
 
 	/**
 	 * kind2Name

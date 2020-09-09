@@ -148,4 +148,4 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 1.3: using Apache httpComponents
 - 1.4: support keep-alive connections
 - 1.6: support Thread daemon
-- 1.7: support 
+- 1.7: support getMetadatas for Kubernetes 

@@ -7,12 +7,8 @@ package com.github.kubesys;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesConstants {
+public final class KubernetesConstants {
 	
-	private KubernetesConstants() {
-		super();
-	}
-
 	/*************************************
 	 * 
 	 * HTTP request
@@ -20,15 +16,6 @@ public class KubernetesConstants {
 	 *************************************/
 
 	
-	public static final String HTTP_REQUEST_ORIGIN          = "Origin";
-	
-	public static final String HTTP_REQUEST_AUTHORIZATION   = "Authorization";
-
-	public static final String HTTP_REQUEST_HEADER_KEY      = "Sec-WebSocket-Protocol";
-
-	public static final String HTTP_REQUEST_HEADER_VALUE    = "v4.channel.k8s.io";
-	
-	public static final String HTTP_REQUEST_DELETE          = "DELETE";
 
 	public static final String HTTP_RESPONSE_PATHS          = "paths";
 	
@@ -124,6 +111,7 @@ public class KubernetesConstants {
 	public static final String KUBEAPI_PATHSEPARTOR_PATTERN  = "/";
 	
 	public static final String KUBEAPI_NAMESPACES_PATTERN    = "namespaces/";
+	
 	
 	/*************************************
 	 * 

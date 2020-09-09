@@ -15,7 +15,7 @@ import com.github.kubesys.utils.URLUtils;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesAnalyzer {
+public final class KubernetesAnalyzer {
 
 	/**
 	 * m_logger
@@ -42,7 +42,7 @@ public class KubernetesAnalyzer {
 		JsonNode resp = client.getResponse(client.httpClient.execute(request));
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
-			throw new KubernetesException("Fail to init HTTP(s) client, please check url and/or token.");
+			throw new Exception("Fail to init HTTP(s) client, please check url and/or token.");
 		}
 		
 		Iterator<JsonNode> iterator = resp.get(
@@ -152,7 +152,6 @@ public class KubernetesAnalyzer {
 	/**
 	 * @param client               client
 	 * @return                     KubernetesParser
-	 * @throws Exception           exception
 	 */ 
 	public static KubernetesAnalyzer getParser(KubernetesClient client) {
 		try {
