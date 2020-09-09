@@ -3,6 +3,7 @@
  */
 package com.github.kubesys;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -72,7 +73,7 @@ public class KubernetesClient {
 	 * @param masterUrl                             masterUrl                 
 	 * @throws Exception                            exception
 	 */
-	public KubernetesClient(String masterUrl) throws Exception {
+	public KubernetesClient(String masterUrl) {
 		this(masterUrl, null);
 	}
 	
@@ -81,7 +82,7 @@ public class KubernetesClient {
 	 * @param tokenInfo                             token
 	 * @throws Exception                            exception
 	 */
-	public KubernetesClient(String masterUrl, String tokenInfo) throws Exception {
+	public KubernetesClient(String masterUrl, String tokenInfo) {
 		this.masterUrl  = masterUrl;
 		this.tokenInfo  = tokenInfo;
 		this.httpClient = createHttpClient(); 
@@ -92,7 +93,7 @@ public class KubernetesClient {
 	 * @return                                      httpClient
 	 * @throws Exception                            exception
 	 */
-	protected CloseableHttpClient createHttpClient() throws Exception {
+	protected CloseableHttpClient createHttpClient() {
 		SocketConfig socketConfig = SocketConfig.custom()
 		        .setSoKeepAlive(true)
 		        .build();
@@ -111,12 +112,16 @@ public class KubernetesClient {
 	 * @return                                  SocketFactory
 	 * @throws Exception                        exception
 	 */
-	private static SSLSocketFactory getSocketFactory() throws Exception {
+	private static SSLSocketFactory getSocketFactory() {
 		TrustManager[] managers = new TrustManager[] {
 								new TrustAllManager()};
-		SSLContext sc = SSLContext.getInstance("TLS");
-		sc.init(null, managers, new SecureRandom());
+		try {
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(null, managers, new SecureRandom());
 		return sc.getSocketFactory();
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 	
 	
@@ -505,7 +510,7 @@ public class KubernetesClient {
 	 * @return                                  response
 	 * @throws Exception                        exception
 	 */
-	protected synchronized JsonNode getResponse(CloseableHttpResponse response) throws Exception {
+	protected synchronized JsonNode getResponse(CloseableHttpResponse response) {
 		
 		try {
 			return new ObjectMapper().readTree(response.getEntity().getContent());
@@ -514,7 +519,11 @@ public class KubernetesClient {
 			throw new KubernetesException(ex);
 		} finally {
 			if (response != null) {
-				response.close();
+				try {
+					response.close();
+				} catch (IOException e) {
+					m_logger.severe(e.toString());
+				}
 			}
 		}
 	}
@@ -552,7 +561,7 @@ public class KubernetesClient {
 	 * @throws Exception                        exception
 	 */
 	public String getNamespace(boolean namespaced, String namespace) throws Exception {
-		return (namespaced && namespace.length() != 0) 
+		return (namespaced && namespace != null &&namespace.length() != 0) 
 					? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
 						: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}

@@ -154,9 +154,13 @@ public class KubernetesAnalyzer {
 	 * @return                     KubernetesParser
 	 * @throws Exception           exception
 	 */ 
-	public static KubernetesAnalyzer getParser(KubernetesClient client) throws Exception {
-		if (analyzer == null) {
-			analyzer = new KubernetesAnalyzer(client);
+	public static KubernetesAnalyzer getParser(KubernetesClient client) {
+		try {
+			if (analyzer == null) {
+				analyzer = new KubernetesAnalyzer(client);
+			}
+		} catch (Exception ex) {
+			
 		}
 		return analyzer;
 	}

@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.6.0</version> 
+  <version>1.7.0</version> 
 </dependency>
 
 <repositories>
@@ -147,4 +147,5 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 - 1.3: using Apache httpComponents
 - 1.4: support keep-alive connections
-- 1.6: support daemon
+- 1.6: support Thread daemon
+- 1.7: support 
