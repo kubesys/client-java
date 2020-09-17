@@ -33,6 +33,11 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 				System.out.println(node);
 			}
 
+			@Override
+			public void doClose() {
+				System.out.println("close");
+			}
+
 		};
 		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
