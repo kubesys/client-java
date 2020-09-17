@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>1.7.0</version> 
+  <version>1.8.0</version> 
 </dependency>
 
 <repositories>
@@ -57,10 +57,15 @@ Add this dependency to your project's POM:
 ### Creating a client
 
 
+### if you use an old version >= 1.3.0 
+
 The easiest way to create a client is:
 
 ```java
 KubernetesClient client = new KubernetesClient(url, eyJhbGciOiJSUzI1NiIsImtpZCI6IjZMbjZOUGxaZHZBamRfY2tPSUlCOGhoRXBwcWpvQjlFQ1RPU3NzZzhmeXcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudC10b2tlbi00N2Y2ZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImYzZjRkYjRlLTUzNDYtNDc0NS1iOWM1LTdhMTJmMzk5MDI5YyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTprdWJlcm5ldGVzLWNsaWVudCJ9.Kt31obAmLePHJWO1Y_krp-h3KRDQFd34bunG_5u-mrDk5YP7EBJ87HbNSzNpZJe-_wZQDE_ZNMprpabfz19K3D5VrZjuq1g1pwcYTpxyaN_QjzVRBx7B2lPJmKNXeA-godT8yfbQDMtiMw9uyksLg8qDMUHP5VI-CH2KSTkRgqbaU5OoAkwy2niR3S9atsVcaPCzp1ab36XLvTLckgGSTJt5uHnFfGSmWS4Ako8aM5HVVox6Hz55OgiyRUbc7c-ED39itQHDkUOgKNUXkX9saW38l5Xn9OG_MWkpyJD7GQxbQJf2I36tgM0io1c08IGTFRLcSDB_YflDeyFqJT5aDA);
+client.watchResources(AutoDiscoverCustomizedResourcesWacther.TARGET_KIND, 
+								AutoDiscoverCustomizedResourcesWacther.TARGET_NAMESPACE, 
+								new AutoDiscoverCustomizedResourcesWacther(client));
 ```
 
 Here, the token can be created and get by following commands:
@@ -122,6 +127,12 @@ client.deleteResource("Pod", "default", "busybox")
 ```
 
 
+Close client
+
+```java
+client.close()
+```
+
 ### work-with-other-sdks
 
 Unlike [fabric8](https://github.com/fabric8io/kubernetes-client), which need to learn fabric8 framework to support customized Kubernetes resources. Deveolpers use this SDK just need to focus on how to write JSON.
@@ -140,7 +151,8 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 1.3: using Apache httpComponents
-- 1.4: support keep-alive connections
-- 1.6: support Thread daemon
-- 1.7: support getMetadatas for Kubernetes 
+- 1.3.0:  using Apache httpComponents
+- 1.4.0:  support keep-alive connections
+- 1.6.0:  support Thread daemon
+- 1.7.0:  support getMetadatas for Kubernetes 
+- 1.8.0:  fix watch timeout bug

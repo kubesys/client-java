@@ -39,7 +39,7 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 		int i = 3;
 		while (i-- > 0) {
 			System.out.println(client.listResources("Namespace"));
-			Thread.sleep(10000);
+			Thread.sleep(30*60*1000);
 		}
 	}
 

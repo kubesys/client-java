@@ -86,8 +86,6 @@ public abstract class KubernetesWatcher extends Thread {
 	/**
 	 * 
 	 */
-	public void doClose() {
-		System.out.println("Closing");
-	};
+	public abstract void doClose();
 
 }

@@ -6,7 +6,7 @@ package com.github.kubesys;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -79,8 +79,15 @@ public class KubernetesClient {
 		        .setSoKeepAlive(true)
 		        .build();
 		
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectTimeout(0)
+				.setConnectionRequestTimeout(0)
+				.setSocketTimeout(0)
+				.build();
+		
 		return createDefaultHttpClientBuilder()
 				.setDefaultSocketConfig(socketConfig)
+				.setDefaultRequestConfig(requestConfig )
 				.build();
 	}
 
@@ -461,6 +468,18 @@ public class KubernetesClient {
 				} catch (IOException e) {
 					m_logger.severe(e.toString());
 				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void close() {
+		if (httpClient != null) {
+			try {
+				httpClient.close();
+			} catch (IOException e) {
 			}
 		}
 	}
