@@ -84,7 +84,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	@Override
 	public void doModified(JsonNode node) {
-
+		// ignore here
 	}
 
 	@Override
