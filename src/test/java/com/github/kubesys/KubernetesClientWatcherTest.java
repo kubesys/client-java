@@ -41,7 +41,7 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 		};
 		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
-		int i = 3;
+		int i = 5;
 		while (i-- > 0) {
 			System.out.println(client.listResources("Namespace"));
 			Thread.sleep(30*60*1000);

@@ -68,6 +68,7 @@ public class KubernetesClient {
 		this.tokenInfo  = tokenInfo;
 		this.httpClient = createDefaultHttpClient(); 
 		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
+		new Thread(new Daemon(this)).start();
 	}
 
 	/**
@@ -416,8 +417,8 @@ public class KubernetesClient {
 										kubeConfig.getName(kind),  
 										KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
-		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
-		watcher.setHttpClient(cloneHttpClient);
+		KubernetesClient cloneHttpClient = new KubernetesClient(masterUrl, tokenInfo);
+		watcher.setHttpClient(cloneHttpClient.getHttpClient());
 		watcher.setRequest(HttpUtils.get(tokenInfo, uri));
 		watcher.start();
 		
@@ -526,7 +527,7 @@ public class KubernetesClient {
 	 * @param namespaced                       bool
 	 * @param json                             json
 	 * @return                                 full path
-	 * @throws Exception                        exception
+	 * @throws Exception                       exception
 	 */
 	public String getNamespace(boolean namespaced, JsonNode json) throws Exception {
 		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
@@ -537,6 +538,14 @@ public class KubernetesClient {
 		return getNamespace(namespaced, ns);
 	}
 	
+	
+	/**
+	 * @return                                 httpClient
+	 */
+	public CloseableHttpClient getHttpClient() {
+		return httpClient;
+	}
+
 	/**
 	 * @return                                  url
 	 */
@@ -551,4 +560,35 @@ public class KubernetesClient {
 		return kubeConfig;
 	}
 	
+	/**
+	 * @author wuheng09@gmail.com
+	 *
+	 */
+	public static class Daemon implements Runnable {
+
+		/**
+		 * client
+		 */
+		protected final KubernetesClient client;
+		
+		/**
+		 * @param client                        client
+		 */
+		public Daemon(KubernetesClient client) {
+			super();
+			this.client = client;
+		}
+
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					client.listResources("Namespace");
+					Thread.sleep(1000*60*30);
+				} catch (Exception e) {
+				}
+			}
+		}
+		
+	}
 }
