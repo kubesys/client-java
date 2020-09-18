@@ -51,6 +51,7 @@ Add this dependency to your project's POM:
 - [Usage](#usage)
     - [Creating a client](#creating-a-client)
     - [Simple example](#simple-example)
+    - [Get all kinds](#get-all-kinds)
     - [Work with other SDKs](#work-with-other-sdks)
 
 
@@ -131,6 +132,12 @@ Close client
 
 ```java
 client.close()
+```
+
+### get-all-kinds
+
+```java
+System.out.println(client.getMeta());
 ```
 
 ### work-with-other-sdks
