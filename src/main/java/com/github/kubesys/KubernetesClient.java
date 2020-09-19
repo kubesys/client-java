@@ -68,7 +68,6 @@ public class KubernetesClient {
 		this.tokenInfo  = tokenInfo;
 		this.httpClient = createDefaultHttpClient(); 
 		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
-		new Thread(new Daemon(this)).start();
 	}
 
 	/**
@@ -78,6 +77,8 @@ public class KubernetesClient {
 		
 		SocketConfig socketConfig = SocketConfig.custom()
 		        .setSoKeepAlive(true)
+		        .setSoTimeout(0)
+		        .setSoReuseAddress(true)
 		        .build();
 		
 		RequestConfig requestConfig = RequestConfig.custom()
@@ -417,8 +418,8 @@ public class KubernetesClient {
 										kubeConfig.getName(kind),  
 										KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 		
-		KubernetesClient cloneHttpClient = new KubernetesClient(masterUrl, tokenInfo);
-		watcher.setHttpClient(cloneHttpClient.getHttpClient());
+		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
+		watcher.setHttpClient(cloneHttpClient);
 		watcher.setRequest(HttpUtils.get(tokenInfo, uri));
 		watcher.start();
 		
@@ -564,31 +565,31 @@ public class KubernetesClient {
 	 * @author wuheng09@gmail.com
 	 *
 	 */
-	public static class Daemon implements Runnable {
-
-		/**
-		 * client
-		 */
-		protected final KubernetesClient client;
-		
-		/**
-		 * @param client                        client
-		 */
-		public Daemon(KubernetesClient client) {
-			super();
-			this.client = client;
-		}
-
-		@Override
-		public void run() {
-			while(true) {
-				try {
-					client.listResources("Namespace");
-					Thread.sleep(1000*60*30);
-				} catch (Exception e) {
-				}
-			}
-		}
-		
-	}
+//	public static class Daemon implements Runnable {
+//
+//		/**
+//		 * client
+//		 */
+//		protected final KubernetesClient client;
+//		
+//		/**
+//		 * @param client                        client
+//		 */
+//		public Daemon(KubernetesClient client) {
+//			super();
+//			this.client = client;
+//		}
+//
+//		@Override
+//		public void run() {
+//			while(true) {
+//				try {
+//					System.out.println(client.listResources("Namespace"));
+//					Thread.sleep(1000*60*30);
+//				} catch (Exception e) {
+//				}
+//			}
+//		}
+//		
+//	}
 }
