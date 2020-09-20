@@ -4,12 +4,16 @@
 package com.github.kubesys;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
+import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
@@ -88,8 +92,12 @@ public class KubernetesClient {
 				.build();
 		
 		return createDefaultHttpClientBuilder()
+				.setConnectionTimeToLive(0, TimeUnit.SECONDS)
 				.setDefaultSocketConfig(socketConfig)
 				.setDefaultRequestConfig(requestConfig )
+				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
+				.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy())
 				.build();
 	}
 
@@ -561,35 +569,4 @@ public class KubernetesClient {
 		return kubeConfig;
 	}
 	
-	/**
-	 * @author wuheng09@gmail.com
-	 *
-	 */
-//	public static class Daemon implements Runnable {
-//
-//		/**
-//		 * client
-//		 */
-//		protected final KubernetesClient client;
-//		
-//		/**
-//		 * @param client                        client
-//		 */
-//		public Daemon(KubernetesClient client) {
-//			super();
-//			this.client = client;
-//		}
-//
-//		@Override
-//		public void run() {
-//			while(true) {
-//				try {
-//					System.out.println(client.listResources("Namespace"));
-//					Thread.sleep(1000*60*30);
-//				} catch (Exception e) {
-//				}
-//			}
-//		}
-//		
-//	}
 }

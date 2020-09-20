@@ -33,7 +33,7 @@ public final class KubernetesConstants {
 	
 	public static final String HTTP_QUERY_NEXTID             = "&continue=";
 	
-	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=0";
+	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=315360000";
 	
 	
 	
@@ -45,7 +45,7 @@ public final class KubernetesConstants {
 	
 	public static final String VALUE_DEFAULT_NAMESPACE       = "default";
 	
-	public static final String VALUE_ALL_NAMESPACES          = "";
+	public static final String VALUE_ALL_NAMESPACES          = "default";
 	
 	public static final String VALUE_NAMESPACED              = "Namespaced";
 	

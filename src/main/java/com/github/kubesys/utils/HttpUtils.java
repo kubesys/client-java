@@ -74,7 +74,9 @@ public class HttpUtils {
 	 */
 	public static void setBearerHeader(HttpRequestBase request, String token) {
 		if (token != null) {
-			request.setHeader("Authorization", "Bearer " + token);
+			request.addHeader("Authorization", "Bearer " + token);
 		}
+		
+		request.addHeader("Connection", "keep-alive");
 	}
 }

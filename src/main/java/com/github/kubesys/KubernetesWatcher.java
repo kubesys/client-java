@@ -44,6 +44,9 @@ public abstract class KubernetesWatcher extends Thread {
 
 	@Override
 	public void run() {
+		
+		new Thread(new Daemon(kubeClient)).start();
+		
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 						httpClient.execute(request).getEntity().getContent()));
@@ -61,13 +64,14 @@ public abstract class KubernetesWatcher extends Thread {
 				}
 		    }
 		} catch (Exception ex) {
-			
+			ex.printStackTrace();
 		}
 		
+		System.out.println("I am here");
+		
 	}
-
-
 	
+
 	/**
 	 * @param node                  node
 	 */
@@ -87,5 +91,33 @@ public abstract class KubernetesWatcher extends Thread {
 	 * 
 	 */
 	public abstract void doClose();
+	
+	public static class Daemon implements Runnable {
+
+		/**
+		 * client
+		 */
+		protected final KubernetesClient client;
+		
+		/**
+		 * @param client                        client
+		 */
+		public Daemon(KubernetesClient client) {
+			super();
+			this.client = client;
+		}
+
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					System.out.println(client.listResources("Namespace"));
+					Thread.sleep(1000*60*30);
+				} catch (Exception e) {
+				}
+			}
+		}
+		
+	}
 
 }
