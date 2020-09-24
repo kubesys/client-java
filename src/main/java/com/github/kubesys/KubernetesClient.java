@@ -372,10 +372,11 @@ public class KubernetesClient {
 	 * @param kind                              kind
 	 * @param name                              name
 	 * @param watcher                           watcher
+	 * @return                                  thread
 	 * @throws Exception                        exception
 	 */
-	public void watchResource(String kind, String name, KubernetesWatcher watcher) throws Exception {
-		watchResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name, watcher);
+	public Thread watchResource(String kind, String name, KubernetesWatcher watcher) throws Exception {
+		return watchResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name, watcher);
 	}
 	
 	/**
@@ -385,9 +386,10 @@ public class KubernetesClient {
 	 * @param namespace                         namespace
 	 * @param name                              name
 	 * @param watcher                           watcher
+	 * @return                                  thread
 	 * @throws Exception                        exception
 	 */
-	public void watchResource(String kind, String namespace, String name, KubernetesWatcher watcher) throws Exception {
+	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher) throws Exception {
 		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
 										KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
 										getNamespace(kubeConfig.isNamespaced(kind), namespace), 
@@ -397,7 +399,9 @@ public class KubernetesClient {
 		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
 		watcher.setHttpClient(cloneHttpClient);
 		watcher.setRequest(HttpUtils.get(tokenInfo, uri));
-		watcher.start();
+		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
+		thread.start();
+		return thread;
 	}
 	
 	/**
@@ -405,10 +409,11 @@ public class KubernetesClient {
 	 * 
 	 * @param kind                              kind
 	 * @param watcher                           watcher
+	 * @return                                  thread
 	 * @throws Exception                        exception
 	 */
-	public void watchResources(String kind, KubernetesWatcher watcher) throws Exception {
-		watchResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+	public Thread watchResources(String kind, KubernetesWatcher watcher) throws Exception {
+		return watchResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 	}
 	
 	/**
@@ -417,9 +422,10 @@ public class KubernetesClient {
 	 * @param kind                              kind
 	 * @param namespace                         namespace
 	 * @param watcher                           watcher
+	 * @return                                  thread
 	 * @throws Exception                        exception
 	 */
-	public void watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
+	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 		final String uri = URLUtils.join(kubeConfig.getApiPrefix(kind), 
 										KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
 										getNamespace(kubeConfig.isNamespaced(kind), namespace), 
@@ -429,8 +435,9 @@ public class KubernetesClient {
 		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
 		watcher.setHttpClient(cloneHttpClient);
 		watcher.setRequest(HttpUtils.get(tokenInfo, uri));
-		watcher.start();
-		
+		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace);
+		thread.start();
+		return thread;
 	}
 	
 	/** 

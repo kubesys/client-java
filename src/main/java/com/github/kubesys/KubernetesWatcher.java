@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * 
  **/
-public abstract class KubernetesWatcher extends Thread {
+public abstract class KubernetesWatcher implements Runnable {
 
 	/**
 	 * client
