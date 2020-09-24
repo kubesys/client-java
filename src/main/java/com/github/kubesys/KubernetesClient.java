@@ -527,7 +527,7 @@ public class KubernetesClient {
 	 * @throws Exception                        exception
 	 */
 	public String getNamespace(boolean namespaced, String namespace) throws Exception {
-		return (namespaced && namespace != null &&namespace.length() != 0) 
+		return (namespaced && namespace != null && namespace.length() != 0) 
 					? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
 						: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}

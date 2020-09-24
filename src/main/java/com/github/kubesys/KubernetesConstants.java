@@ -45,7 +45,7 @@ public final class KubernetesConstants {
 	
 	public static final String VALUE_DEFAULT_NAMESPACE       = "default";
 	
-	public static final String VALUE_ALL_NAMESPACES          = "default";
+	public static final String VALUE_ALL_NAMESPACES          = "";
 	
 	public static final String VALUE_NAMESPACED              = "Namespaced";
 	
