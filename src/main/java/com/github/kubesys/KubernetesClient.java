@@ -453,7 +453,7 @@ public class KubernetesClient {
 			node.put("apiVersion", kubeConfig.kind2VersionMapping.get(kind));
 			node.put("kind", kind);
 			node.put("plural", kubeConfig.kind2NameMapping.get(kind));
-			
+			node.set("verbs", kubeConfig.kind2VerbsMapping.get(kind));
 			list.add(node);
 		}
 		

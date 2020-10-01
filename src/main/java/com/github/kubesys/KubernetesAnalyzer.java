@@ -34,11 +34,8 @@ public final class KubernetesAnalyzer {
 	 */
 	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		
-		HttpGet request = new HttpGet(client.getMasterUrl());
+		HttpGet request = createHttpGet(client.tokenInfo, client.masterUrl);
 		
-		if (client.tokenInfo != null) {
-			request.setHeader("Authorization", "Bearer " + client.tokenInfo);
-		}
 		JsonNode resp = client.getResponse(client.httpClient.execute(request));
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
@@ -64,7 +61,8 @@ public final class KubernetesAnalyzer {
 			}
 		}
 	}
-	
+
+
 
 	/**
 	 * @param client              client
@@ -75,11 +73,7 @@ public final class KubernetesAnalyzer {
 		
 		String   uri   = URLUtils.join(client.getMasterUrl(), path);
 		
-		HttpGet request = new HttpGet(uri);
-		
-		if (client.tokenInfo != null) {
-			request.setHeader("Authorization", "Bearer " + client.tokenInfo);
-		}
+		HttpGet request = createHttpGet(client.tokenInfo, uri);
 		
 		JsonNode response  = client.getResponse(client.httpClient.execute(request));
 		
@@ -96,6 +90,7 @@ public final class KubernetesAnalyzer {
 				continue;
 			}
 			
+			config.getKind2VerbsMapping().put(thisKind, resource.get("verbs"));
 			config.getKind2ApiPrefixMapping().put(thisKind, uri);
 			config.getKind2GroupMapping().put(thisKind, getGroup(path));
 			config.getKind2NameMapping().put(thisKind, resource.get(
@@ -111,7 +106,22 @@ public final class KubernetesAnalyzer {
 					+ uri + ">");
 		}
 	}
-	
+
+	/**
+	 * @param tokenInfo                 taskInfo
+	 * @param url                       url
+	 * @return                          httpGet
+	 */
+	protected HttpGet createHttpGet(String tokenInfo, String url) {
+		
+		HttpGet request = new HttpGet(url);
+		
+		if (tokenInfo != null) {
+			request.setHeader("Authorization", "Bearer " + tokenInfo);
+		}
+		
+		return request;
+	}
 	/*******************************************
 	 * 
 	 *            getter

@@ -6,6 +6,8 @@ package com.github.kubesys;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author wuheng09@gmail.com
  *
@@ -49,6 +51,11 @@ public final class KubernetesConfig {
 	 * kind2ApiPrefix
 	 */
 	protected final Map<String, String> kind2ApiPrefixMapping   = new HashMap<>();
+	
+	/**
+	 * kind2Verbs
+	 */
+	protected final Map<String, JsonNode> kind2VerbsMapping   = new HashMap<>();
 
 	/**
 	 * @param kind                   kind
@@ -146,6 +153,14 @@ public final class KubernetesConfig {
 	}
 	
 	/**
+	 * @param kind                    kind
+	 * @param verbs                   verbs
+	 */
+	public void addVerbs(String kind, JsonNode verbs) {
+		this.kind2VerbsMapping.put(kind, verbs);
+	}
+	
+	/**
 	 * @param kind                   kind
 	 * @return                       apiPrefix
 	 */
@@ -202,6 +217,13 @@ public final class KubernetesConfig {
 	 */
 	public Map<String, String> getKind2ApiPrefixMapping() {
 		return kind2ApiPrefixMapping;
+	}
+
+	/**
+	 * @return                       kind2VerbsMapping
+	 */
+	public Map<String, JsonNode> getKind2VerbsMapping() {
+		return kind2VerbsMapping;
 	}
 
 }
