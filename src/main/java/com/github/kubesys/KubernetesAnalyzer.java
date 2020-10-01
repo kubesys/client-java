@@ -240,7 +240,6 @@ public final class KubernetesAnalyzer {
 	 * @param namespaced            bool
 	 * @param namespace             ns
 	 * @return                      full path
-	 * @throws Exception            exception
 	 */
 	public String getNamespace(boolean namespaced, String namespace) {
 		return (namespaced && namespace != null && namespace.length() != 0) 
