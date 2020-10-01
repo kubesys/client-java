@@ -11,7 +11,7 @@ public class KubernetesClientMetaTest extends AbstractKubernetesClientTest {
 
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient1();
-		System.out.println(client.getMeta());
+		System.out.println(client.getAnalyzer().getMeta());
 		
 	}
 

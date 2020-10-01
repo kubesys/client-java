@@ -38,7 +38,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		
 		String kind = names.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
 		
-		KubernetesConfig config = kubeClient.getConfig();
+		KubernetesConfig config = kubeClient.getAnalyzer().getConfig();
 		if (config.getName(kind) != null) {
 			return;
 		}
@@ -50,7 +50,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String url = URLUtils.join(kubeClient.getMasterUrl(), KubernetesConstants
 							.VALUE_APIS, group, version);
 		try {
-			kubeClient.getKubeAnalyzer().registerKinds(url);
+			kubeClient.getAnalyzer().registerKinds(kubeClient, url);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -64,7 +64,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 						.get(KubernetesConstants.KUBE_SPEC_NAMES)
 						.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
 		
-		KubernetesConfig config = kubeClient.getConfig();
+		KubernetesConfig config = kubeClient.getAnalyzer().getConfig();
 		config.removeNameBy(kind);
 		config.removeGroupBy(kind);
 		config.removeVersionBy(kind);
