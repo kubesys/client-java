@@ -185,6 +185,14 @@ public final class KubernetesConfig {
 	}
 	
 	/**
+	 * @param kind                   kind
+	 * @return                       verbs
+	 */
+	public JsonNode removeVerbsBy(String kind) {
+		return kind2VerbsMapping.remove(kind);
+	}
+	
+	/**
 	 * @return                       kind2NameMapping
 	 */
 	public Map<String, String> getKind2NameMapping() {

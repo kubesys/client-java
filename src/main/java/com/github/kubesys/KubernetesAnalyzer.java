@@ -22,6 +22,12 @@ public final class KubernetesAnalyzer {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
+	
+	/**
+	 * client
+	 */
+	protected KubernetesClient kubeClient;
+	
 	/**
 	 * config
 	 */
@@ -33,6 +39,8 @@ public final class KubernetesAnalyzer {
 	 * @throws Exception          exception 
 	 */
 	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
+		
+		this.kubeClient = client;
 		
 		HttpGet request = createHttpGet(client.tokenInfo, client.masterUrl);
 		
@@ -57,7 +65,7 @@ public final class KubernetesAnalyzer {
 						|| path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN))) {
 
 				// register it
-				registerKinds(client, path);
+				registerKinds(URLUtils.join(client.getMasterUrl(), path));
 			}
 		}
 	}
@@ -65,17 +73,15 @@ public final class KubernetesAnalyzer {
 
 
 	/**
-	 * @param client              client
-	 * @param path                path
+	 * @param uri                 uri
 	 * @throws Exception          exception
 	 */
-	protected void registerKinds(KubernetesClient client, String path) throws Exception {
+	public void registerKinds(String uri) throws Exception {
 		
-		String   uri   = URLUtils.join(client.getMasterUrl(), path);
 		
-		HttpGet request = createHttpGet(client.tokenInfo, uri);
+		HttpGet request = createHttpGet(kubeClient.tokenInfo, uri);
 		
-		JsonNode response  = client.getResponse(client.httpClient.execute(request));
+		JsonNode response  = kubeClient.getResponse(kubeClient.httpClient.execute(request));
 		
 		JsonNode resources = response.get(KubernetesConstants.HTTP_RESPONSE_RESOURCES);
 		
@@ -90,17 +96,17 @@ public final class KubernetesAnalyzer {
 				continue;
 			}
 			
-			config.getKind2VerbsMapping().put(thisKind, resource.get("verbs"));
 			config.getKind2ApiPrefixMapping().put(thisKind, uri);
-			config.getKind2GroupMapping().put(thisKind, getGroup(path));
+			config.getKind2GroupMapping().put(thisKind, getGroup(uri));
 			config.getKind2NameMapping().put(thisKind, resource.get(
 							KubernetesConstants.KUBE_METADATA_NAME).asText());
 			config.getKind2NamespacedMapping().put(thisKind, resource.get(
 							KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asBoolean());
 			config.getKind2VersionMapping().put(thisKind, response.get(
 							KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText());
+			config.getKind2VerbsMapping().put(thisKind, resource.get("verbs"));
 			
-			m_logger.info("register " + thisKind + ": <" + getGroup(path) + "," 
+			m_logger.info("register " + thisKind + ": <" + getGroup(uri) + "," 
 					+ response.get(KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText() + ","
 					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asText() + ","
 					+ uri + ">");
@@ -129,16 +135,16 @@ public final class KubernetesAnalyzer {
 	 ********************************************/
 	
 	/**
-	 * @param path               path
+	 * @param url                url
 	 * @return                   group
 	 */
-	public String getGroup(String path) {
-		if (path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
+	public String getGroup(String url) {
+		if (url.endsWith(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
 			return "";
 		}
-		int stx = path.indexOf('/', 1);
-		int etx = path.lastIndexOf('/');
-		return  path.substring(stx + 1, etx);
+		int etx = url.lastIndexOf('/');
+		int stx = url.substring(0, etx).lastIndexOf("/");
+		return  url.substring(stx + 1, etx);
 	}
 	
 	/**

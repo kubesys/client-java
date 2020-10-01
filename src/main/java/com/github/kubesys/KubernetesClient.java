@@ -47,6 +47,11 @@ public class KubernetesClient {
 	protected final String tokenInfo;
 	
 	/**
+	 * analyzer
+	 */
+	protected final KubernetesAnalyzer kubeAnalyzer;
+	
+	/**
 	 * config
 	 */
 	protected final KubernetesConfig kubeConfig;
@@ -71,7 +76,8 @@ public class KubernetesClient {
 		this.masterUrl  = masterUrl;
 		this.tokenInfo  = tokenInfo;
 		this.httpClient = createDefaultHttpClient(); 
-		this.kubeConfig = KubernetesAnalyzer.getParser(this).getConfig();
+		this.kubeAnalyzer = KubernetesAnalyzer.getParser(this);
+		this.kubeConfig = kubeAnalyzer.getConfig();
 	}
 
 	/**
@@ -575,5 +581,13 @@ public class KubernetesClient {
 	public KubernetesConfig getConfig() {
 		return kubeConfig;
 	}
+
+	/**
+	 * @return                                  analyzer
+	 */
+	public KubernetesAnalyzer getKubeAnalyzer() {
+		return kubeAnalyzer;
+	}
+	
 	
 }

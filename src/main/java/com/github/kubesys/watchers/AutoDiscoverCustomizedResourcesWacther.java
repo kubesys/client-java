@@ -43,26 +43,18 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 			return;
 		}
 		
-		String name = names.get(KubernetesConstants.KUBE_SPEC_NAMES_PLURAL).asText();
-		boolean namespaced = spec.get(KubernetesConstants.KUBE_SPEC_SCOPE).asText()
-				.equals(KubernetesConstants.VALUE_NAMESPACED);
 		String group = spec.get(KubernetesConstants.KUBE_SPEC_GROUP).asText();
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
 		String url = URLUtils.join(kubeClient.getMasterUrl(), KubernetesConstants
 							.VALUE_APIS, group, version);
+		try {
+			kubeClient.getKubeAnalyzer().registerKinds(url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-		config.addName(kind, name);
-		config.addNamespaced(kind, namespaced);
-		config.addGroup(kind, group);
-		config.addVersion(kind, version);
-		config.addApiPrefix(kind, url);
-		
-		m_logger.info("register " + kind + ": <" + group + "," 
-											+ version + ","
-											+ namespaced + ","
-											+ url + ">");
 	}
 
 
@@ -78,6 +70,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		config.removeVersionBy(kind);
 		config.removeNamespacedBy(kind);
 		config.removeApiPrefixBy(kind);
+		config.removeVerbsBy(kind);
 		
 		m_logger.info("unregister " + kind);
 	}
