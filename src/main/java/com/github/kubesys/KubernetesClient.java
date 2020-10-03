@@ -71,6 +71,20 @@ public class KubernetesClient {
 		this.httpClient = createDefaultHttpClient(); 
 		this.kubeAnalyzer = KubernetesAnalyzer.getParser(this);
 	}
+	
+
+	/**
+	 * @param masterUrl                           masterUrl
+	 * @param tokenInfo                           token
+	 * @param kubeAnalyzer                        analyzer
+	 */
+	public KubernetesClient(String masterUrl, String tokenInfo, KubernetesAnalyzer kubeAnalyzer) {
+		super();
+		this.masterUrl = masterUrl;
+		this.tokenInfo = tokenInfo;
+		this.httpClient = createDefaultHttpClient(); 
+		this.kubeAnalyzer = kubeAnalyzer;
+	}
 
 	/**
 	 * @return                                      httpClient

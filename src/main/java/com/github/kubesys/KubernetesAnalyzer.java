@@ -35,7 +35,16 @@ public final class KubernetesAnalyzer {
 	 * 
 	 *            Core
 	 * 
+	
 	 ********************************************/
+	
+	/**
+	 * @param kubeConfig         config
+	 */
+	public KubernetesAnalyzer(KubernetesConfig kubeConfig) {
+		super();
+		this.kubeConfig = kubeConfig;
+	}
 	
 	/**
 	 * @param client              client
@@ -48,7 +57,7 @@ public final class KubernetesAnalyzer {
 		JsonNode resp = client.getResponse(client.httpClient.execute(request));
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
-			throw new Exception("Fail to init HTTP(s) client, please check url and/or token.");
+			throw new Exception("Fail to init HTTP(s) client, forbidden users or invalid token.");
 		}
 		
 		Iterator<JsonNode> iterator = resp.get(
@@ -70,7 +79,6 @@ public final class KubernetesAnalyzer {
 			}
 		}
 	}
-
 
 
 	/**
