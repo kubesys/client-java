@@ -257,6 +257,27 @@ public class KubernetesClient {
 	}
 	
 	/**
+	 * get a Kubernetes resource using kind, namespace and name
+	 * 
+	 * @param kind                              kind
+	 * @param namespace                         namespace, if this kind unsupports namespace, it is null
+	 * @param name                              name
+	 * @return                                  json
+	 */
+	public boolean hasResource(String kind, String namespace, String name) {
+		
+		final String uri = kubeAnalyzer.getUrl(
+							kind, namespace, name);
+		try {
+			getResponse(httpClient.execute(
+				HttpUtils.get(tokenInfo, uri)));
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	
+	/**
 	 * list all Kubernetes resources using kind
 	 * 
 	 * @param kind                            kind
