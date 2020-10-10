@@ -396,7 +396,7 @@ public class KubernetesClient {
 		
 		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
 		watcher.setHttpClient(cloneHttpClient);
-		watcher.setRequest(HttpUtils.get(tokenInfo, kubeAnalyzer.watchOneUrl(namespace, namespace, name)));
+		watcher.setRequest(HttpUtils.get(tokenInfo, kubeAnalyzer.watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
 		thread.start();
 		return thread;
