@@ -10,7 +10,6 @@ import org.apache.http.client.methods.HttpGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.HttpUtils;
 import com.github.kubesys.utils.URLUtils;
@@ -261,7 +260,7 @@ public final class KubernetesAnalyzer {
 	 */
 	public JsonNode getMeta() {
 		
-		ArrayNode list = new ObjectMapper().createArrayNode();
+		ObjectNode map = new ObjectMapper().createObjectNode();
 		
 		for (String kind : kubeConfig.kind2NameMapping.keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
@@ -269,10 +268,11 @@ public final class KubernetesAnalyzer {
 			node.put("kind", kind);
 			node.put("plural", kubeConfig.kind2NameMapping.get(kind));
 			node.set("verbs", kubeConfig.kind2VerbsMapping.get(kind));
-			list.add(node);
+			
+			map.set(kind, node);
 		}
 		
-		return list;
+		return map;
 	}
 	
 	/*******************************************
