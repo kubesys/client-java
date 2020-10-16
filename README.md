@@ -58,7 +58,7 @@ Add this dependency to your project's POM:
 ### Creating a client
 
 
-### if you use an old version >= 1.3.0 
+### if you use a new version >= 2.0.0 
 
 The easiest way to create a client is:
 
