@@ -167,3 +167,4 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 2.2.0:  support RBAC
 - 2.3.0:  support hasResource
 - 2.5.0： update getMeta
+- 3.0.0:  support multiple group
