@@ -3,6 +3,7 @@
  */
 package com.github.kubesys;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,13 +41,13 @@ public class KubernetesClientBasicTest extends AbstractKubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient1();
+		KubernetesClient client = createClient2();
 
 //		create(client);
 //		updateStatus(client);
 //		update(client);
-//		get(client);
-		delete(client);
+		get(client);
+//		delete(client);
 //		list(client);
 		
 	}

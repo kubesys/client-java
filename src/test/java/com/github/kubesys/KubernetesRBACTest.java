@@ -16,10 +16,10 @@ public class KubernetesRBACTest extends AbstractKubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		
 		KubernetesClient all = new KubernetesClient("https://39.106.40.190:6443", 
-				"all-permission-token");
+				"");
 		
 		KubernetesClient limited = new KubernetesClient("https://39.106.40.190:6443", 
-				"your-token", 
+				"", 
 				all.getAnalyzer());
 		
 		KubernetesWatcher watcher = new KubernetesWatcher(limited) {
