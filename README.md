@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.3.0</version> 
+  <version>2.5.0</version> 
 </dependency>
 
 <repositories>
@@ -57,8 +57,6 @@ Add this dependency to your project's POM:
 
 ### Creating a client
 
-
-### if you use an old version >= 1.3.0 
 
 The easiest way to create a client is:
 
@@ -168,3 +166,5 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 2.1.0： support getMeta for all kinds
 - 2.2.0:  support RBAC
 - 2.3.0:  support hasResource
+- 2.5.0： update getMeta
+- 3.0.0:  support multiple group
