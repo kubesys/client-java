@@ -4,6 +4,9 @@
 package com.github.kubesys;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -19,6 +22,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.HttpUtils;
 import com.github.kubesys.utils.SSLUtils;
@@ -532,5 +536,32 @@ public class KubernetesClient {
 		return kubeAnalyzer;
 	}
 	
+	/**
+	 * @return                                  kinds
+	 */
+	public List<String> getKinds() {
+		List<String> kinds = new ArrayList<>();
+		JsonNode json = kubeAnalyzer.getMeta();
+		for (Iterator<JsonNode> iter =json.iterator();iter.hasNext(); ) {
+			kinds.add(iter.next().get("kind").asText());
+		}
+		return kinds;
+	}
+	
+	/**
+	 * @param kind                             kind
+	 * @return                                 apiVersion
+	 */
+	public String getLatestApiVersion(String kind) {
+		return kubeAnalyzer.getMeta().get(kind).get("apiVersion").asText();
+	}
+	
+	/**
+	 * @param kind                            kind
+	 * @return                                plural
+	 */
+	public String getPlural(String kind) {
+		return kubeAnalyzer.getMeta().get(kind).get("plural").asText();
+	}
 	
 }
