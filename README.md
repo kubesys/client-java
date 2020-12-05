@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.5.0</version> 
+  <version>2.6.0</version> 
 </dependency>
 
 <repositories>
@@ -164,9 +164,9 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 1.7.0:  support getMetadatas for Kubernetes 
 - 1.8.0:  fix watch timeout bug
 - 1.9.0:  default timeout is 10 years
-- 2.0.0锛� production-ready
-- 2.1.0锛� support getMeta for all kinds
+- 2.0.0   production-ready
+- 2.1.0   support getMeta for all kinds
 - 2.2.0:  support RBAC
 - 2.3.0:  support hasResource
-- 2.5.0锛� update getMeta
+- 2.5.0   update getMeta
 - 3.0.0:  support multiple group
