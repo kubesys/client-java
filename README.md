@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.6.0</version> 
+  <version>2.7.0</version> 
 </dependency>
 
 <repositories>
@@ -61,10 +61,9 @@ Add this dependency to your project's POM:
 The easiest way to create a client is:
 
 ```java
-KubernetesClient client = new KubernetesClient(url, eyJhbGciOiJSUzI1NiIsImtpZCI6IjZMbjZOUGxaZHZBamRfY2tPSUlCOGhoRXBwcWpvQjlFQ1RPU3NzZzhmeXcifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudC10b2tlbi00N2Y2ZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJrdWJlcm5ldGVzLWNsaWVudCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6ImYzZjRkYjRlLTUzNDYtNDc0NS1iOWM1LTdhMTJmMzk5MDI5YyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDprdWJlLXN5c3RlbTprdWJlcm5ldGVzLWNsaWVudCJ9.Kt31obAmLePHJWO1Y_krp-h3KRDQFd34bunG_5u-mrDk5YP7EBJ87HbNSzNpZJe-_wZQDE_ZNMprpabfz19K3D5VrZjuq1g1pwcYTpxyaN_QjzVRBx7B2lPJmKNXeA-godT8yfbQDMtiMw9uyksLg8qDMUHP5VI-CH2KSTkRgqbaU5OoAkwy2niR3S9atsVcaPCzp1ab36XLvTLckgGSTJt5uHnFfGSmWS4Ako8aM5HVVox6Hz55OgiyRUbc7c-ED39itQHDkUOgKNUXkX9saW38l5Xn9OG_MWkpyJD7GQxbQJf2I36tgM0io1c08IGTFRLcSDB_YflDeyFqJT5aDA);
-client.watchResources(AutoDiscoverCustomizedResourcesWacther.TARGET_KIND, 
-								AutoDiscoverCustomizedResourcesWacther.TARGET_NAMESPACE, 
-								new AutoDiscoverCustomizedResourcesWacther(client));
+KubernetesClient client = new KubernetesClient(url, token);
+client.watchResources(kind, namespace, 
+					new AutoDiscoverCustomizedResourcesWacther(client));
 ```
 
 Here, the token can be created and get by following commands:
@@ -169,4 +168,5 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 2.2.0:  support RBAC
 - 2.3.0:  support hasResource
 - 2.5.0   update getMeta
+- 2.7.0   support get kinds
 - 3.0.0:  support multiple group

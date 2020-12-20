@@ -3,7 +3,7 @@
  */
 package com.github.kubesys;
 
-
+import com.github.kubesys.watchers.AutoDiscoverCustomizedResourcesWacther;
 
 /**
  * @author wuheng09@gmail.com
