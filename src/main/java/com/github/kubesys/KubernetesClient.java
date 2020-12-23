@@ -22,7 +22,6 @@ import org.apache.http.impl.client.HttpClients;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.HttpUtils;
 import com.github.kubesys.utils.SSLUtils;
@@ -146,7 +145,7 @@ public class KubernetesClient {
 	 * @throws Exception                        exception
 	 */
 	public JsonNode createResource(String jsonStr) throws Exception {
-		return new ObjectMapper().readTree(jsonStr);
+		return createResource(new ObjectMapper().readTree(jsonStr));
 	}
 	
 	/**
