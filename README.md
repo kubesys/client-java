@@ -41,7 +41,7 @@ Add this dependency to your project's POM:
    <repository>
        <id>pdos-repos</id>
        <name>PDOS Releases</name>
-       <url>http://39.106.40.190:8081/repository/maven-public/</url>
+       <url>http://39.106.40.190:31021/repository/maven-public/</url>
     </repository>
 </repositories>
 ```
