@@ -46,8 +46,8 @@ public class KubernetesClientBasicTest extends AbstractKubernetesClientTest {
 //		create(client);
 //		updateStatus(client);
 //		update(client);
-		get(client);
-//		delete(client);
+//		get(client);
+		delete(client);
 //		list(client);
 		
 	}

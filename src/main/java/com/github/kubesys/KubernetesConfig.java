@@ -167,6 +167,7 @@ public final class KubernetesConfig {
 	public String getApiPrefix(String kind) {
 		return kind2ApiPrefixMapping.get(kind);
 	}
+	
 
 	/**
 	 * @param kind                   kind

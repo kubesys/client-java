@@ -10,8 +10,8 @@ package com.github.kubesys;
 public class KubernetesClientMetaTest extends AbstractKubernetesClientTest {
 
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient1();
-		System.out.println(client.getAnalyzer().getMeta());
+		KubernetesClient client = createClient2();
+		System.out.println(client.getMeta());
 		
 	}
 

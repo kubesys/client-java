@@ -11,18 +11,17 @@ package com.github.kubesys;
  */
 public abstract class AbstractKubernetesClientTest {
 
-	static String URL1 = "http://39.106.40.190:8888/";
+	static String URL = "https://39.106.40.190:6443/";
 	
-	static String URL2 = "https://192.168.42.144:6443";
 	
 	static String TOKEN = "";
 
 	public static KubernetesClient createClient1() throws Exception {
-		return new KubernetesClient(URL1);
+		return new KubernetesClient(URL);
 	}
 	
 	public static KubernetesClient createClient2() throws Exception {
-		return new KubernetesClient(URL2, TOKEN);
+		return new KubernetesClient(URL, TOKEN);
 	}
 
 }

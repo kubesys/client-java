@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.kubesys.utils.HttpUtils;
 import com.github.kubesys.utils.SSLUtils;
+import com.github.kubesys.utils.URLUtils;
 
 /**
  * @author wuheng@iscas.ac.cn
@@ -157,8 +158,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
-		final String uri = kubeAnalyzer.createUrl(
-						getKind(json), getNamespace(json));
+		final String uri = createUrl(json);
 		
 		return getResponse(httpClient.execute(
 			HttpUtils.post(tokenInfo, uri, json.toString())));
@@ -198,8 +198,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
-		final String uri = kubeAnalyzer.deleteUrl(
-								kind, namespace, name);
+		final String uri = deleteUrl(kind, namespace, name);
 		
 		return getResponse(httpClient.execute(
 				HttpUtils.delete(tokenInfo, uri)));
@@ -215,8 +214,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 		
-		final String uri = kubeAnalyzer.updateUrl(
-				getKind(json), getNamespace(json), getName(json));
+		final String uri = updateUrl(getKind(json), getNamespace(json), getName(json));
 		
 		ObjectNode node = json.deepCopy();
 		
@@ -252,8 +250,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
 		
-		final String uri = kubeAnalyzer.getUrl(
-							kind, namespace, name);
+		final String uri = getUrl(kind, namespace, name);
 		
 		return getResponse(httpClient.execute(
 				HttpUtils.get(tokenInfo, uri)));
@@ -269,8 +266,8 @@ public class KubernetesClient {
 	 */
 	public boolean hasResource(String kind, String namespace, String name) {
 		
-		final String uri = kubeAnalyzer.getUrl(
-							kind, namespace, name);
+		final String uri = getUrl(kind, namespace, name);
+		
 		try {
 			getResponse(httpClient.execute(
 				HttpUtils.get(tokenInfo, uri)));
@@ -332,7 +329,7 @@ public class KubernetesClient {
 	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit, String nextId) throws Exception {
 		StringBuilder uri = new StringBuilder();
 		
-		uri.append(kubeAnalyzer.listUrl(kind, namespace));
+		uri.append(listUrl(kind, namespace));
 		
 		uri.append(KubernetesConstants.HTTP_QUERY_KIND + kind);
 		
@@ -365,8 +362,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 		
-		final String uri = kubeAnalyzer.updateStatusUrl(
-				getKind(json), getNamespace(json), getName(json));
+		final String uri = updateStatusUrl(getKind(json), getNamespace(json), getName(json));
 		
 		return getResponse(httpClient.execute(
 				HttpUtils.put(tokenInfo, uri, json.toString())));
@@ -399,7 +395,7 @@ public class KubernetesClient {
 		
 		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
 		watcher.setHttpClient(cloneHttpClient);
-		watcher.setRequest(HttpUtils.get(tokenInfo, kubeAnalyzer.watchOneUrl(kind, namespace, name)));
+		watcher.setRequest(HttpUtils.get(tokenInfo, watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
 		thread.start();
 		return thread;
@@ -429,7 +425,7 @@ public class KubernetesClient {
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
 		watcher.setHttpClient(cloneHttpClient);
-		watcher.setRequest(HttpUtils.get(tokenInfo, kubeAnalyzer.watchAllUrl(kind, namespace)));
+		watcher.setRequest(HttpUtils.get(tokenInfo, watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace);
 		thread.start();
 		return thread;
@@ -484,18 +480,16 @@ public class KubernetesClient {
 	/**
 	 * @param json                             json
 	 * @return                                 kind
-	 * @throws Exception                       exception
 	 */
-	public String getKind(JsonNode json) throws Exception {
+	public String getKind(JsonNode json) {
 		return json.get(KubernetesConstants.KUBE_KIND).asText();
 	}
 	
 	/**
 	 * @param json                             json
 	 * @return                                 name
-	 * @throws Exception                       exception
 	 */
-	public String getName(JsonNode json) throws Exception {
+	public String getName(JsonNode json) {
 		return json.get(KubernetesConstants.KUBE_METADATA)
 					.get(KubernetesConstants.KUBE_METADATA_NAME).asText();
 	}
@@ -510,6 +504,15 @@ public class KubernetesClient {
 		return meta.has(KubernetesConstants.KUBE_METADATA_NAMESPACE) 
 					? meta.get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
 						: KubernetesConstants.VALUE_DEFAULT_NAMESPACE;
+					
+	}
+	
+	/**
+	 * @param json                             json
+	 * @return                                 full path
+	 */
+	public String getApiVersion(JsonNode json)  {
+		return json.get("apiVersion").asText();
 					
 	}
 	
@@ -540,7 +543,7 @@ public class KubernetesClient {
 	 */
 	public List<String> getKinds() {
 		List<String> kinds = new ArrayList<>();
-		JsonNode json = kubeAnalyzer.getMeta();
+		JsonNode json = getMeta();
 		for (Iterator<JsonNode> iter =json.iterator();iter.hasNext(); ) {
 			kinds.add(iter.next().get("kind").asText());
 		}
@@ -552,7 +555,7 @@ public class KubernetesClient {
 	 * @return                                 apiVersion
 	 */
 	public String getLatestApiVersion(String kind) {
-		return kubeAnalyzer.getMeta().get(kind).get("apiVersion").asText();
+		return getMeta().get(kind).get("apiVersion").asText();
 	}
 	
 	/**
@@ -560,7 +563,160 @@ public class KubernetesClient {
 	 * @return                                plural
 	 */
 	public String getPlural(String kind) {
-		return kubeAnalyzer.getMeta().get(kind).get("plural").asText();
+		return getMeta().get(kind).get("plural").asText();
 	}
 	
+	
+	/*******************************************
+	 * 
+	 *            knowledge-based Url
+	 * 
+	 ********************************************/
+	/**
+	 * @param json                 json
+	 * @return                     Url
+	 */
+	protected String createUrl(JsonNode json) {
+		
+		String version = getApiVersion(json);
+		String uri = (version.indexOf("/") == -1) 
+				? "api/" + version 
+				: "apis/" + version;
+					
+		String kind = getKind(json);
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(getMasterUrl(), uri, getNamespace(
+				kubeConfig.isNamespaced(kind), 
+				getNamespace(json)), 
+				kubeConfig.getName(kind));
+	}
+	
+	/** 
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @param name                 name
+	 * @return                     Url
+	 */
+	protected String deleteUrl(String kind, String ns, String name) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind), name);
+	}
+	
+	/** 
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @param name                 name
+	 * @return                     Url
+	 */
+	protected String updateUrl(String kind, String ns, String name) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind), name);
+	}
+	
+	/** 
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @param name                 name
+	 * @return                     Url
+	 */
+	protected String getUrl(String kind, String ns, String name) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind), name);
+	}
+	
+	
+	/**
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @return                     Url
+	 */
+	protected String listUrl(String kind, String ns) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind));
+	}
+	
+	/**
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @param name                 name
+	 * @return                     Url
+	 */
+	protected String updateStatusUrl(String kind, String ns, String name) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), getNamespace(
+				kubeConfig.isNamespaced(kind), ns), kubeConfig.getName(kind), 
+				name, KubernetesConstants.HTTP_RESPONSE_STATUS);
+	}
+	
+	/**
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @param name                 name
+	 * @return                     Url
+	 */
+	protected String watchOneUrl(String kind, String ns, String name) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind), name, 
+				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+	}
+	
+	/**
+	 * @param kind                 kind
+	 * @param ns                   ns
+	 * @return                     Url
+	 */
+	protected String watchAllUrl(String kind, String ns) {
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(kubeConfig.getApiPrefix(kind), 
+				KubernetesConstants.KUBEAPI_WATCHER_PATTERN,  
+				getNamespace(kubeConfig.isNamespaced(kind), ns), 
+				kubeConfig.getName(kind),  
+				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+	}
+	
+	
+	/**
+	 * @param namespaced            bool
+	 * @param namespace             ns
+	 * @return                      full path
+	 */
+	protected String getNamespace(boolean namespaced, String namespace) {
+		return (namespaced && namespace != null && namespace.length() != 0) 
+					? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
+						: KubernetesConstants.VALUE_ALL_NAMESPACES;
+	}
+	
+	
+	/** 
+	 * @return                                json
+	 */
+	public JsonNode getMeta() {
+		
+		ObjectNode map = new ObjectMapper().createObjectNode();
+		
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		
+		for (String kind : kubeConfig.getKind2NamespacedMapping().keySet()) {
+			ObjectNode node = new ObjectMapper().createObjectNode();
+			node.put("apiVersion", kubeConfig.kind2VersionMapping.get(kind));
+			node.put("kind", kind);
+			node.put("plural", kubeConfig.kind2NameMapping.get(kind));
+			node.set("verbs", kubeConfig.kind2VerbsMapping.get(kind));
+			
+			map.set(kind, node);
+		}
+		
+		return map;
+	}
 }
