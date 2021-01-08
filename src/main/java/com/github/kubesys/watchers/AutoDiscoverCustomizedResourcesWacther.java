@@ -47,7 +47,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtils.join(kubeClient.getMasterUrl(), KubernetesConstants
+		String url = URLUtils.join(KubernetesConstants
 							.VALUE_APIS, group, version);
 		try {
 			kubeClient.getAnalyzer().registerKinds(kubeClient, url);
