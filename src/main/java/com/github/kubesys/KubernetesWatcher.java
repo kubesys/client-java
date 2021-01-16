@@ -62,7 +62,7 @@ public abstract class KubernetesWatcher implements Runnable {
 				}
 		    }
 		} catch (Exception ex) {
-			throw new RuntimeException("Forbidden users");
+			throw new RuntimeException(ex);
 		}
 		
 	}
