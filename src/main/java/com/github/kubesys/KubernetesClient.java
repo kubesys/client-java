@@ -444,7 +444,11 @@ public class KubernetesClient {
 	protected synchronized JsonNode getResponse(CloseableHttpResponse response) {
 		
 		try {
-			return new ObjectMapper().readTree(response.getEntity().getContent());
+			JsonNode result = new ObjectMapper().readTree(response.getEntity().getContent());
+			if (result.has("status") && result.get("status").asText().equals("Failure")) {
+				throw new Exception(result.get("status").get("message").asText());
+			}
+			return result;
 		} catch (Exception ex) {
 			m_logger.severe(ex.toString());
 			throw new RuntimeException(ex);
