@@ -52,7 +52,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		try {
 			kubeClient.getAnalyzer().registerKinds(kubeClient, url);
 		} catch (Exception e) {
-			e.printStackTrace();
+			m_logger.warning(e.getMessage());
 		}
 		
 	}
@@ -89,7 +89,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		} catch (Exception e) {
 			try {
 				Thread.sleep(5000);
-			} catch (InterruptedException e1) {
+			} catch (Exception e1) {
 				doClose();
 			}
 		}

@@ -155,7 +155,7 @@ public final class KubernetesAnalyzer {
 				analyzer = new KubernetesAnalyzer(client);
 			}
 		} catch (Exception ex) {
-			
+			m_logger.warning(ex.getMessage());
 		}
 		return analyzer;
 	}

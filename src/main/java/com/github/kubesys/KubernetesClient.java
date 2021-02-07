@@ -450,7 +450,6 @@ public class KubernetesClient {
 			}
 			return result;
 		} catch (Exception ex) {
-			m_logger.severe(ex.toString());
 			throw new RuntimeException(ex);
 		} finally {
 			if (response != null) {

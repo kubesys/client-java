@@ -6,6 +6,7 @@ package com.github.kubesys.utils;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -27,7 +28,7 @@ import sun.security.x509.X509CertImpl;
 @SuppressWarnings({ "deprecation", "restriction"})
 public class SSLUtils {
 
-
+	public static final Logger m_logger = Logger.getLogger(SSLUtils.class.getName());
 	
 	/**
 	 * @return                                 SocketFactory
@@ -47,13 +48,13 @@ public class SSLUtils {
 									@Override
 									public void checkClientTrusted(X509Certificate[] chain, String authType)
 											throws CertificateException {
-										
+										m_logger.info("check client trusted.");
 									}
 
 									@Override
 									public void checkServerTrusted(X509Certificate[] chain, String authType)
 											throws CertificateException {
-										
+										m_logger.info("check server trusted.");
 									}
 
 									@Override
