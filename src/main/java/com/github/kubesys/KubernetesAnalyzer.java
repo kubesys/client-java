@@ -3,7 +3,11 @@
  */
 package com.github.kubesys;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.http.client.methods.HttpGet;
@@ -27,6 +31,12 @@ public final class KubernetesAnalyzer {
 	 * config
 	 */
 	protected KubernetesConfig kubeConfig = new KubernetesConfig();
+	
+	/**
+	 * mapper
+	 */
+	protected Map<String, List<String>> fullKindMapper = new HashMap<>();
+	
 	
 	/*******************************************
 	 * 
@@ -96,25 +106,29 @@ public final class KubernetesAnalyzer {
 			
 			JsonNode resource = resources.get(i);
 			
-			String  thisKind  = resource.get(KubernetesConstants.KUBE_KIND).asText();
+			String shortKind  = resource.get(KubernetesConstants.KUBE_KIND).asText();
+			String apiVersion = response.get(KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText();
+			String apiGroup   = apiVersion.indexOf("/") == -1 ? null : apiVersion.substring(0, apiVersion.indexOf("/"));
+			String fullKind   = apiGroup == null ? shortKind : apiGroup + "." + shortKind;
 			
 			// we only support a version for each resources
-			if (kubeConfig.getKind2NameMapping().containsKey(thisKind)) {
+			if (kubeConfig.getNameMapping().containsKey(fullKind)) {
 				continue;
 			}
-			
-			kubeConfig.addApiPrefix(thisKind, uri);
-			kubeConfig.addGroup(thisKind, getGroup(uri));
-			kubeConfig.addName(thisKind, resource.get(
+
+			addFullKind(shortKind, fullKind);
+			kubeConfig.addApiPrefix(fullKind, uri);
+			kubeConfig.addKind(fullKind, shortKind);
+			kubeConfig.addGroup(fullKind, getGroup(uri));
+			kubeConfig.addName(fullKind, resource.get(
 							KubernetesConstants.KUBE_METADATA_NAME).asText());
-			kubeConfig.addNamespaced(thisKind, resource.get(
+			kubeConfig.addNamespaced(fullKind, resource.get(
 							KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asBoolean());
-			kubeConfig.addVersion(thisKind, response.get(
-							KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText());
-			kubeConfig.addVerbs(thisKind, resource.get("verbs"));
+			kubeConfig.addVersion(fullKind, apiVersion);
+			kubeConfig.addVerbs(fullKind, resource.get("verbs"));
 			
-			m_logger.info("register " + thisKind + ": <" + getGroup(uri) + "," 
-					+ response.get(KubernetesConstants.KUBE_RESOURCES_GROUPVERSION).asText() + ","
+			m_logger.info("register " + fullKind + ": <" + getGroup(uri) + "," 
+					+ apiVersion + ","
 					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asText() + ","
 					+ uri + ">");
 		}
@@ -166,5 +180,62 @@ public final class KubernetesAnalyzer {
 	public KubernetesConfig getConfig() {
 		return kubeConfig;
 	}
+
+	/**
+	 * @return                    fullKinds
+	 */
+	public Map<String, List<String>> getFullKinds() {
+		return fullKindMapper;
+	}
 	
+	/**
+	 * @param kind                kind
+	 * @return                    fullKinds
+	 */
+	public List<String> getFullKinds(String kind) {
+		return fullKindMapper.get(kind);
+	}
+
+	/**
+	 * @param kind                kind
+	 * @param fullKind            fullKind
+	 */
+	public void addFullKind(String kind, String fullKind) {
+		List<String> values = fullKindMapper.containsKey(kind) ? 
+				fullKindMapper.get(kind) : new ArrayList<>();
+		values.add(fullKind);
+		fullKindMapper.put(kind, values);
+	}
+
+	/**
+	 * @param kind                kind
+	 * @return                    fullKinds
+	 * @throws Exception          exception
+	 */
+	public String getFullKind(String kind) throws Exception {
+		List<String> values = fullKindMapper.get(kind);
+		if (values != null && values.size() == 1) {
+			return values.get(0);
+		}
+		throw new Exception("Please use fullKind, " + getFullKinds(kind));
+	}
+	
+	/**
+	 * @param kind                kind
+	 * @param fullKind            fullKind
+	 */
+	public void removeFullKind(String kind, String fullKind) {
+		List<String> values = fullKindMapper.get(kind);
+		if (values == null) {
+			return;
+		}
+		
+		values.remove(fullKind);
+		
+		if (values.size() == 0) {
+			fullKindMapper.remove(kind);
+		} else {
+			fullKindMapper.put(kind, values);
+		}
+	}
 }

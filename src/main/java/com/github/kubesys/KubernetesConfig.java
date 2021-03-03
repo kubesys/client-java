@@ -28,211 +28,247 @@ import com.fasterxml.jackson.databind.JsonNode;
 public final class KubernetesConfig {
 
 	/**
-	 * kind2Name
+	 * name
 	 */
-	protected final Map<String, String> kind2NameMapping        = new HashMap<>();
+	protected final Map<String, String> nameMapping        = new HashMap<>();
 	
 	/**
-	 * kind2Version
+	 * kind
 	 */
-	protected final Map<String, String> kind2VersionMapping     = new HashMap<>();
+	protected final Map<String, String> kindMapping        = new HashMap<>();
 	
 	/**
-	 * kind2Group
+	 * version
 	 */
-	protected final Map<String, String> kind2GroupMapping       = new HashMap<>();
-
-	/**
-	 * kind2Namespace
-	 */
-	protected final Map<String, Boolean> kind2NamespacedMapping = new HashMap<>();
-
-	/**
-	 * kind2ApiPrefix
-	 */
-	protected final Map<String, String> kind2ApiPrefixMapping   = new HashMap<>();
+	protected final Map<String, String> versionMapping     = new HashMap<>();
 	
 	/**
-	 * kind2Verbs
+	 * group
 	 */
-	protected final Map<String, JsonNode> kind2VerbsMapping   = new HashMap<>();
+	protected final Map<String, String> groupMapping       = new HashMap<>();
 
 	/**
-	 * @param kind                   kind
+	 * namespace
+	 */
+	protected final Map<String, Boolean> namespacedMapping = new HashMap<>();
+
+	/**
+	 * apiPrefix
+	 */
+	protected final Map<String, String> apiPrefixMapping   = new HashMap<>();
+	
+	/**
+	 * verbs
+	 */
+	protected final Map<String, JsonNode> verbsMapping     = new HashMap<>();
+
+	/**
+	 * @param key                    key
 	 * @return                       name
 	 */
-	public String getName(String kind) {
-		return kind2NameMapping.get(kind);
+	public String getName(String key) {
+		return nameMapping.get(key);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @param name                   name
 	 */
-	public void addName(String kind, String name) {
-		this.kind2NameMapping.put(kind, name);
+	public void addName(String key, String name) {
+		this.nameMapping.put(key, name);
 	}
 	
 	/**
-	 * @param kind                   kind
+	 * @param key                   key
 	 */
-	public void removeNameBy(String kind) {
-		this.kind2NameMapping.remove(kind);
+	public void removeNameBy(String key) {
+		this.nameMapping.remove(key);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       version
 	 */     
-	public String getVersion(String kind) {
-		return kind2VersionMapping.get(kind);
+	public String getVersion(String key) {
+		return versionMapping.get(key);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @param version                version
 	 */
-	public void addVersion(String kind, String version) {
-		this.kind2VersionMapping.put(kind, version);
+	public void addVersion(String key, String version) {
+		this.versionMapping.put(key, version);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       version
 	 */     
-	public String removeVersionBy(String kind) {
-		return kind2VersionMapping.remove(kind);
+	public String removeVersionBy(String key) {
+		return versionMapping.remove(key);
 	}
 	
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       version
 	 */
-	public String getGroup(String kind) {
-		return kind2GroupMapping.get(kind);
+	public String getGroup(String key) {
+		return groupMapping.get(key);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @param group                  group
 	 */
-	public void addGroup(String kind, String group) {
-		this.kind2GroupMapping.put(kind, group);
+	public void addGroup(String key, String group) {
+		this.groupMapping.put(key, group);
 	}
 	
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       version
 	 */
-	public String removeGroupBy(String kind) {
-		return kind2GroupMapping.remove(kind);
+	public String removeGroupBy(String key) {
+		return groupMapping.remove(key);
 	}
 	
 	/**
-	 * @param kind                   kind
-	 * @return                       namespaced
+	 * @param key                    key
+	 * @return                       kind
 	 */
-	public Boolean isNamespaced(String kind) {
-		return kind2NamespacedMapping.get(kind);
+	public String getKind(String key) {
+		return kindMapping.get(key);
 	}
 
 	/**
+	 * @param key                    key
 	 * @param kind                   kind
+	 */
+	public void addKind(String key, String kind) {
+		this.kindMapping.put(key, kind);
+	}
+	
+	/**
+	 * @param key                    key
+	 * @return                       kind
+	 */
+	public String removeKindBy(String key) {
+		return kindMapping.remove(key);
+	}
+	
+	/**
+	 * @param key                    key
+	 * @return                       namespaced
+	 */
+	public Boolean isNamespaced(String key) {
+		return namespacedMapping.get(key);
+	}
+
+	/**
+	 * @param key                    key
 	 * @param namespaced             namespaced
 	 */
-	public void addNamespaced(String kind, boolean namespaced) {
-		this.kind2NamespacedMapping.put(kind, namespaced);
+	public void addNamespaced(String key, boolean namespaced) {
+		this.namespacedMapping.put(key, namespaced);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       namespaced
 	 */
-	public Boolean removeNamespacedBy(String kind) {
-		return kind2NamespacedMapping.remove(kind);
+	public Boolean removeNamespacedBy(String key) {
+		return namespacedMapping.remove(key);
 	}
 	
 	/**
-	 * @param kind                    kind
+	 * @param key                     key
 	 * @param verbs                   verbs
 	 */
-	public void addVerbs(String kind, JsonNode verbs) {
-		this.kind2VerbsMapping.put(kind, verbs);
+	public void addVerbs(String key, JsonNode verbs) {
+		this.verbsMapping.put(key, verbs);
 	}
 	
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       apiPrefix
 	 */
-	public String getApiPrefix(String kind) {
-		return kind2ApiPrefixMapping.get(kind);
+	public String getApiPrefix(String key) {
+		return apiPrefixMapping.get(key);
 	}
 	
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @param apiPrefix              apiPrefix
 	 */
-	public void addApiPrefix(String kind, String apiPrefix) {
-		this.kind2ApiPrefixMapping.put(kind, apiPrefix);
+	public void addApiPrefix(String key, String apiPrefix) {
+		this.apiPrefixMapping.put(key, apiPrefix);
 	}
 
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       apiPrefix
 	 */
-	public String removeApiPrefixBy(String kind) {
-		return kind2ApiPrefixMapping.remove(kind);
+	public String removeApiPrefixBy(String key) {
+		return apiPrefixMapping.remove(key);
 	}
 	
 	/**
-	 * @param kind                   kind
+	 * @param key                    key
 	 * @return                       verbs
 	 */
-	public JsonNode removeVerbsBy(String kind) {
-		return kind2VerbsMapping.remove(kind);
+	public JsonNode removeVerbsBy(String key) {
+		return verbsMapping.remove(key);
 	}
 	
 	/**
-	 * @return                       kind2NameMapping
+	 * @return                       nameMapping
 	 */
-	public Map<String, String> getKind2NameMapping() {
-		return kind2NameMapping;
+	public Map<String, String> getNameMapping() {
+		return nameMapping;
 	}
 
 	/**
-	 * @return                       kind2VersionMapping
+	 * @return                       versionMapping
 	 */
-	public Map<String, String> getKind2VersionMapping() {
-		return kind2VersionMapping;
+	public Map<String, String> getVersionMapping() {
+		return versionMapping;
 	}
 
 	/**
-	 * @return                       kind2GroupMapping
+	 * @return                       groupMapping
 	 */
-	public Map<String, String> getKind2GroupMapping() {
-		return kind2GroupMapping;
+	public Map<String, String> getGroupMapping() {
+		return groupMapping;
 	}
 
 	/**
-	 * @return                       kind2NamespacedMapping
+	 * @return                       namespacedMapping
 	 */
-	public Map<String, Boolean> getKind2NamespacedMapping() {
-		return kind2NamespacedMapping;
+	public Map<String, Boolean> getNamespacedMapping() {
+		return namespacedMapping;
 	}
 
 	/**
-	 * @return                       kind2ApiPrefixMapping
+	 * @return                       apiPrefixMapping
 	 */
-	public Map<String, String> getKind2ApiPrefixMapping() {
-		return kind2ApiPrefixMapping;
+	public Map<String, String> getApiPrefixMapping() {
+		return apiPrefixMapping;
 	}
 
 	/**
-	 * @return                       kind2VerbsMapping
+	 * @return                       verbsMapping
 	 */
-	public Map<String, JsonNode> getKind2VerbsMapping() {
-		return kind2VerbsMapping;
+	public Map<String, JsonNode> getVerbsMapping() {
+		return verbsMapping;
+	}
+
+	/**
+	 * @return                       kindMapping
+	 */
+	public Map<String, String> getKindMapping() {
+		return kindMapping;
 	}
 
 }

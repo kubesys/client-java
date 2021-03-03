@@ -7,12 +7,13 @@ package com.github.kubesys;
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesClientMetaTest extends AbstractKubernetesClientTest {
+public class KubernetesMetadataTest extends AbstractKubernetesClientTest {
 
+	
+	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient2();
-		System.out.println(client.getMeta());
-		
+		KubernetesClient client = createClient2(null);
+		System.out.println(client.getMetaData().toPrettyString());
 	}
 
 }

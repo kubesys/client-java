@@ -15,12 +15,9 @@ public class KubernetesRBACTest extends AbstractKubernetesClientTest {
 	
 	public static void main(String[] args) throws Exception {
 		
-		KubernetesClient all = new KubernetesClient("https://39.106.40.190:6443", 
-				"");
+		KubernetesClient all = createClient2(null);
 		
-		KubernetesClient limited = new KubernetesClient("https://39.106.40.190:6443", 
-				"", 
-				all.getAnalyzer());
+		KubernetesClient limited = createClient2(all.getAnalyzer());
 		
 		KubernetesWatcher watcher = new KubernetesWatcher(limited) {
 			

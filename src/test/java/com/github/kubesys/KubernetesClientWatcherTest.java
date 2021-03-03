@@ -14,7 +14,7 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient1();
+		KubernetesClient client = createClient2(null);
 		
 		KubernetesWatcher watcher = new KubernetesWatcher(client) {
 			
@@ -41,12 +41,6 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 		};
 		client.watchResources("Namespace", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 	
-		int i = 0;
-		while (i++ < 7) {
-			Thread.sleep(10 * 1000 * 60);
-			System.out.println(i*10 + "分钟");
-			System.out.println(client.listResources("Namespace"));
-		}
 	}
 
 
