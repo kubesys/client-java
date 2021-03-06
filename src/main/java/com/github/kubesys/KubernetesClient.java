@@ -220,7 +220,8 @@ public class KubernetesClient {
 	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
 	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
 	 * 
-	 * @param json json
+	 * @param pod pod
+	 * @param host host
 	 * @return json
 	 * @throws Exception exception
 	 */
