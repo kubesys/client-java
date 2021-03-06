@@ -224,10 +224,24 @@ public class KubernetesClient {
 	 * @return json
 	 * @throws Exception exception
 	 */
-	public JsonNode bindingResource(JsonNode json) throws Exception {
+	public JsonNode bindingResource(JsonNode pod, String host) throws Exception {
 
-		final String uri = bindingUrl(json);
-		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, json.toString())));
+		ObjectNode binding = new ObjectMapper().createObjectNode();
+		binding.put("apiVersion", "v1");
+		binding.put("kind", "Binding");
+		
+		ObjectNode metadata = new ObjectMapper().createObjectNode();
+		metadata.put("name", pod.get("metadata").get("name").asText());
+		binding.set("metadata", metadata);
+		
+		ObjectNode target = new ObjectMapper().createObjectNode();
+		target.put("apiVersion", "v1");
+		target.put("kind", "Node");
+		target.put("name", host);
+		binding.set("target", target);
+			
+		final String uri = bindingUrl(binding);
+		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, binding.toString())));
 	}
 
 	/**
