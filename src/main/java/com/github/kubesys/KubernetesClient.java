@@ -228,6 +228,20 @@ public class KubernetesClient {
 	}
 	
 	/**
+	 * update a Kubernetes resource using JSON
+	 * 
+	 * @param json                              json
+	 * @return                                  json
+	 * @throws Exception                        exception
+	 */
+	public JsonNode bindingResource(JsonNode json) throws Exception {
+		
+		final String uri = bindingUrl(json);
+		return getResponse(httpClient.execute(
+				HttpUtils.post(tokenInfo, uri, json.toString())));
+	}
+	
+	/**
 	 * get a Kubernetes resource using kind, namespace and name
 	 * 
 	 * @param kind                              kind
@@ -601,6 +615,29 @@ public class KubernetesClient {
 				kubeConfig.getName(fullKind));
 	}
 	
+	
+	/**
+	 * @param json                 json
+	 * @return                     Url
+	 * @throws Exception           exception
+	 */
+	protected String bindingUrl(JsonNode json) throws Exception {
+		
+		String version = getApiVersion(json);
+		String uri = (version.indexOf("/") == -1) 
+				? "api/" + version 
+				: "apis/" + version;
+		
+		String kind = getKind(json);
+		String fullKind = version.indexOf("/") == -1 ? kind : version.substring(0, version.indexOf("/")) + "." + kind;
+		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
+		return URLUtils.join(getMasterUrl(), uri, getNamespace(
+				kubeConfig.isNamespaced(fullKind), 
+				getNamespace(json)), 
+				"pods",
+				json.get("metadata").get("name").asText(),
+				"binding");
+	}
 	/** 
 	 * @param kind                 kind
 	 * @param ns                   ns
