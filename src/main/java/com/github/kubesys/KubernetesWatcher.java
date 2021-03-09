@@ -51,6 +51,9 @@ public abstract class KubernetesWatcher implements Runnable {
 		    String line = null;
 		    while ((line = br.readLine()) != null) {
 		    	JsonNode json = new ObjectMapper().readTree(line);
+		    	if (!json.has(KubernetesConstants.KUBE_TYPE)) {
+		    		continue;
+		    	}
 				String type = json.get(KubernetesConstants.KUBE_TYPE).asText();
 				JsonNode obj = json.get(KubernetesConstants.KUBE_OBJECT);
 				if (type.equals(KubernetesConstants.JSON_TYPE_ADDED)) {
