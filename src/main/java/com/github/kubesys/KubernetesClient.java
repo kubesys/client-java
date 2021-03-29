@@ -203,7 +203,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
-		final String uri = updateUrl(getKind(json), getNamespace(json), getName(json));
+		final String uri = updateUrl(getFullKind(json), getNamespace(json), getName(json));
 
 		ObjectNode node = json.deepCopy();
 
@@ -528,6 +528,12 @@ public class KubernetesClient {
 	 */
 	public String getKind(JsonNode json) {
 		return json.get(KubernetesConstants.KUBE_KIND).asText();
+	}
+
+	public String getFullKind(JsonNode json) {
+		String apiVersion = json.get(KubernetesConstants.KUBE_APIVERSION).asText();
+		String kind = json.get(KubernetesConstants.KUBE_KIND).asText();
+		return apiVersion.substring(0, apiVersion.indexOf("/")) + "." + kind;
 	}
 
 	/**
