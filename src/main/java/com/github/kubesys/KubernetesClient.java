@@ -533,7 +533,11 @@ public class KubernetesClient {
 	public String getFullKind(JsonNode json) {
 		String apiVersion = json.get(KubernetesConstants.KUBE_APIVERSION).asText();
 		String kind = json.get(KubernetesConstants.KUBE_KIND).asText();
-		return apiVersion.substring(0, apiVersion.indexOf("/")) + "." + kind;
+		if(apiVersion.indexOf("/") > 0) {
+			return apiVersion.substring(0, apiVersion.indexOf("/"))+ "." + kind;
+		}
+		return kind;
+
 	}
 
 	/**
