@@ -34,7 +34,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>com.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>4.2.0</version> 
+  <version>4.5.0</version> 
 </dependency>
 
 <repositories>
@@ -170,3 +170,4 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - 2.5.0   update getMeta
 - 2.7.0   support get kinds
 - 4.0.0:  support multiple group
+- 4.5.0:  fix minor bugs

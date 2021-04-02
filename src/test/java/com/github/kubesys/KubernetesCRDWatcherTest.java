@@ -16,7 +16,7 @@ public class KubernetesCRDWatcherTest extends AbstractKubernetesClientTest {
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
-		client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", new AutoDiscoverCustomizedResourcesWacther(client) {
+		client.watchResources("CustomResourceDefinition", new AutoDiscoverCustomizedResourcesWacther(client) {
 
 			@Override
 			public void doAdded(JsonNode node) {

@@ -82,7 +82,11 @@ public final class KubernetesAnalyzer {
 						|| path.equals(KubernetesConstants.KUBEAPI_CORE_PATTERN))) {
 
 				// register it
-				registerKinds(client, path);
+				try {
+					registerKinds(client, path);
+				} catch (Exception ex) {
+					// warning
+				}
 			}
 		}
 	}

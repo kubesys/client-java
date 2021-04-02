@@ -467,7 +467,7 @@ public class KubernetesClient {
 		try {
 			JsonNode result = new ObjectMapper().readTree(response.getEntity().getContent());
 			if (result.has("status") && result.get("status").asText().equals("Failure")) {
-				throw new Exception(result.get("status").get("message").asText());
+				throw new Exception(result.toPrettyString());
 			}
 			return result;
 		} catch (Exception ex) {
@@ -581,7 +581,7 @@ public class KubernetesClient {
 	 * @return kind
 	 */
 	public String getKind(String key) {
-		return getMetaData().get(key).get("kind").asText();
+		return getFullKinds().get(key).get("kind").asText();
 	}
 
 	/**
@@ -589,7 +589,7 @@ public class KubernetesClient {
 	 * @return apiVersion
 	 */
 	public String getLatestApiVersion(String key) {
-		return getMetaData().get(key).get("apiVersion").asText();
+		return getFullKinds().get(key).get("apiVersion").asText();
 	}
 
 	/**
@@ -597,7 +597,7 @@ public class KubernetesClient {
 	 * @return plural
 	 */
 	public String getPlural(String key) {
-		return getMetaData().get(key).get("plural").asText();
+		return getFullKinds().get(key).get("plural").asText();
 	}
 
 	/*******************************************
@@ -757,7 +757,7 @@ public class KubernetesClient {
 	/**
 	 * @return json
 	 */
-	public JsonNode getMetaData() {
+	public JsonNode getFullKinds() {
 
 		ObjectNode map = new ObjectMapper().createObjectNode();
 
