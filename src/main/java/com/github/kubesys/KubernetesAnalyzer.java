@@ -27,15 +27,8 @@ public final class KubernetesAnalyzer {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
-	/**
-	 * config
-	 */
-	protected KubernetesConfig kubeConfig = new KubernetesConfig();
 	
-	/**
-	 * mapper
-	 */
-	protected Map<String, List<String>> fullKindMapper = new HashMap<>();
+	
 	
 	
 	/*******************************************
@@ -44,14 +37,6 @@ public final class KubernetesAnalyzer {
 	 * 
 	
 	 ********************************************/
-	
-	/**
-	 * @param kubeConfig         config
-	 */
-	public KubernetesAnalyzer(KubernetesConfig kubeConfig) {
-		super();
-		this.kubeConfig = kubeConfig;
-	}
 	
 	/**
 	 * @param client              client
@@ -116,22 +101,22 @@ public final class KubernetesAnalyzer {
 			String fullKind   = apiGroup == null ? shortKind : apiGroup + "." + shortKind;
 			
 			// we only support a version for each resources
-			if (kubeConfig.getNameMapping().containsKey(fullKind)) {
+			if (getNameMapping().containsKey(fullKind)) {
 				continue;
 			}
 
 			addFullKind(shortKind, fullKind);
-			kubeConfig.addApiPrefix(fullKind, uri);
-			kubeConfig.addKind(fullKind, shortKind);
-			kubeConfig.addGroup(fullKind, getGroup(uri));
-			kubeConfig.addName(fullKind, resource.get(
+			addApiPrefix(fullKind, uri);
+			addKind(fullKind, shortKind);
+			addGroup(fullKind, getGroupByUrl(uri));
+			addName(fullKind, resource.get(
 							KubernetesConstants.KUBE_METADATA_NAME).asText());
-			kubeConfig.addNamespaced(fullKind, resource.get(
+			addNamespaced(fullKind, resource.get(
 							KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asBoolean());
-			kubeConfig.addVersion(fullKind, apiVersion);
-			kubeConfig.addVerbs(fullKind, resource.get("verbs"));
+			addVersion(fullKind, apiVersion);
+			addVerbs(fullKind, resource.get("verbs"));
 			
-			m_logger.info("register " + fullKind + ": <" + getGroup(uri) + "," 
+			m_logger.info("register " + fullKind + ": <" + getGroupByUrl(uri) + "," 
 					+ apiVersion + ","
 					+ resource.get(KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asText() + ","
 					+ uri + ">");
@@ -142,7 +127,7 @@ public final class KubernetesAnalyzer {
 	 * @param url                url
 	 * @return                   group
 	 */
-	public String getGroup(String url) {
+	public String getGroupByUrl(String url) {
 		if (url.endsWith(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
 			return "";
 		}
@@ -178,18 +163,61 @@ public final class KubernetesAnalyzer {
 		return analyzer;
 	}
 	
+	
+	
+	/*******************************************
+	 * 
+	 * Getter and Putter
+	 * 
+	 ********************************************/
+	
 	/**
-	 * @return                    config
-	 */ 
-	public KubernetesConfig getConfig() {
-		return kubeConfig;
-	}
+	 * mapper
+	 */
+	protected Map<String, List<String>>   kindToFullKindMapper        = new HashMap<>();
+	
+	/**
+	 * kind
+	 */
+	protected final Map<String, String>   fullKindToKindMapper        = new HashMap<>();
+	
+	/**
+	 * name
+	 */
+	protected final Map<String, String>   fullKindToNameMapper        = new HashMap<>();
+	
+	/**
+	 * namespace
+	 */
+	protected final Map<String, Boolean>  fullKindToNamespacedMapper  = new HashMap<>();
+	
+	/**
+	 * version
+	 */
+	protected final Map<String, String>   fullKindToVersionMapper     = new HashMap<>();
+	
+	/**
+	 * group
+	 */
+	protected final Map<String, String>   fullKindToGroupMapper       = new HashMap<>();
 
+	/**
+	 * verbs
+	 */
+	protected final Map<String, JsonNode> fullKindToVerbsMapper       = new HashMap<>();
+
+
+	/**
+	 * apiPrefix
+	 */
+	protected final Map<String, String>   fullKindToApiPrefixMapper   = new HashMap<>();
+	
+	
 	/**
 	 * @return                    fullKinds
 	 */
 	public Map<String, List<String>> getFullKinds() {
-		return fullKindMapper;
+		return kindToFullKindMapper;
 	}
 	
 	/**
@@ -197,7 +225,7 @@ public final class KubernetesAnalyzer {
 	 * @return                    fullKinds
 	 */
 	public List<String> getFullKinds(String kind) {
-		return fullKindMapper.get(kind);
+		return kindToFullKindMapper.get(kind);
 	}
 
 	/**
@@ -205,10 +233,10 @@ public final class KubernetesAnalyzer {
 	 * @param fullKind            fullKind
 	 */
 	public void addFullKind(String kind, String fullKind) {
-		List<String> values = fullKindMapper.containsKey(kind) ? 
-				fullKindMapper.get(kind) : new ArrayList<>();
+		List<String> values = kindToFullKindMapper.containsKey(kind) ? 
+				kindToFullKindMapper.get(kind) : new ArrayList<>();
 		values.add(fullKind);
-		fullKindMapper.put(kind, values);
+		kindToFullKindMapper.put(kind, values);
 	}
 
 	/**
@@ -217,7 +245,7 @@ public final class KubernetesAnalyzer {
 	 * @throws Exception          exception
 	 */
 	public String getFullKind(String kind) throws Exception {
-		List<String> values = fullKindMapper.get(kind);
+		List<String> values = kindToFullKindMapper.get(kind);
 		if (values != null && values.size() == 1) {
 			return values.get(0);
 		}
@@ -229,7 +257,7 @@ public final class KubernetesAnalyzer {
 	 * @param fullKind            fullKind
 	 */
 	public void removeFullKind(String kind, String fullKind) {
-		List<String> values = fullKindMapper.get(kind);
+		List<String> values = kindToFullKindMapper.get(kind);
 		if (values == null) {
 			return;
 		}
@@ -237,9 +265,219 @@ public final class KubernetesAnalyzer {
 		values.remove(fullKind);
 		
 		if (values.size() == 0) {
-			fullKindMapper.remove(kind);
+			kindToFullKindMapper.remove(kind);
 		} else {
-			fullKindMapper.put(kind, values);
+			kindToFullKindMapper.put(kind, values);
 		}
 	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       name
+	 */
+	public String getName(String fullKind) {
+		return fullKindToNameMapper.get(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param name                   name
+	 */
+	public void addName(String fullKind, String name) {
+		this.fullKindToNameMapper.put(fullKind, name);
+	}
+	
+	/**
+	 * @param fullKind             fullKind
+	 */
+	public void removeNameBy(String fullKind) {
+		this.fullKindToNameMapper.remove(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       version
+	 */     
+	public String getVersion(String fullKind) {
+		return fullKindToVersionMapper.get(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param version                version
+	 */
+	public void addVersion(String fullKind, String version) {
+		this.fullKindToVersionMapper.put(fullKind, version);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       version
+	 */     
+	public String removeVersionBy(String fullKind) {
+		return fullKindToVersionMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       version
+	 */
+	public String getGroup(String fullKind) {
+		return fullKindToGroupMapper.get(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param group                  group
+	 */
+	public void addGroup(String fullKind, String group) {
+		this.fullKindToGroupMapper.put(fullKind, group);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       version
+	 */
+	public String removeGroupBy(String fullKind) {
+		return fullKindToGroupMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       kind
+	 */
+	public String getKind(String fullKind) {
+		return fullKindToKindMapper.get(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param kind                   kind
+	 */
+	public void addKind(String fullKind, String kind) {
+		this.fullKindToKindMapper.put(fullKind, kind);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       kind
+	 */
+	public String removeKindBy(String fullKind) {
+		return fullKindToKindMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       namespaced
+	 */
+	public Boolean isNamespaced(String fullKind) {
+		return fullKindToNamespacedMapper.get(fullKind);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param namespaced             namespaced
+	 */
+	public void addNamespaced(String fullKind, boolean namespaced) {
+		this.fullKindToNamespacedMapper.put(fullKind, namespaced);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       namespaced
+	 */
+	public Boolean removeNamespacedBy(String fullKind) {
+		return fullKindToNamespacedMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @param fullKind               fullKind
+	 * @param verbs                   verbs
+	 */
+	public void addVerbs(String fullKind, JsonNode verbs) {
+		this.fullKindToVerbsMapper.put(fullKind, verbs);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       apiPrefix
+	 */
+	public String getApiPrefix(String fullKind) {
+		return fullKindToApiPrefixMapper.get(fullKind);
+	}
+	
+
+	/**
+	 * @param fullKind              fullKind
+	 * @param apiPrefix              apiPrefix
+	 */
+	public void addApiPrefix(String fullKind, String apiPrefix) {
+		this.fullKindToApiPrefixMapper.put(fullKind, apiPrefix);
+	}
+
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       apiPrefix
+	 */
+	public String removeApiPrefixBy(String fullKind) {
+		return fullKindToApiPrefixMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @param fullKind              fullKind
+	 * @return                       verbs
+	 */
+	public JsonNode removeVerbsBy(String fullKind) {
+		return fullKindToVerbsMapper.remove(fullKind);
+	}
+	
+	/**
+	 * @return                       nameMapping
+	 */
+	public Map<String, String> getNameMapping() {
+		return fullKindToNameMapper;
+	}
+
+	/**
+	 * @return                       versionMapping
+	 */
+	public Map<String, String> getVersionMapping() {
+		return fullKindToVersionMapper;
+	}
+
+	/**
+	 * @return                       groupMapping
+	 */
+	public Map<String, String> getGroupMapping() {
+		return fullKindToGroupMapper;
+	}
+
+	/**
+	 * @return                       namespacedMapping
+	 */
+	public Map<String, Boolean> getNamespacedMapping() {
+		return fullKindToNamespacedMapper;
+	}
+
+	/**
+	 * @return                       apiPrefixMapping
+	 */
+	public Map<String, String> getApiPrefixMapping() {
+		return fullKindToApiPrefixMapper;
+	}
+
+	/**
+	 * @return                       verbsMapping
+	 */
+	public Map<String, JsonNode> getVerbsMapping() {
+		return fullKindToVerbsMapper;
+	}
+
+	/**
+	 * @return                       kindMapping
+	 */
+	public Map<String, String> getKindMapping() {
+		return fullKindToKindMapper;
+	}
+	
 }

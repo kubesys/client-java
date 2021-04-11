@@ -13,7 +13,7 @@ public class KubernetesMetadataTest extends AbstractKubernetesClientTest {
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
-		System.out.println(client.getFullKinds().toPrettyString());
+		System.out.println(client.getKindDesc().toPrettyString());
 	}
 
 }

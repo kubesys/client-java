@@ -4,7 +4,6 @@
 package com.github.kubesys;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -570,35 +569,25 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * @return kinds
+	 * @return kinds           kinds
+	 * @throws Exception       exception
 	 */
-	public Collection<String> getKinds() {
-		return getAnalyzer().getConfig().kindMapping.values();
+	public JsonNode getKinds() throws Exception {
+		return new ObjectMapper().readTree(
+				new ObjectMapper().writeValueAsString(
+						getAnalyzer().fullKindToKindMapper.values()));
+	}
+	
+	/**
+	 * @return fullkinds       fullkinds
+	 * @throws Exception       execption
+	 */
+	public JsonNode getFullKinds() throws Exception {
+		return new ObjectMapper().readTree(
+				new ObjectMapper().writeValueAsString(
+						getAnalyzer().fullKindToKindMapper.keySet()));
 	}
 
-	/**
-	 * @param key key [group.kind]
-	 * @return kind
-	 */
-	public String getKind(String key) {
-		return getFullKinds().get(key).get("kind").asText();
-	}
-
-	/**
-	 * @param key key
-	 * @return apiVersion
-	 */
-	public String getLatestApiVersion(String key) {
-		return getFullKinds().get(key).get("apiVersion").asText();
-	}
-
-	/**
-	 * @param key key
-	 * @return plural
-	 */
-	public String getPlural(String key) {
-		return getFullKinds().get(key).get("plural").asText();
-	}
 
 	/*******************************************
 	 * 
@@ -617,9 +606,8 @@ public class KubernetesClient {
 
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 ? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
-		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeConfig.isNamespaced(fullKind), getNamespace(json)),
-				kubeConfig.getName(fullKind));
+		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
+				kubeAnalyzer.getName(fullKind));
 	}
 
 	/**
@@ -634,8 +622,7 @@ public class KubernetesClient {
 
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 ? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
-		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeConfig.isNamespaced(fullKind), getNamespace(json)),
+		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
 				"pods", json.get("metadata").get("name").asText(), "binding");
 	}
 
@@ -647,10 +634,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String deleteUrl(String kind, String ns, String name) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), getNamespace(kubeConfig.isNamespaced(fullKind), ns),
-				kubeConfig.getName(fullKind), name);
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+				kubeAnalyzer.getName(fullKind), name);
 	}
 
 	/**
@@ -661,10 +647,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String updateUrl(String kind, String ns, String name) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), getNamespace(kubeConfig.isNamespaced(fullKind), ns),
-				kubeConfig.getName(fullKind), name);
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+				kubeAnalyzer.getName(fullKind), name);
 	}
 
 	/**
@@ -675,10 +660,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String getUrl(String kind, String ns, String name) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), getNamespace(kubeConfig.isNamespaced(fullKind), ns),
-				kubeConfig.getName(fullKind), name);
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+				kubeAnalyzer.getName(fullKind), name);
 	}
 
 	/**
@@ -688,10 +672,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String listUrl(String kind, String ns) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), getNamespace(kubeConfig.isNamespaced(fullKind), ns),
-				kubeConfig.getName(fullKind));
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+				kubeAnalyzer.getName(fullKind));
 	}
 
 	/**
@@ -702,10 +685,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String updateStatusUrl(String kind, String ns, String name) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), getNamespace(kubeConfig.isNamespaced(fullKind), ns),
-				kubeConfig.getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+				kubeAnalyzer.getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
 	}
 
 	/**
@@ -716,10 +698,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String watchOneUrl(String kind, String ns, String name) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
-				getNamespace(kubeConfig.isNamespaced(fullKind), ns), kubeConfig.getName(fullKind), name,
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+				getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns), kubeAnalyzer.getName(fullKind), name,
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
 
@@ -730,10 +711,9 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	protected String watchAllUrl(String kind, String ns) throws Exception {
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeConfig.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
-				getNamespace(kubeConfig.isNamespaced(fullKind), ns), kubeConfig.getName(fullKind),
+		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+				getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns), kubeAnalyzer.getName(fullKind),
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
 
@@ -757,18 +737,17 @@ public class KubernetesClient {
 	/**
 	 * @return json
 	 */
-	public JsonNode getFullKinds() {
+	public JsonNode getKindDesc() {
 
 		ObjectNode map = new ObjectMapper().createObjectNode();
 
-		KubernetesConfig kubeConfig = kubeAnalyzer.getConfig();
 
-		for (String kind : kubeConfig.getNamespacedMapping().keySet()) {
+		for (String kind : kubeAnalyzer.getNamespacedMapping().keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
-			node.put("apiVersion", kubeConfig.versionMapping.get(kind));
-			node.put("kind", kubeConfig.kindMapping.get(kind));
-			node.put("plural", kubeConfig.nameMapping.get(kind));
-			node.set("verbs", kubeConfig.verbsMapping.get(kind));
+			node.put("apiVersion", kubeAnalyzer.fullKindToVersionMapper.get(kind));
+			node.put("kind", kubeAnalyzer.fullKindToKindMapper.get(kind));
+			node.put("plural", kubeAnalyzer.fullKindToNameMapper.get(kind));
+			node.set("verbs", kubeAnalyzer.fullKindToVerbsMapper.get(kind));
 
 			map.set(kind, node);
 		}

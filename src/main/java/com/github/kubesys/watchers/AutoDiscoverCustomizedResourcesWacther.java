@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.kubesys.KubernetesAnalyzer;
 import com.github.kubesys.KubernetesClient;
-import com.github.kubesys.KubernetesConfig;
 import com.github.kubesys.KubernetesConstants;
 import com.github.kubesys.KubernetesWatcher;
 import com.github.kubesys.utils.URLUtils;
@@ -67,14 +66,13 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		KubernetesAnalyzer analyzer = kubeClient.getAnalyzer();
 		analyzer.removeFullKind(shortKind, fullKind);
 		
-		KubernetesConfig config = analyzer.getConfig();
-		config.removeKindBy(fullKind);
-		config.removeNameBy(fullKind);
-		config.removeGroupBy(fullKind);
-		config.removeVersionBy(fullKind);
-		config.removeNamespacedBy(fullKind);
-		config.removeApiPrefixBy(fullKind);
-		config.removeVerbsBy(fullKind);
+		analyzer.removeKindBy(fullKind);
+		analyzer.removeNameBy(fullKind);
+		analyzer.removeGroupBy(fullKind);
+		analyzer.removeVersionBy(fullKind);
+		analyzer.removeNamespacedBy(fullKind);
+		analyzer.removeApiPrefixBy(fullKind);
+		analyzer.removeVerbsBy(fullKind);
 		
 		m_logger.info("unregister " + shortKind);
 	}

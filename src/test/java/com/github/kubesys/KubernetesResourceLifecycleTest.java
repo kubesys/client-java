@@ -15,42 +15,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTest {
 
 	static String CreateJSON = "{\r\n"
-			+ "  \"apiVersion\": \"apps/v1\",\r\n"
-			+ "  \"kind\": \"Deployment\",\r\n"
+			+ "  \"apiVersion\": \"v1\",\r\n"
+			+ "  \"kind\": \"Pod\",\r\n"
 			+ "  \"metadata\": {\r\n"
 			+ "    \"name\": \"busybox\",\r\n"
-			+ "    \"namespace\": \"default\",\r\n"
-			+ "    \"labels\": {\r\n"
-			+ "      \"app\": \"busybox\"\r\n"
-			+ "    }\r\n"
+			+ "    \"namespace\": \"default\"\r\n"
 			+ "  },\r\n"
 			+ "  \"spec\": {\r\n"
-			+ "    \"replicas\": 1,\r\n"
-			+ "    \"selector\": {\r\n"
-			+ "      \"matchLabels\": {\r\n"
-			+ "        \"app\": \"busybox\"\r\n"
+			+ "    \"containers\": [\r\n"
+			+ "      {\r\n"
+			+ "        \"image\": \"busybox\",\r\n"
+			+ "        \"env\": [{\r\n"
+			+ "           \"name\": \"abc\",\r\n"
+			+ "           \"value\": \"abc\"\r\n"
+			+ "        }],\r\n"
+			+ "        \"command\": [\r\n"
+			+ "          \"sleep\",\r\n"
+			+ "          \"3600\"\r\n"
+			+ "        ],\r\n"
+			+ "        \"imagePullPolicy\": \"IfNotPresent\",\r\n"
+			+ "        \"name\": \"busybox\"\r\n"
 			+ "      }\r\n"
-			+ "    },\r\n"
-			+ "    \"template\": {\r\n"
-			+ "      \"metadata\": {\r\n"
-			+ "        \"labels\": {\r\n"
-			+ "          \"app\": \"busybox\"\r\n"
-			+ "        }\r\n"
-			+ "      },\r\n"
-			+ "      \"spec\": {\r\n"
-			+ "        \"containers\": [\r\n"
-			+ "          {\r\n"
-			+ "            \"image\": \"busybox\",\r\n"
-			+ "            \"command\": [\r\n"
-			+ "              \"sleep\",\r\n"
-			+ "              \"3600\"\r\n"
-			+ "            ],\r\n"
-			+ "            \"imagePullPolicy\": \"IfNotPresent\",\r\n"
-			+ "            \"name\": \"busybox\"\r\n"
-			+ "          }\r\n"
-			+ "        ]\r\n"
-			+ "      }\r\n"
-			+ "    }\r\n"
+			+ "    ],\r\n"
+			+ "    \"restartPolicy\": \"Always\"\r\n"
 			+ "  }\r\n"
 			+ "}";
 	
@@ -58,12 +45,12 @@ public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTes
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
 
-//		create(client);
+		create(client);
 //		updateStatus(client);
 //		update(client);
 //		get(client);
 //		list(client);
-		delete(client);
+//		delete(client);
 		
 	}
 

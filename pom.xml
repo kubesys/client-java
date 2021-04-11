@@ -5,14 +5,14 @@
 
 	<groupId>com.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>4.5.0</version>
+	<version>5.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<jackson.version>2.12.1</jackson.version>
+		<jackson.version>2.12.2</jackson.version>
 		<httpclient.version>4.5.13</httpclient.version>
 	</properties>
 
