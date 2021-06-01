@@ -62,20 +62,22 @@ public class KubernetesClient {
 
 	/**
 	 * @param masterUrl masterUrl
+	 * @throws Exception 
 	 */
-	public KubernetesClient(String masterUrl) {
+	public KubernetesClient(String masterUrl) throws Exception {
 		this(masterUrl, null);
 	}
 
 	/**
 	 * @param masterUrl masterUrl
 	 * @param tokenInfo token
+	 * @throws Exception 
 	 */
-	public KubernetesClient(String masterUrl, String tokenInfo) {
+	public KubernetesClient(String masterUrl, String tokenInfo) throws Exception {
 		this.masterUrl = masterUrl;
 		this.tokenInfo = tokenInfo;
 		this.httpClient = createDefaultHttpClient();
-		this.kubeAnalyzer = KubernetesAnalyzer.getParser(this);
+		this.kubeAnalyzer = new KubernetesAnalyzer(this);
 	}
 
 	/**

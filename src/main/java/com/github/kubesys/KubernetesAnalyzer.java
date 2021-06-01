@@ -42,7 +42,7 @@ public final class KubernetesAnalyzer {
 	 * @param client              client
 	 * @throws Exception          exception 
 	 */
-	protected KubernetesAnalyzer(KubernetesClient client) throws Exception {
+	public KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		
 		HttpGet request = HttpUtils.get(client.tokenInfo, client.masterUrl);
 		
@@ -143,25 +143,6 @@ public final class KubernetesAnalyzer {
 	 * 
 	 ********************************************/
 	
-	/**
-	 * singleton
-	 */
-	protected static KubernetesAnalyzer analyzer;
-	
-	/**
-	 * @param client               client
-	 * @return                     KubernetesParser
-	 */ 
-	public static KubernetesAnalyzer getParser(KubernetesClient client) {
-		try {
-			if (analyzer == null) {
-				analyzer = new KubernetesAnalyzer(client);
-			}
-		} catch (Exception ex) {
-			m_logger.warning(ex.getMessage());
-		}
-		return analyzer;
-	}
 	
 	
 	

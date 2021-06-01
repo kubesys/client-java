@@ -39,7 +39,7 @@ public class KubernetesClientWatcherTest extends AbstractKubernetesClientTest {
 			}
 
 		};
-		client.watchResources("Deployment", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		// or
 //		client.watchResources("apps.Deployment", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 	}

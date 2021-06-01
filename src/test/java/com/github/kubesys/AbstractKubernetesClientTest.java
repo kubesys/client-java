@@ -11,7 +11,7 @@ package com.github.kubesys;
  */
 public abstract class AbstractKubernetesClientTest {
 
-	static String URL = "https://119.8.188.235:6443/";
+	static String URL = "";
 	
 	
 	static String TOKEN = "";
