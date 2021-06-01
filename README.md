@@ -1,4 +1,4 @@
-# Kubernetes-client
+# Kubernetes-client-java
 
 We expect to provide a Java client:
 - **Flexibility**. It can support all Kubernetes-based systems with minimized extra development, such as [Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift), [istio](https://istio.io/), etc.
@@ -21,7 +21,7 @@ This project is based on [httpclient](https://github.com/apache/httpcomponents-c
 To install the Java client library to your local Maven repository, simply execute:
 
 ```shell
-git clone --recursive https://github.com/kubesys/kubernetes-client
+git clone --recursive https://github.com/kubesys/kubernetes-client-java
 cd java
 mvn install
 ```
@@ -71,7 +71,7 @@ Here, the token can be created and get by following commands:
 1. create token
 
 ```yaml
-kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client/master/account.yaml
+kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client-java/master/account.yaml
 ```
 2. get token
 
@@ -157,17 +157,19 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 1.3.0:  using Apache httpComponents
-- 1.4.0:  support keep-alive connections
-- 1.6.0:  support Thread daemon
-- 1.7.0:  support getMetadatas for Kubernetes 
-- 1.8.0:  fix watch timeout bug
-- 1.9.0:  default timeout is 10 years
-- 2.0.0   production-ready
-- 2.1.0   support getMeta for all kinds
-- 2.2.0:  support RBAC
-- 2.3.0:  support hasResource
-- 2.5.0   update getMeta
-- 2.7.0   support get kinds
-- 4.0.0:  support multiple group
+- ~~1.3.0:  using Apache httpComponents~~
+- ~~1.4.0:  support keep-alive connections~~
+- ~~1.6.0:  support Thread daemon~~
+- ~~1.7.0:  support getMetadatas for Kubernetes ~~
+- ~~1.8.0:  fix watch timeout bug~~
+- ~~1.9.0:  default timeout is 10 years~~
+- ~~2.0.0   production-ready~~
+- ~~2.1.0   support getMeta for all kinds~~
+- ~~2.2.0:  support RBAC~~
+- ~~2.3.0:  support hasResource~~
+- ~~2.5.0   update getMeta~~
+- ~~2.7.0   support get kinds~~
+- ~~4.0.0:  support multiple group~~
 - 4.5.0:  fix minor bugs
+- 5.0.0:  support bind
+- 6.0.0:  support Object
