@@ -21,7 +21,7 @@ This project is based on [httpclient](https://github.com/apache/httpcomponents-c
 To install the Java client library to your local Maven repository, simply execute:
 
 ```shell
-git clone --recursive https://github.com/kubesys/kubernetes-client-java
+git clone --recursive https://github.com/kubesys/client-java
 cd java
 mvn install
 ```
