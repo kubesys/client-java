@@ -173,4 +173,5 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - ~~4.5.0:  fix minor bugs~~
 - ~~5.0.0:  support bind~~
 - ~~5.1.0：support mutiple clients~~ 
-- 6.0.0:  support watching Object
+- ~~6.0.0:  support watching Object~~
+- 7.0.0: using maven repository
