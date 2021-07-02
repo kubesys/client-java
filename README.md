@@ -1,6 +1,7 @@
 # Kubernetes-client-java
 
 We expect to provide a Java client:
+
 - **Flexibility**. It can support all Kubernetes-based systems with minimized extra development, such as [Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift), [istio](https://istio.io/), etc.
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
@@ -32,18 +33,10 @@ Add this dependency to your project's POM:
 
 ```xml
 <dependency>
-  <groupId>com.github.kubesys</groupId>
+  <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>6.0.0</version> 
+  <version>7.0.0</version> 
 </dependency>
-
-<repositories>
-   <repository>
-       <id>pdos-repos</id>
-       <name>PDOS Releases</name>
-       <url>http://39.106.40.190:31021/repository/maven-public/</url>
-    </repository>
-</repositories>
 ```
 
 ## Usage
@@ -61,9 +54,10 @@ Add this dependency to your project's POM:
 The easiest way to create a client is:
 
 ```java
+String url = "https://IP:6443/";
+String token = "xxx";
 KubernetesClient client = new KubernetesClient(url, token);
-client.watchResources(kind, namespace, 
-					new AutoDiscoverCustomizedResourcesWacther(client));
+client.watchResources(kind, new AutoDiscoverCustomizedResourcesWacther(client));
 ```
 
 Here, the token can be created and get by following commands:
@@ -135,8 +129,6 @@ client.close()
 
 ```java
 System.out.println(client.getKinds());
-System.out.println(client.getLatestApiVersion("Pod"));
-System.out.println(client.getPlural("Pod"));
 ```
 
 ### work-with-other-sdks
@@ -155,6 +147,10 @@ JsonNode json = client.getResource("Pod", "default", "busybox");
 io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toString(), io.fabric8.kubernetes.api.model.Pod.class);
 ```
 
+## docs
+
+- [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
+
 ## Roadmap
 
 - ~~1.3.0:  using Apache httpComponents~~
@@ -172,6 +168,6 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 - ~~4.0.0:  support multiple group~~
 - ~~4.5.0:  fix minor bugs~~
 - ~~5.0.0:  support bind~~
-- ~~5.1.0：support mutiple clients~~ 
+- ~~5.1.0   support mutiple clients~~ 
 - ~~6.0.0:  support watching Object~~
-- 7.0.0: using maven repository
+- 7.0.0:  using maven repository

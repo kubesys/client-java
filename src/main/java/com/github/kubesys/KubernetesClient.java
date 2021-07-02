@@ -151,9 +151,41 @@ public class KubernetesClient {
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
+		updateJsonIfNeed(json);
+		
 		final String uri = createUrl(json);
-
+		
 		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, json.toString())));
+	}
+
+	private void updateJsonIfNeed(JsonNode json) {
+		ObjectNode meta = (ObjectNode) json.get("metadata");
+		
+		if (meta.has("creationTimestamp")) {
+			meta.remove("creationTimestamp");
+		}
+		
+		if (meta.has("managedFields")) {
+			meta.remove("managedFields");
+		}
+		
+		if (meta.has("resourceVersion")) {
+			meta.remove("resourceVersion");
+		}
+		
+		if (meta.has("uid")) {
+			meta.remove("uid");
+		}
+		
+		ObjectNode spec = (ObjectNode) json.get("metadata");
+		
+		if (spec.has("nodeName")) {
+			spec.remove("nodeName");
+		}
+		
+		if (json.has("status")) {
+			((ObjectNode) json).remove("status");
+		}
 	}
 
 	/**
@@ -176,7 +208,7 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
-		return deleteResource(getKind(json), getNamespace(json), getName(json));
+		return deleteResource(getFullKind(json), getNamespace(json), getName(json));
 	}
 
 	/**
