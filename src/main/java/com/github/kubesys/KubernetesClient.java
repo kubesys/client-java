@@ -177,7 +177,7 @@ public class KubernetesClient {
 			meta.remove("uid");
 		}
 		
-		ObjectNode spec = (ObjectNode) json.get("metadata");
+		ObjectNode spec = (ObjectNode) json.get("spec");
 		
 		if (spec.has("nodeName")) {
 			spec.remove("nodeName");
