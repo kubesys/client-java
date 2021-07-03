@@ -4,6 +4,7 @@
 package com.github.kubesys;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -45,10 +46,10 @@ public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTes
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
 
-		create(client);
+//		create(client);
 //		updateStatus(client);
 //		update(client);
-//		get(client);
+		create(client, get(client));
 //		list(client);
 //		delete(client);
 		
@@ -80,15 +81,20 @@ public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTes
 	}
 
 
-	protected static void get(KubernetesClient client) throws Exception {
+	protected static JsonNode get(KubernetesClient client) throws Exception {
 //		System.out.println(client.getResource("Deployment", "default", "busybox").toPrettyString());
 		// or
-		System.out.println(client.getResource("apps.Deployment", "default", "busybox").toPrettyString());
+//		System.out.println(client.getResource("apps.Deployment", "default", "busybox").toPrettyString());
+		return client.getResource("Pod", "default", "busybox");
 	}
 
 
 	protected static void create(KubernetesClient client) throws Exception {
 		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
+	}
+	
+	protected static void create(KubernetesClient client, JsonNode json) throws Exception {
+		System.out.println(client.createResource(json));
 	}
 
 	protected static void update(KubernetesClient client) throws Exception {

@@ -151,42 +151,11 @@ public class KubernetesClient {
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
-		updateJsonIfNeed(json);
-		
 		final String uri = createUrl(json);
 		
 		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, json.toString())));
 	}
 
-	private void updateJsonIfNeed(JsonNode json) {
-		ObjectNode meta = (ObjectNode) json.get("metadata");
-		
-		if (meta.has("creationTimestamp")) {
-			meta.remove("creationTimestamp");
-		}
-		
-		if (meta.has("managedFields")) {
-			meta.remove("managedFields");
-		}
-		
-		if (meta.has("resourceVersion")) {
-			meta.remove("resourceVersion");
-		}
-		
-		if (meta.has("uid")) {
-			meta.remove("uid");
-		}
-		
-		ObjectNode spec = (ObjectNode) json.get("spec");
-		
-		if (spec.has("nodeName")) {
-			spec.remove("nodeName");
-		}
-		
-		if (json.has("status")) {
-			((ObjectNode) json).remove("status");
-		}
-	}
 
 	/**
 	 * delete a Kubernetes resource using JSON
