@@ -235,6 +235,7 @@ public class KubernetesClient {
 		
 		ObjectNode metadata = new ObjectMapper().createObjectNode();
 		metadata.put("name", pod.get("metadata").get("name").asText());
+		metadata.put("namespace", pod.get("metadata").get("namespace").asText());
 		binding.set("metadata", metadata);
 		
 		ObjectNode target = new ObjectMapper().createObjectNode();
