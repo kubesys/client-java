@@ -5,7 +5,7 @@
 
 	<groupId>io.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>7.0.0</version>
+	<version>1.20.0</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
