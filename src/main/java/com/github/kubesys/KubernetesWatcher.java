@@ -6,11 +6,13 @@ package com.github.kubesys;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.kubesys.KubernetesClient.HttpCaller;
 
 /**
  * @author  wuheng@iscas.ac.cn
@@ -22,19 +24,13 @@ public abstract class KubernetesWatcher implements Runnable {
 	/**
 	 * client
 	 */
-	protected CloseableHttpClient httpClient;
+	protected HttpCaller httpCaller;
 	
 	protected HttpGet request;
 
-	protected final KubernetesClient kubeClient;
-	
-	public KubernetesWatcher(KubernetesClient kubeClient) {
+	public KubernetesWatcher(HttpCaller httpCaller) {
 		super();
-		this.kubeClient = kubeClient;
-	}
-
-	public void setHttpClient(CloseableHttpClient httpClient) {
-		this.httpClient = httpClient;
+		this.httpCaller = httpCaller;
 	}
 
 	public void setRequest(HttpGet request) {
@@ -45,8 +41,10 @@ public abstract class KubernetesWatcher implements Runnable {
 	public void run() {
 		
 		try {
+			CloseableHttpResponse execute = httpCaller.getHttpClient()
+					.execute(request);
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-						httpClient.execute(request).getEntity().getContent()));
+						execute.getEntity().getContent()));
 		    String line = null;
 		    while ((line = br.readLine()) != null) {
 		    	JsonNode json = new ObjectMapper().readTree(line);

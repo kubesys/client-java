@@ -402,8 +402,6 @@ public class KubernetesClient {
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
 
-		HttpCaller cloneHttpClient = new HttpCaller();
-		watcher.setHttpClient(cloneHttpClient.getHttpClient());
 		watcher.setRequest(HttpUtil.get(httpCaller.getTokenInfo(), watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
 		thread.start();
@@ -432,8 +430,6 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		HttpCaller cloneHttpClient = new HttpCaller();
-		watcher.setHttpClient(cloneHttpClient.getHttpClient());
 		watcher.setRequest(HttpUtil.get(httpCaller.getTokenInfo(), watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace);
 		thread.start();
@@ -707,12 +703,12 @@ public class KubernetesClient {
 		protected final CloseableHttpClient httpClient;
 
 		/**
+		 * @param masterUrl
+		 * @param tokenInfo
 		 */
-		public HttpCaller() {
-			super();
-			this.httpClient = createDefaultHttpClient();
+		public HttpCaller(HttpCaller caller) {
+			this(caller.getMasterUrl(), caller.getTokenInfo());
 		}
-		
 		/**
 		 * @param masterUrl
 		 * @param tokenInfo

@@ -25,7 +25,7 @@ import sun.security.x509.X509CertImpl;
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
  **/
-@SuppressWarnings({ "deprecation", "restriction"})
+@SuppressWarnings({ "deprecation"})
 public class SSLUtil {
 
 	public static final Logger m_logger = Logger.getLogger(SSLUtil.class.getName());

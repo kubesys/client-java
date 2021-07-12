@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.kubesys.KubernetesAnalyzer;
 import com.github.kubesys.KubernetesClient;
+import com.github.kubesys.KubernetesClient.HttpCaller;
 import com.github.kubesys.KubernetesConstants;
 import com.github.kubesys.KubernetesWatcher;
 import com.github.kubesys.utils.URLUtil;
@@ -27,8 +28,8 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 	 */
 	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
 	
-	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client) {
-		super(client);
+	public AutoDiscoverCustomizedResourcesWacther(HttpCaller httpCaller) {
+		super(httpCaller);
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 							.VALUE_APIS, apiGroup, version);
 		
 		try {
-			kubeClient.getAnalyzer().registerKinds(kubeClient.getHttpCaller(), url);
+//			kubeClient.getAnalyzer().registerKinds(httpCaller, url);
 		} catch (Exception e) {
 			m_logger.warning(e.getMessage());
 		}
@@ -63,16 +64,16 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String apiGroup  = spec.get(KubernetesConstants.KUBE_SPEC_GROUP).asText();
 		String fullKind  = apiGroup + "." + shortKind;
 		
-		KubernetesAnalyzer analyzer = kubeClient.getAnalyzer();
-		analyzer.removeFullKind(shortKind, fullKind);
-		
-		analyzer.removeKindBy(fullKind);
-		analyzer.removeNameBy(fullKind);
-		analyzer.removeGroupBy(fullKind);
-		analyzer.removeVersionBy(fullKind);
-		analyzer.removeNamespacedBy(fullKind);
-		analyzer.removeApiPrefixBy(fullKind);
-		analyzer.removeVerbsBy(fullKind);
+//		KubernetesAnalyzer analyzer = kubeClient.getAnalyzer();
+//		analyzer.removeFullKind(shortKind, fullKind);
+//		
+//		analyzer.removeKindBy(fullKind);
+//		analyzer.removeNameBy(fullKind);
+//		analyzer.removeGroupBy(fullKind);
+//		analyzer.removeVersionBy(fullKind);
+//		analyzer.removeNamespacedBy(fullKind);
+//		analyzer.removeApiPrefixBy(fullKind);
+//		analyzer.removeVerbsBy(fullKind);
 		
 		m_logger.info("unregister " + shortKind);
 	}
@@ -84,17 +85,17 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	@Override
 	public void doClose() {
-		try {
-			this.kubeClient.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
-					KubernetesConstants.VALUE_ALL_NAMESPACES, 
-					new AutoDiscoverCustomizedResourcesWacther(kubeClient));
-		} catch (Exception e) {
-			try {
-				Thread.sleep(5000);
-			} catch (Exception e1) {
-				doClose();
-			}
-		}
+//		try {
+//			this.kubeClient.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
+//					KubernetesConstants.VALUE_ALL_NAMESPACES, 
+//					new AutoDiscoverCustomizedResourcesWacther(kubeClient));
+//		} catch (Exception e) {
+//			try {
+//				Thread.sleep(5000);
+//			} catch (Exception e1) {
+//				doClose();
+//			}
+//		}
 	}
 
 }

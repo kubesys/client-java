@@ -1,19 +1,21 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package com.github.kubesys;
+package com.github.kubesys.testcases;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.kubesys.AbstractKubernetesClientTest;
+import com.github.kubesys.KubernetesClient;
 
 
 /**
  * @author wuheng09@gmail.com
  *
  */
-public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTest {
+public class LifecycleTest extends AbstractKubernetesClientTest {
 
 	static String CreateJSON = "{\r\n"
 			+ "  \"apiVersion\": \"v1\",\r\n"

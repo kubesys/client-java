@@ -6,6 +6,7 @@ package com.github.kubesys;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.kubesys.KubernetesClient.HttpCaller;
 
 /**
  * @author  wuheng09@gmail.com
@@ -16,8 +17,8 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 
 	protected final Class<?> clz;
 	
-	public KubernetesObjectWatcher(KubernetesClient kubeClient) throws Exception {
-		super(kubeClient);
+	public KubernetesObjectWatcher(HttpCaller kubeCaller) throws Exception {
+		super(kubeCaller);
 		String gSclz = getClass().getGenericSuperclass().getTypeName();
 		int idx = gSclz.indexOf("<");
 		int edx = gSclz.indexOf(">");
