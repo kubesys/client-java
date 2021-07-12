@@ -17,7 +17,7 @@ import org.apache.http.entity.StringEntity;
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
  **/
-public class HttpUtils {
+public class HttpUtil {
 
 
 	/**

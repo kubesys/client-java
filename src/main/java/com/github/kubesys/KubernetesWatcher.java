@@ -3,7 +3,6 @@
  */
 package com.github.kubesys;
 
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -14,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * @author  wuheng09@gmail.com
+ * @author  wuheng@iscas.ac.cn
  * 
  * 
  **/

@@ -10,7 +10,7 @@ import com.github.kubesys.KubernetesAnalyzer;
 import com.github.kubesys.KubernetesClient;
 import com.github.kubesys.KubernetesConstants;
 import com.github.kubesys.KubernetesWatcher;
-import com.github.kubesys.utils.URLUtils;
+import com.github.kubesys.utils.URLUtil;
 
 
 /**
@@ -41,11 +41,11 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtils.join(KubernetesConstants
+		String url = URLUtil.join(KubernetesConstants
 							.VALUE_APIS, apiGroup, version);
 		
 		try {
-			kubeClient.getAnalyzer().registerKinds(kubeClient, url);
+			kubeClient.getAnalyzer().registerKinds(kubeClient.getHttpCaller(), url);
 		} catch (Exception e) {
 			m_logger.warning(e.getMessage());
 		}

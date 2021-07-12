@@ -46,10 +46,10 @@ public class KubernetesResourceLifecycleTest extends AbstractKubernetesClientTes
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
 
-//		create(client);
+		create(client);
 //		updateStatus(client);
 //		update(client);
-		create(client, get(client));
+//		create(client, get(client));
 //		list(client);
 //		delete(client);
 		

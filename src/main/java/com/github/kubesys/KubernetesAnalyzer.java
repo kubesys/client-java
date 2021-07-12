@@ -13,8 +13,9 @@ import java.util.logging.Logger;
 import org.apache.http.client.methods.HttpGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.kubesys.utils.HttpUtils;
-import com.github.kubesys.utils.URLUtils;
+import com.github.kubesys.KubernetesClient.HttpCaller;
+import com.github.kubesys.utils.HttpUtil;
+import com.github.kubesys.utils.URLUtil;
 
 /**
  * @author wuheng09@gmail.com
@@ -30,7 +31,6 @@ public final class KubernetesAnalyzer {
 	
 	
 	
-	
 	/*******************************************
 	 * 
 	 *            Core
@@ -39,14 +39,14 @@ public final class KubernetesAnalyzer {
 	 ********************************************/
 	
 	/**
-	 * @param client              client
+	 * @param  caller              caller
 	 * @throws Exception          exception 
 	 */
-	public KubernetesAnalyzer(KubernetesClient client) throws Exception {
+	public KubernetesAnalyzer(HttpCaller caller) throws Exception {
 		
-		HttpGet request = HttpUtils.get(client.tokenInfo, client.masterUrl);
+		HttpGet request = HttpUtil.get(caller.getTokenInfo(), caller.getMasterUrl());
 		
-		JsonNode resp = client.getResponse(client.httpClient.execute(request));
+		JsonNode resp = caller.getResponse(request);
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
 			throw new Exception("Fail to init HTTP(s) client, forbidden users or invalid token.");
@@ -68,7 +68,7 @@ public final class KubernetesAnalyzer {
 
 				// register it
 				try {
-					registerKinds(client, path);
+					registerKinds(caller, path);
 				} catch (Exception ex) {
 					// warning
 				}
@@ -77,17 +77,17 @@ public final class KubernetesAnalyzer {
 	}
 
 	/**
-	 * @param client              client
+	 * @param caller             caller
 	 * @param path                path
 	 * @throws Exception          exception
 	 */
-	public void registerKinds(KubernetesClient client, String path) throws Exception {
+	public void registerKinds(HttpCaller caller, String path) throws Exception {
 		
-		String uri = URLUtils.join(client.getMasterUrl(), path);
+		String uri = URLUtil.join(caller.getMasterUrl(), path);
 		
-		HttpGet request = HttpUtils.get(client.tokenInfo, uri);
+		HttpGet request = HttpUtil.get(caller.getTokenInfo(), uri);
 		
-		JsonNode response  = client.getResponse(client.httpClient.execute(request));
+		JsonNode response  = caller.getResponse(request);
 		
 		JsonNode resources = response.get(KubernetesConstants.HTTP_RESPONSE_RESOURCES);
 		

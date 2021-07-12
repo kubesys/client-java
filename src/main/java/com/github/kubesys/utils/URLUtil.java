@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
  **/
-public class URLUtils {
+public class URLUtil {
 
 	/**
 	 * @param parts path

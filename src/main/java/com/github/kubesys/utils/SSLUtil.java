@@ -26,9 +26,9 @@ import sun.security.x509.X509CertImpl;
  * 
  **/
 @SuppressWarnings({ "deprecation", "restriction"})
-public class SSLUtils {
+public class SSLUtil {
 
-	public static final Logger m_logger = Logger.getLogger(SSLUtils.class.getName());
+	public static final Logger m_logger = Logger.getLogger(SSLUtil.class.getName());
 	
 	/**
 	 * @return                                 SocketFactory

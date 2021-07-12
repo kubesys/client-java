@@ -9,6 +9,11 @@ import java.util.logging.Logger;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
@@ -20,17 +25,16 @@ import org.apache.http.impl.client.HttpClients;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.kubesys.utils.HttpUtils;
-import com.github.kubesys.utils.SSLUtils;
-import com.github.kubesys.utils.URLUtils;
+import com.github.kubesys.utils.HttpUtil;
+import com.github.kubesys.utils.SSLUtil;
+import com.github.kubesys.utils.URLUtil;
 
 /**
  * @author wuheng@iscas.ac.cn
  *
- *         Support create, update, delete, get and list [Kubernetes
- *         resources](https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- *         by using [Kubernetes native
- *         API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/)
+ * Support create, update, delete, get and list [Kubernetes resources]
+ * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
+ * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
  * 
  */
 public class KubernetesClient {
@@ -40,25 +44,17 @@ public class KubernetesClient {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 
+	
 	/**
-	 * master IP
+	 * caller
 	 */
-	protected final String masterUrl;
-
-	/**
-	 * token
-	 */
-	protected final String tokenInfo;
-
+	protected final HttpCaller httpCaller;
+	
 	/**
 	 * analyzer
 	 */
 	protected final KubernetesAnalyzer kubeAnalyzer;
 
-	/**
-	 * client
-	 */
-	protected final CloseableHttpClient httpClient;
 
 	/**
 	 * @param masterUrl masterUrl
@@ -74,10 +70,8 @@ public class KubernetesClient {
 	 * @throws Exception 
 	 */
 	public KubernetesClient(String masterUrl, String tokenInfo) throws Exception {
-		this.masterUrl = masterUrl;
-		this.tokenInfo = tokenInfo;
-		this.httpClient = createDefaultHttpClient();
-		this.kubeAnalyzer = new KubernetesAnalyzer(this);
+		this.httpCaller = new HttpCaller(masterUrl, tokenInfo);
+		this.kubeAnalyzer = new KubernetesAnalyzer(httpCaller);
 	}
 
 	/**
@@ -87,43 +81,10 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String masterUrl, String tokenInfo, KubernetesAnalyzer kubeAnalyzer) {
 		super();
-		this.masterUrl = masterUrl;
-		this.tokenInfo = tokenInfo;
-		this.httpClient = createDefaultHttpClient();
+		this.httpCaller = new HttpCaller(masterUrl, tokenInfo);
 		this.kubeAnalyzer = kubeAnalyzer;
 	}
 
-	/**
-	 * @return httpClient
-	 */
-	protected CloseableHttpClient createDefaultHttpClient() {
-
-		SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(0).setSoReuseAddress(true)
-				.build();
-
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(0).setConnectionRequestTimeout(0)
-				.setSocketTimeout(0).build();
-
-		return createDefaultHttpClientBuilder().setConnectionTimeToLive(0, TimeUnit.SECONDS)
-				.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
-				.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();
-	}
-
-	/**
-	 * @return builder
-	 */
-	protected HttpClientBuilder createDefaultHttpClientBuilder() {
-		HttpClientBuilder builder = HttpClients.custom();
-
-		if (this.tokenInfo != null) {
-			builder.setSSLHostnameVerifier(SSLUtils.createHostnameVerifier())
-					.setSSLSocketFactory(SSLUtils.createSocketFactory());
-		}
-
-		return builder;
-	}
 
 	/**********************************************************
 	 * 
@@ -153,7 +114,11 @@ public class KubernetesClient {
 
 		final String uri = createUrl(json);
 		
-		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, json.toString())));
+		HttpPost request = HttpUtil.post(
+				httpCaller.getTokenInfo(), 
+				uri, json.toString());
+		
+		return httpCaller.getResponse(request);
 	}
 
 
@@ -193,7 +158,9 @@ public class KubernetesClient {
 
 		final String uri = deleteUrl(kind, namespace, name);
 
-		return getResponse(httpClient.execute(HttpUtils.delete(tokenInfo, uri)));
+		HttpDelete request = HttpUtil.delete(httpCaller.tokenInfo, uri);
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -213,7 +180,11 @@ public class KubernetesClient {
 			node.remove(KubernetesConstants.KUBE_STATUS);
 		}
 
-		return getResponse(httpClient.execute(HttpUtils.put(tokenInfo, uri, json.toString())));
+		HttpPut request = HttpUtil.put(
+				httpCaller.getTokenInfo(), 
+				uri, json.toString());
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -244,7 +215,12 @@ public class KubernetesClient {
 		binding.set("target", target);
 			
 		final String uri = bindingUrl(binding);
-		return getResponse(httpClient.execute(HttpUtils.post(tokenInfo, uri, binding.toString())));
+		
+		HttpPost request = HttpUtil.post(
+					httpCaller.tokenInfo, 
+					uri, binding.toString());
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -273,7 +249,9 @@ public class KubernetesClient {
 
 		final String uri = getUrl(kind, namespace, name);
 
-		return getResponse(httpClient.execute(HttpUtils.get(tokenInfo, uri)));
+		HttpGet request = HttpUtil.get(httpCaller.getTokenInfo(), uri);
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -290,7 +268,8 @@ public class KubernetesClient {
 		final String uri = getUrl(kind, namespace, name);
 
 		try {
-			getResponse(httpClient.execute(HttpUtils.get(tokenInfo, uri)));
+			HttpGet request = HttpUtil.get(httpCaller.getTokenInfo(), uri);
+			httpCaller.getResponse(request);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -373,7 +352,9 @@ public class KubernetesClient {
 			uri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 
-		return getResponse(httpClient.execute(HttpUtils.get(tokenInfo, uri.toString())));
+		HttpGet request = HttpUtil.get(httpCaller.getTokenInfo(), uri.toString());
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -387,7 +368,11 @@ public class KubernetesClient {
 
 		final String uri = updateStatusUrl(getKind(json), getNamespace(json), getName(json));
 
-		return getResponse(httpClient.execute(HttpUtils.put(tokenInfo, uri, json.toString())));
+		HttpPut request = HttpUtil.put(
+				httpCaller.getTokenInfo(), 
+				uri, json.toString());
+		
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -416,9 +401,9 @@ public class KubernetesClient {
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
 
-		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
-		watcher.setHttpClient(cloneHttpClient);
-		watcher.setRequest(HttpUtils.get(tokenInfo, watchOneUrl(kind, namespace, name)));
+		HttpCaller cloneHttpClient = new HttpCaller();
+		watcher.setHttpClient(cloneHttpClient.getHttpClient());
+		watcher.setRequest(HttpUtil.get(httpCaller.getTokenInfo(), watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
 		thread.start();
 		return thread;
@@ -446,70 +431,14 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		CloseableHttpClient cloneHttpClient = createDefaultHttpClient();
-		watcher.setHttpClient(cloneHttpClient);
-		watcher.setRequest(HttpUtils.get(tokenInfo, watchAllUrl(kind, namespace)));
+		HttpCaller cloneHttpClient = new HttpCaller();
+		watcher.setHttpClient(cloneHttpClient.getHttpClient());
+		watcher.setRequest(HttpUtil.get(httpCaller.getTokenInfo(), watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace);
 		thread.start();
 		return thread;
 	}
 
-	/**********************************************************
-	 * 
-	 * Request and Response
-	 * 
-	 **********************************************************/
-
-	/**
-	 * @param response response
-	 * @return response
-	 */
-	protected synchronized JsonNode getResponse(CloseableHttpResponse response) {
-
-		try {
-			JsonNode result = new ObjectMapper().readTree(response.getEntity().getContent());
-			if (result.has("status") && result.get("status").asText().equals("Failure")) {
-				throw new Exception(result.toPrettyString());
-			}
-			return result;
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		} finally {
-			if (response != null) {
-				try {
-					response.close();
-				} catch (IOException e) {
-					m_logger.severe(e.toString());
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	protected void close() {
-		if (httpClient != null) {
-			try {
-				httpClient.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
-	/**
-	 * @return httpClient
-	 */
-	public CloseableHttpClient getHttpClient() {
-		return httpClient;
-	}
-
-	/**
-	 * @return url
-	 */
-	public String getMasterUrl() {
-		return masterUrl;
-	}
 
 	/**
 	 * @return analyzer
@@ -609,7 +538,7 @@ public class KubernetesClient {
 
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 ? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
+		return URLUtil.join(httpCaller.getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
 				kubeAnalyzer.getName(fullKind));
 	}
 
@@ -625,7 +554,7 @@ public class KubernetesClient {
 
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 ? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		return URLUtils.join(getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
+		return URLUtil.join(httpCaller.getMasterUrl(), uri, getNamespace(kubeAnalyzer.isNamespaced(fullKind), getNamespace(json)),
 				"pods", json.get("metadata").get("name").asText(), "binding");
 	}
 
@@ -638,7 +567,7 @@ public class KubernetesClient {
 	 */
 	protected String deleteUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
 				kubeAnalyzer.getName(fullKind), name);
 	}
 
@@ -651,7 +580,7 @@ public class KubernetesClient {
 	 */
 	protected String updateUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
 				kubeAnalyzer.getName(fullKind), name);
 	}
 
@@ -664,7 +593,7 @@ public class KubernetesClient {
 	 */
 	protected String getUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
 				kubeAnalyzer.getName(fullKind), name);
 	}
 
@@ -676,7 +605,7 @@ public class KubernetesClient {
 	 */
 	protected String listUrl(String kind, String ns) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
 				kubeAnalyzer.getName(fullKind));
 	}
 
@@ -689,7 +618,7 @@ public class KubernetesClient {
 	 */
 	protected String updateStatusUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns),
 				kubeAnalyzer.getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
 	}
 
@@ -702,7 +631,7 @@ public class KubernetesClient {
 	 */
 	protected String watchOneUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
 				getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns), kubeAnalyzer.getName(fullKind), name,
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
@@ -715,7 +644,7 @@ public class KubernetesClient {
 	 */
 	protected String watchAllUrl(String kind, String ns) throws Exception {
 		String fullKind = kind.indexOf(".") == -1 ? kubeAnalyzer.getFullKind(kind) : kind;
-		return URLUtils.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+		return URLUtil.join(kubeAnalyzer.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
 				getNamespace(kubeAnalyzer.isNamespaced(fullKind), ns), kubeAnalyzer.getName(fullKind),
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
@@ -730,12 +659,6 @@ public class KubernetesClient {
 				? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
 				: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}
-
-	/*******************************************
-	 * 
-	 * Utils
-	 * 
-	 ********************************************/
 
 	/**
 	 * @return json
@@ -756,5 +679,139 @@ public class KubernetesClient {
 		}
 
 		return map;
+	}
+	
+	
+	public HttpCaller getHttpCaller() {
+		return httpCaller;
+	}
+
+
+
+	public static class HttpCaller {
+		
+		/**
+		 * master IP
+		 */
+		protected String masterUrl;
+
+		/**
+		 * token
+		 */
+		protected String tokenInfo;
+
+		/**
+		 * client
+		 */
+		protected final CloseableHttpClient httpClient;
+
+		/**
+		 */
+		public HttpCaller() {
+			super();
+			this.httpClient = createDefaultHttpClient();
+		}
+		
+		/**
+		 * @param masterUrl
+		 * @param tokenInfo
+		 */
+		public HttpCaller(String masterUrl, String tokenInfo) {
+			super();
+			this.masterUrl = masterUrl;
+			this.tokenInfo = tokenInfo;
+			this.httpClient = createDefaultHttpClient();
+		}
+		
+		/**
+		 * @return httpClient
+		 */
+		protected CloseableHttpClient createDefaultHttpClient() {
+
+			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(0).setSoReuseAddress(true)
+					.build();
+
+			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(0).setConnectionRequestTimeout(0)
+					.setSocketTimeout(0).build();
+
+			return createDefaultHttpClientBuilder().setConnectionTimeToLive(0, TimeUnit.SECONDS)
+					.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
+					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
+					.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();
+		}
+
+		/**
+		 * @return builder
+		 */
+		protected HttpClientBuilder createDefaultHttpClientBuilder() {
+			HttpClientBuilder builder = HttpClients.custom();
+
+			if (this.tokenInfo != null) {
+				builder.setSSLHostnameVerifier(SSLUtil.createHostnameVerifier())
+						.setSSLSocketFactory(SSLUtil.createSocketFactory());
+			}
+
+			return builder;
+		}
+
+		/**
+		 * @param response response
+		 * @return response
+		 */
+		public synchronized JsonNode getResponse(CloseableHttpResponse response) {
+
+			try {
+				JsonNode result = new ObjectMapper().readTree(response.getEntity().getContent());
+				if (result.has("status") && result.get("status").asText().equals("Failure")) {
+					throw new Exception(result.toPrettyString());
+				}
+				return result;
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			} finally {
+				if (response != null) {
+					try {
+						response.close();
+					} catch (IOException e) {
+						m_logger.severe(e.toString());
+					}
+				}
+			}
+		}
+		
+		/**
+		 * @param  caller caller
+		 * @return response
+		 * @throws Exception 
+		 */
+		public synchronized JsonNode getResponse(HttpRequestBase req) throws Exception {
+			return getResponse(httpClient.execute(req)); 
+		}
+
+		/**
+		 * 
+		 */
+		protected void close() {
+			if (httpClient != null) {
+				try {
+					httpClient.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		
+		public String getMasterUrl() {
+			return masterUrl;
+		}
+
+		public String getTokenInfo() {
+			return tokenInfo;
+		}
+
+		public CloseableHttpClient getHttpClient() {
+			return httpClient;
+		}
+		
 	}
 }
