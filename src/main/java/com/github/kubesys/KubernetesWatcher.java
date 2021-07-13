@@ -8,11 +8,9 @@ import java.io.InputStreamReader;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.kubesys.KubernetesClient.HttpCaller;
 
 /**
  * @author  wuheng@iscas.ac.cn
@@ -24,13 +22,13 @@ public abstract class KubernetesWatcher implements Runnable {
 	/**
 	 * client
 	 */
-	protected HttpCaller httpCaller;
+	protected KubernetesClient client;
 	
 	protected HttpGet request;
 
-	public KubernetesWatcher(HttpCaller httpCaller) {
+	public KubernetesWatcher(KubernetesClient client) {
 		super();
-		this.httpCaller = httpCaller;
+		this.client = client;
 	}
 
 	public void setRequest(HttpGet request) {
@@ -41,11 +39,13 @@ public abstract class KubernetesWatcher implements Runnable {
 	public void run() {
 		
 		try {
-			CloseableHttpResponse execute = httpCaller.getHttpClient()
-					.execute(request);
+			CloseableHttpResponse execute = client.getHttpCaller()
+								.getHttpClient().execute(request);
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 						execute.getEntity().getContent()));
 		    String line = null;
+		    
 		    while ((line = br.readLine()) != null) {
 		    	JsonNode json = new ObjectMapper().readTree(line);
 		    	if (!json.has(KubernetesConstants.KUBE_TYPE)) {

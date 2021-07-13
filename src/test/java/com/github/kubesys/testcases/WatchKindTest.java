@@ -20,7 +20,7 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
 		
-		KubernetesWatcher watcher = new KubernetesWatcher(client.getHttpCaller()) {
+		KubernetesWatcher watcher = new KubernetesWatcher(client) {
 			
 			@Override
 			public void doModified(JsonNode node) {
@@ -47,7 +47,9 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 		// or
 //		client.watchResources("apps.Deployment", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
-		System.out.println("This name");
+		System.out.println("Start...");
+		Thread.sleep(10000);
+		System.out.println("End...");
 	}
 
 
