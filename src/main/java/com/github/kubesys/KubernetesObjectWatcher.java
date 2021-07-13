@@ -4,6 +4,8 @@
 package com.github.kubesys;
 
 
+import java.util.logging.Logger;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,6 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  **/
 public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 
+	/**
+	 * m_logger
+	 */
+	public static final Logger m_logger = Logger.getLogger(KubernetesObjectWatcher.class.getName());
+	
 	protected final Class<?> clz;
 	
 	public KubernetesObjectWatcher(KubernetesClient client) throws Exception {
@@ -51,7 +58,7 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 			doObjectAdded((O) new ObjectMapper().readValue(
 								node.toPrettyString(), clz));
 		} catch (Exception e) {
-			e.printStackTrace();
+			m_logger.severe(e.getMessage());
 		}
 	}
 
@@ -62,7 +69,7 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 			doObjectModified((O) new ObjectMapper().readValue(
 								node.toPrettyString(), clz));
 		} catch (Exception e) {
-			e.printStackTrace();
+			m_logger.severe(e.getMessage());
 		}
 	}
 
@@ -73,7 +80,7 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 			doObjectDeleted((O) new ObjectMapper().readValue(
 								node.toPrettyString(), clz));
 		} catch (Exception e) {
-			e.printStackTrace();
+			m_logger.severe(e.getMessage());
 		}
 	}
 	
