@@ -521,16 +521,16 @@ public class KubernetesClient {
 		 */
 		protected final CloseableHttpClient httpClient;
 
+		
 		/**
-		 * @param masterUrl
-		 * @param token
+		 * @param caller       caller
 		 */
 		public HttpCaller(HttpCaller caller) {
 			this(caller.getMasterUrl(), caller.getToken());
 		}
 		/**
-		 * @param masterUrl
-		 * @param token
+		 * @param masterUrl    masterUrl    
+		 * @param token        token
 		 */
 		public HttpCaller(String masterUrl, String token) {
 			super();
@@ -572,8 +572,8 @@ public class KubernetesClient {
 		}
 
 		/**
-		 * @param response response
-		 * @return response
+		 * @param response        response
+		 * @return json           json 
 		 */
 		protected synchronized JsonNode parseResponse(CloseableHttpResponse response) {
 
@@ -597,9 +597,9 @@ public class KubernetesClient {
 		}
 		
 		/**
-		 * @param  caller caller
-		 * @return response
-		 * @throws Exception 
+		 * @param  req             req
+		 * @return json            json 
+		 * @throws Exception       exception
 		 */
 		public synchronized JsonNode getResponse(HttpRequestBase req) throws Exception {
 			return parseResponse(httpClient.execute(req)); 
@@ -617,14 +617,23 @@ public class KubernetesClient {
 			}
 		}
 		
+		/**
+		 * @return   masterUrl
+		 */
 		public String getMasterUrl() {
 			return masterUrl;
 		}
 
+		/**
+		 * @return   token
+		 */
 		public String getToken() {
 			return token;
 		}
 
+		/**
+		 * @return   httpClient
+		 */
 		public CloseableHttpClient getHttpClient() {
 			return httpClient;
 		}
