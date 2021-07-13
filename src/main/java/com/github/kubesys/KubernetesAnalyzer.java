@@ -29,7 +29,10 @@ public final class KubernetesAnalyzer {
 	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
 	
-	
+	/**
+	 * caller
+	 */
+	protected final HttpCaller caller;
 	
 	/*******************************************
 	 * 
@@ -40,11 +43,13 @@ public final class KubernetesAnalyzer {
 	
 	/**
 	 * @param  caller              caller
-	 * @throws Exception          exception 
+	 * @throws Exception           exception 
 	 */
 	public KubernetesAnalyzer(HttpCaller caller) throws Exception {
 		
-		HttpGet request = HttpUtil.get(caller.getTokenInfo(), caller.getMasterUrl());
+		this.caller = caller;
+		
+		HttpGet request = HttpUtil.get(caller.getToken(), caller.getMasterUrl());
 		
 		JsonNode resp = caller.getResponse(request);
 		
@@ -77,7 +82,7 @@ public final class KubernetesAnalyzer {
 	}
 
 	/**
-	 * @param caller             caller
+	 * @param caller              caller
 	 * @param path                path
 	 * @throws Exception          exception
 	 */
@@ -85,7 +90,7 @@ public final class KubernetesAnalyzer {
 		
 		String uri = URLUtil.join(caller.getMasterUrl(), path);
 		
-		HttpGet request = HttpUtil.get(caller.getTokenInfo(), uri);
+		HttpGet request = HttpUtil.get(caller.getToken(), uri);
 		
 		JsonNode response  = caller.getResponse(request);
 		
@@ -139,12 +144,182 @@ public final class KubernetesAnalyzer {
 	
 	/*******************************************
 	 * 
-	 *            singleton
+	 * analysis-based Url
 	 * 
 	 ********************************************/
+	/**
+	 * @param json json
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String createUrl(JsonNode json) throws Exception {
+
+		String version = getApiVersion(json);
+		String uri = (version.indexOf("/") == -1) 
+				? "api/" + version : "apis/" + version;
+
+		String kind = getKind(json);
+		String fullKind = version.indexOf("/") == -1 
+				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
+		return URLUtil.join(caller.getMasterUrl(), uri, 
+				getNamespace(isNamespaced(fullKind), 
+						getNamespace(json)),
+						getName(fullKind));
+	}
+
+	/**
+	 * @param json json
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String bindingUrl(JsonNode json) throws Exception {
+
+		String version = getApiVersion(json);
+		String uri = (version.indexOf("/") == -1) 
+				? "api/" + version : "apis/" + version;
+
+		String kind = getKind(json);
+		String fullKind = version.indexOf("/") == -1 
+				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
+		return URLUtil.join(caller.getMasterUrl(), uri, 
+				getNamespace(isNamespaced(fullKind), 
+						getNamespace(json)),"pods", 
+				json.get("metadata").get("name").asText(), "binding");
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @param name name
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String deleteUrl(String kind, String ns, String name) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 
+				? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), 
+				getNamespace(isNamespaced(fullKind), ns),
+				getName(fullKind), name);
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @param name name
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String updateUrl(String kind, String ns, String name) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), getNamespace(isNamespaced(fullKind), ns),
+				getName(fullKind), name);
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @param name name
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String getUrl(String kind, String ns, String name) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), getNamespace(isNamespaced(fullKind), ns),
+				getName(fullKind), name);
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String listUrl(String kind, String ns) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), getNamespace(isNamespaced(fullKind), ns),
+				getName(fullKind));
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @param name name
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String updateStatusUrl(String kind, String ns, String name) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), getNamespace(isNamespaced(fullKind), ns),
+				getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @param name name
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String watchOneUrl(String kind, String ns, String name) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+				getNamespace(isNamespaced(fullKind), ns), getName(fullKind), name,
+				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+	}
+
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @return Url
+	 * @throws Exception exception
+	 */
+	public String watchAllUrl(String kind, String ns) throws Exception {
+		String fullKind = kind.indexOf(".") == -1 ? getFullKind(kind) : kind;
+		return URLUtil.join(getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
+				getNamespace(isNamespaced(fullKind), ns), getName(fullKind),
+				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
+	}
 	
 	
+	/**
+	 * @param json json
+	 * @return full path
+	 */
+	protected String getApiVersion(JsonNode json) {
+		return json.get("apiVersion").asText();
+
+	}
 	
+	public String getName(JsonNode json) {
+		return json.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAME).asText();
+	}
+
+	public String getNamespace(JsonNode json) {
+		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
+		return meta.has(KubernetesConstants.KUBE_METADATA_NAMESPACE)
+				? meta.get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText()
+				: KubernetesConstants.VALUE_DEFAULT_NAMESPACE;
+
+	}
+	
+	protected String getNamespace(boolean namespaced, String namespace) {
+		return (namespaced && namespace != null && namespace.length() != 0)
+				? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
+				: KubernetesConstants.VALUE_ALL_NAMESPACES;
+	}
+	
+	public String getKind(JsonNode json) {
+		return json.get(KubernetesConstants.KUBE_KIND).asText();
+	}
+
+	public String getFullKind(JsonNode json) {
+		String apiVersion = json.get(KubernetesConstants.KUBE_APIVERSION).asText();
+		String kind = json.get(KubernetesConstants.KUBE_KIND).asText();
+		if(apiVersion.indexOf("/") > 0) {
+			return apiVersion.substring(0, apiVersion.indexOf("/"))+ "." + kind;
+		}
+		return kind;
+	}
 	
 	/*******************************************
 	 * 
