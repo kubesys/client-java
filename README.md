@@ -6,8 +6,15 @@ We expect to provide a Java client:
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
 - **Integration**. It can work with the other Kubernetes clients, such as [fabric8](https://github.com/fabric8io/kubernetes-client), [official](https://github.com/kubernetes-client/java/).
 
-This project is based on [httpclient](https://github.com/apache/httpcomponents-client) and [jackson](https://github.com/FasterXML/jackson-databind).
+This project is based on the following softwares.
 
+|               NAME            |   Website                       |      LICENSE              | 
+|-------------------------------|---------------------------------|---------------------------|
+|     Apache HttpComponent      |  https://github.com/apache/httpcomponents-client |  Apache License 2.0 |
+|     Apache Commons-codec      |  https://github.com/apache/commons-codec         |  Apache License 2.0 |
+|     FasterXML Jackson         |  https://github.com/FasterXML/jackson-databind   |  Apache License 2.0 |
+|     Snakeyaml                 |  https://github.com/asomov/snakeyaml             |  Apache License 2.0 |
+ 
 ## Comparison
 
 |                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project](https://github.com/kubesys/kubernetes-client)  | 
