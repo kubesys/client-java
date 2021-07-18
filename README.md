@@ -23,6 +23,9 @@ This project is based on the following softwares.
 |  Support customized Kubernetes resources  |  a lot of development          | a lot of development          |  zero-deployment     |
 |    Works with the other SDKs              |  complex                       | complex                       |  simple              |     
 
+## Architecture
+
+![avatar](/docs/arch.png)
  
 ## Installation
 
