@@ -70,18 +70,21 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this.caller = new HttpCaller(url, token);
-		this.analyzer = new KubernetesAnalyzer(caller);
+		this.analyzer = new KubernetesAnalyzer(this);
+		this.analyzer.start();
 	}
 
 	/**
 	 * @param url                   url
 	 * @param token                 token
 	 * @param analyzer              analyzer
+	 * @throws Exception            exception
 	 */
-	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) {
+	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
 		super();
 		this.caller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
+		this.analyzer.start();
 	}
 
 
@@ -111,7 +114,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
-		final String uri = analyzer.createUrl(json);
+		final String uri = analyzer.getConvertor().createUrl(json);
 		
 		HttpPost request = HttpUtil.post(
 						caller.getToken(), 
@@ -130,9 +133,9 @@ public class KubernetesClient {
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
-		return deleteResource(analyzer.getFullKind(json), 
-							  analyzer.getNamespace(json), 
-							  analyzer.getName(json));
+		return deleteResource(analyzer.getConvertor().getFullKind(json), 
+							  analyzer.getConvertor().getNamespace(json), 
+							  analyzer.getConvertor().getName(json));
 	}
 	
 	/**
@@ -159,7 +162,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
-		final String uri = analyzer.deleteUrl(kind, namespace, name);
+		final String uri = analyzer.getConvertor().deleteUrl(kind, namespace, name);
 
 		HttpDelete request = HttpUtil.delete(caller.token, uri);
 		
@@ -175,9 +178,9 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
-		final String uri = analyzer.updateUrl(analyzer.getFullKind(json), 
-										      analyzer.getNamespace(json), 
-										      analyzer.getName(json));
+		final String uri = analyzer.getConvertor().updateUrl(analyzer.getConvertor().getFullKind(json), 
+										      analyzer.getConvertor().getNamespace(json), 
+										      analyzer.getConvertor().getName(json));
 
 		if (json.has(KubernetesConstants.KUBE_STATUS)) {
 			((ObjectNode) json).remove(KubernetesConstants.KUBE_STATUS);
@@ -245,7 +248,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
 
-		final String uri = analyzer.getUrl(kind, namespace, name);
+		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
 		HttpGet request = HttpUtil.get(caller.getToken(), uri);
 		
@@ -263,7 +266,7 @@ public class KubernetesClient {
 	 */
 	public boolean hasResource(String kind, String namespace, String name) throws Exception {
 
-		final String uri = analyzer.getUrl(kind, namespace, name);
+		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
 		try {
 			HttpGet request = HttpUtil.get(caller.getToken(), uri);
@@ -330,7 +333,7 @@ public class KubernetesClient {
 			String nextId) throws Exception {
 		StringBuilder uri = new StringBuilder();
 
-		uri.append(analyzer.listUrl(kind, namespace));
+		uri.append(analyzer.getConvertor().listUrl(kind, namespace));
 
 		uri.append(KubernetesConstants.HTTP_QUERY_KIND + kind);
 
@@ -364,7 +367,9 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 
-		final String uri = analyzer.updateStatusUrl(analyzer.getKind(json), analyzer.getNamespace(json), analyzer.getName(json));
+		final String uri = analyzer.getConvertor().updateStatusUrl(analyzer.getConvertor().getKind(json), 
+							analyzer.getConvertor().getNamespace(json), 
+							analyzer.getConvertor().getName(json));
 
 		HttpPut request = HttpUtil.put(
 				caller.getToken(), 
@@ -399,7 +404,7 @@ public class KubernetesClient {
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
 
-		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.watchOneUrl(kind, namespace, name)));
+		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
 		thread.start();
 		return thread;
@@ -427,7 +432,7 @@ public class KubernetesClient {
 	 * @throws Exception                       exception
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.watchAllUrl(kind, namespace)));
+		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace);
 		thread.start();
 		return thread;
@@ -449,12 +454,6 @@ public class KubernetesClient {
 		return caller;
 	}
 	
-	/**********************************************************
-	 * 
-	 * Getter
-	 * 
-	 **********************************************************/
-
 	/**
 	 * @return kinds           kinds
 	 * @throws Exception       exception
@@ -462,7 +461,7 @@ public class KubernetesClient {
 	public JsonNode getKinds() throws Exception {
 		return new ObjectMapper().readTree(
 				new ObjectMapper().writeValueAsString(
-						getAnalyzer().fullKindToKindMapper.values()));
+						getAnalyzer().getRuleBase().fullKindToKindMapper.values()));
 	}
 	
 	/**
@@ -472,7 +471,7 @@ public class KubernetesClient {
 	public JsonNode getFullKinds() throws Exception {
 		return new ObjectMapper().readTree(
 				new ObjectMapper().writeValueAsString(
-						getAnalyzer().fullKindToKindMapper.keySet()));
+						getAnalyzer().getRuleBase().fullKindToKindMapper.keySet()));
 	}
 
 
@@ -484,12 +483,12 @@ public class KubernetesClient {
 		ObjectNode map = new ObjectMapper().createObjectNode();
 
 
-		for (String kind : analyzer.getNamespacedMapping().keySet()) {
+		for (String kind : analyzer.getRuleBase().fullKindToNamespacedMapper.keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
-			node.put("apiVersion", analyzer.fullKindToVersionMapper.get(kind));
-			node.put("kind", analyzer.fullKindToKindMapper.get(kind));
-			node.put("plural", analyzer.fullKindToNameMapper.get(kind));
-			node.set("verbs", analyzer.fullKindToVerbsMapper.get(kind));
+			node.put("apiVersion", analyzer.getRuleBase().fullKindToVersionMapper.get(kind));
+			node.put("kind", analyzer.getRuleBase().fullKindToKindMapper.get(kind));
+			node.put("plural", analyzer.getRuleBase().fullKindToNameMapper.get(kind));
+			node.set("verbs", analyzer.getRuleBase().fullKindToVerbsMapper.get(kind));
 
 			map.set(kind, node);
 		}
@@ -498,7 +497,6 @@ public class KubernetesClient {
 	}
 	
 	
-
 
 	/**
 	 * @author wuheng@iscas.ac.cn

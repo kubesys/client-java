@@ -18,40 +18,41 @@ import com.github.kubesys.KubernetesClient;
 public class LifecycleTest extends AbstractKubernetesClientTest {
 
 	static String CreateJSON = "{\r\n"
-			+ "  \"apiVersion\": \"v1\",\r\n"
-			+ "  \"kind\": \"Pod\",\r\n"
-			+ "  \"metadata\": {\r\n"
-			+ "    \"name\": \"busybox\",\r\n"
-			+ "    \"namespace\": \"default\"\r\n"
-			+ "  },\r\n"
-			+ "  \"spec\": {\r\n"
-			+ "    \"containers\": [\r\n"
-			+ "      {\r\n"
-			+ "        \"image\": \"busybox\",\r\n"
-			+ "        \"env\": [{\r\n"
-			+ "           \"name\": \"abc\",\r\n"
-			+ "           \"value\": \"abc\"\r\n"
-			+ "        }],\r\n"
-			+ "        \"command\": [\r\n"
-			+ "          \"sleep\",\r\n"
-			+ "          \"3600\"\r\n"
-			+ "        ],\r\n"
-			+ "        \"imagePullPolicy\": \"IfNotPresent\",\r\n"
-			+ "        \"name\": \"busybox\"\r\n"
-			+ "      }\r\n"
-			+ "    ],\r\n"
-			+ "    \"restartPolicy\": \"Always\"\r\n"
-			+ "  }\r\n"
+			+ "	\"apiVersion\": \"v1\",\r\n"
+			+ "	\"kind\": \"Pod\",\r\n"
+			+ "	\"metadata\": {\r\n"
+			+ "		\"name\": \"busybox\",\r\n"
+			+ "		\"namespace\": \"default\",\r\n"
+			+ "		\"labels\": {\r\n"
+			+ "			\"test\": \"test\"\r\n"
+			+ "		}\r\n"
+			+ "	},\r\n"
+			+ "	\"spec\": {\r\n"
+			+ "		\"containers\": [{\r\n"
+			+ "			\"image\": \"busybox\",\r\n"
+			+ "			\"env\": [{\r\n"
+			+ "				\"name\": \"abc\",\r\n"
+			+ "				\"value\": \"abc\"\r\n"
+			+ "			}],\r\n"
+			+ "			\"command\": [\r\n"
+			+ "				\"sleep\",\r\n"
+			+ "				\"3600\"\r\n"
+			+ "			],\r\n"
+			+ "			\"imagePullPolicy\": \"IfNotPresent\",\r\n"
+			+ "			\"name\": \"busybox\"\r\n"
+			+ "		}],\r\n"
+			+ "		\"restartPolicy\": \"Always\"\r\n"
+			+ "	}\r\n"
 			+ "}";
 	
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
 
-		create(client);
-//		updateStatus(client);
+//		create(client);
+		updateStatus(client);
 //		update(client);
-//		create(client, get(client));
+//		get(client);
 //		list(client);
 //		delete(client);
 		
@@ -59,13 +60,16 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 
 
 	protected static void updateStatus(KubernetesClient client) throws Exception {
-//		ObjectNode node = client.getResource("Deployment", "default", "busybox").deepCopy();
+		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
+		JsonNode status = node.get("status");
+		((ObjectNode) status).put("phase", "Testing");
+		System.out.println(client.updateResourceStatus(node));
 		// or
-		ObjectNode node = client.getResource("apps.Deployment", "default", "busybox").deepCopy();
-		ObjectNode status = (ObjectNode) node.get("status");
-		status.put("readyReplicas", 2);
-		status.put("replicas", 2);
-		System.out.println(client.updateResourceStatus(node).toPrettyString());
+//		ObjectNode node = client.getResource("apps.Deployment", "default", "busybox").deepCopy();
+//		ObjectNode status = (ObjectNode) node.get("status");
+//		status.put("readyReplicas", 2);
+//		status.put("replicas", 2);
+//		System.out.println(client.updateResourceStatus(node).toPrettyString());
 	}
 
 
@@ -79,15 +83,16 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	protected static void delete(KubernetesClient client) throws Exception {
 //		System.out.println(client.deleteResource("Deployment", "default", "busybox").toPrettyString());
 		// or
-		System.out.println(client.deleteResource("apps.Deployment", "default", "busybox").toPrettyString());
+//		System.out.println(client.deleteResource("apps.Deployment", "default", "busybox").toPrettyString());
+		System.out.println(client.deleteResource("Pod", "default", "busybox").toPrettyString());
 	}
 
 
-	protected static JsonNode get(KubernetesClient client) throws Exception {
+	protected static void get(KubernetesClient client) throws Exception {
 //		System.out.println(client.getResource("Deployment", "default", "busybox").toPrettyString());
 		// or
 //		System.out.println(client.getResource("apps.Deployment", "default", "busybox").toPrettyString());
-		return client.getResource("Pod", "default", "busybox");
+		System.out.println(client.getResource("Pod", "default", "busybox"));
 	}
 
 

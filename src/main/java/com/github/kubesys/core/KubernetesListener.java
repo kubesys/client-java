@@ -1,12 +1,12 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package com.github.kubesys.watchers;
+package com.github.kubesys.core;
 
 import java.util.logging.Logger;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.kubesys.KubernetesAnalyzer;
 import com.github.kubesys.KubernetesClient;
 import com.github.kubesys.KubernetesConstants;
 import com.github.kubesys.KubernetesWatcher;
@@ -14,24 +14,32 @@ import com.github.kubesys.utils.URLUtil;
 
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
+ * @author wuheng@iscas.ac.cn
+ *
+ * Support create, update, delete, get and list [Kubernetes resources]
+ * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
+ * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
  * 
- * @version 1.7.0
- * @since 2020.3.1
- * 
- **/
-public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
+ */
+public class KubernetesListener extends KubernetesWatcher {
 
 	/**
 	 * m_logger
 	 */
-	public static final Logger m_logger = Logger.getLogger(AutoDiscoverCustomizedResourcesWacther.class.getName());
+	public static final Logger m_logger = Logger.getLogger(KubernetesListener.class.getName());
+
+	protected final KubernetesRegistry registry;
 	
-	
-	public AutoDiscoverCustomizedResourcesWacther(KubernetesClient client) {
+	public KubernetesListener(KubernetesClient client, KubernetesRegistry registry) {
 		super(client);
+		this.registry = registry;
 	}
 
+	public void start() throws Exception {
+		client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
+				KubernetesConstants.VALUE_ALL_NAMESPACES, this);
+	}
+	
 	@Override
 	public void doAdded(JsonNode node) {
 		
@@ -46,7 +54,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 							.VALUE_APIS, apiGroup, version);
 		
 		try {
-			client.getAnalyzer().registerKinds(client.getHttpCaller(), url);
+			registry.registerKinds(client.getHttpCaller(), url);
 		} catch (Exception e) {
 			m_logger.warning(e.getMessage());
 		}
@@ -56,26 +64,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 
 	@Override
 	public void doDeleted(JsonNode node) {
-		
-		JsonNode spec = node.get(KubernetesConstants.KUBE_SPEC);
-		JsonNode names = spec.get(KubernetesConstants.KUBE_SPEC_NAMES);
-		
-		String shortKind = names.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND).asText();
-		String apiGroup  = spec.get(KubernetesConstants.KUBE_SPEC_GROUP).asText();
-		String fullKind  = apiGroup + "." + shortKind;
-		
-		KubernetesAnalyzer analyzer = client.getAnalyzer();
-		analyzer.removeFullKind(shortKind, fullKind);
-		
-		analyzer.removeKindBy(fullKind);
-		analyzer.removeNameBy(fullKind);
-		analyzer.removeGroupBy(fullKind);
-		analyzer.removeVersionBy(fullKind);
-		analyzer.removeNamespacedBy(fullKind);
-		analyzer.removeApiPrefixBy(fullKind);
-		analyzer.removeVerbsBy(fullKind);
-		
-		m_logger.info("unregister " + shortKind);
+		registry.unregisterKinds(node);
 	}
 
 	@Override
@@ -88,7 +77,7 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 		try {
 			client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
 					KubernetesConstants.VALUE_ALL_NAMESPACES, 
-					new AutoDiscoverCustomizedResourcesWacther(client));
+					new KubernetesListener(client, registry));
 		} catch (Exception e) {
 			try {
 				Thread.sleep(5000);
@@ -97,5 +86,5 @@ public class AutoDiscoverCustomizedResourcesWacther extends KubernetesWatcher {
 			}
 		}
 	}
-
+	
 }
