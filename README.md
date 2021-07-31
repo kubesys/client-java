@@ -45,14 +45,14 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.0.0</version> 
+  <version>2.1.0</version> 
 </dependency>
 
 <repositories>
    <repository>
        <id>pdos-repos</id>
        <name>PDOS Releases</name>
-       <url>http://39.106.40.190:31021/repository/maven-public/</url>
+       <url>http://182.92.208.39:31021/repository/maven-public/</url>
     </repository>
 </repositories>
 ```
