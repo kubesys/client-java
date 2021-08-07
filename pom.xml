@@ -5,14 +5,14 @@
 
 	<groupId>io.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>2.1.0</version>
+	<version>2.1.1</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<jackson.version>2.12.3</jackson.version>
+		<jackson.version>2.12.4</jackson.version>
 		<httpclient.version>4.5.13</httpclient.version>
 	</properties>
 
@@ -94,6 +94,9 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
+						<manifest>
+							<mainClass>com.github.kubesys.tests.WatchKindTest</mainClass>
+						</manifest>
 						<manifestEntries>
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
