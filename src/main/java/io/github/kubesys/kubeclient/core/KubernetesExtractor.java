@@ -50,9 +50,9 @@ public class KubernetesExtractor {
 	
 
 	/**
-	 * @param caller
-	 * @param registry
-	 * @throws Exception
+	 * @param caller                caller
+	 * @param registry              registry
+	 * @throws Exception            exception
 	 */
 	public KubernetesExtractor(HttpCaller caller, 
 			KubernetesRegistry registry) throws Exception {

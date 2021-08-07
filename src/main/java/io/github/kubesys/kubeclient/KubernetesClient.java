@@ -449,7 +449,7 @@ public class KubernetesClient {
 
 
 	/**
-	 * @return
+	 * @return               httpCaller
 	 */
 	public HttpCaller getHttpCaller() {
 		return caller;
