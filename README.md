@@ -167,12 +167,12 @@ JsonNode json = client.getResource("Pod", "default", "busybox");
 io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toString(), io.fabric8.kubernetes.api.model.Pod.class);
 ```
 
-## docs
-
-- [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
 
 ## Roadmap
 
 - 2.0.x: product ready
   - 2.0.1: use new package name: io.github.kubesys.kubeclient
-  - 2.0.2: 
+  - 2.0.2: fix duplicate codes bug
+
+  
+[Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)

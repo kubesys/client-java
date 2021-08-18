@@ -18,10 +18,9 @@ import io.github.kubesys.kubeclient.utils.HttpUtil;
 
 /**
  * @author wuheng@iscas.ac.cn
+ * @since  2.0.0
  *
- * Support create, update, delete, get and list [Kubernetes resources]
- * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
+ * extract Kubernetes kinds and their descriptions using Http-based query
  * 
  */
 public class KubernetesExtractor {
@@ -70,7 +69,7 @@ public class KubernetesExtractor {
 		JsonNode resp = caller.getResponse(request);
 		
 		if (!resp.has(KubernetesConstants.HTTP_RESPONSE_PATHS)) {
-			throw new Exception("Fail to init HTTP(s) client, forbidden users or invalid token.");
+			throw new Exception("fail to init HTTP(s) client, forbidden users or invalid token.");
 		}
 		
 		Iterator<JsonNode> iterator = resp.get(
@@ -92,6 +91,7 @@ public class KubernetesExtractor {
 					registry.registerKinds(caller, path);
 				} catch (Exception ex) {
 					// warning
+					m_logger.warning(ex.toString());
 				}
 			}
 		}

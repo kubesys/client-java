@@ -16,11 +16,10 @@ import io.github.kubesys.kubeclient.utils.URLUtil;
 
 /**
  * @author wuheng@iscas.ac.cn
- *
- * Support create, update, delete, get and list [Kubernetes resources]
- * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
+ * @since  2.0.0
  * 
+ * listen for Kubernetes kinds and their descriptions during runtime
+ *
  */
 public class KubernetesListener extends KubernetesWatcher {
 

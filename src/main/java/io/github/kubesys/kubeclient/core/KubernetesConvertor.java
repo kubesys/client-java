@@ -12,10 +12,9 @@ import io.github.kubesys.kubeclient.utils.URLUtil;
 
 /**
  * @author wuheng@iscas.ac.cn
+ * @since  2.0.0
  *
- * Support create, update, delete, get and list [Kubernetes resources]
- * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
+ * get real Url from <code>KubernetesRuleBase</code>
  * 
  */
 public class KubernetesConvertor {

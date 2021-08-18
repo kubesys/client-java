@@ -15,10 +15,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author wuheng@iscas.ac.cn
+ * @since  2.0.0
  *
- * Support create, update, delete, get and list [Kubernetes resources]
- * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
+ * see [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
  * 
  */
 public class KubernetesRuleBase {

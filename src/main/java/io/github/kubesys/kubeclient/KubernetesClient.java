@@ -72,8 +72,8 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this.caller = new HttpCaller(url, token);
-		this.analyzer = new KubernetesAnalyzer(this);
-		this.analyzer.start();
+		this.analyzer = new KubernetesAnalyzer();
+		this.analyzer.doStart(this);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class KubernetesClient {
 		super();
 		this.caller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
-		this.analyzer.start();
+		this.analyzer.doStart(this);
 	}
 
 

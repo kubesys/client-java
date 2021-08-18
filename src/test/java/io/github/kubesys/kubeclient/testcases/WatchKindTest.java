@@ -52,6 +52,4 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 		Thread.sleep(10000);
 		System.out.println("End...");
 	}
-
-
 }

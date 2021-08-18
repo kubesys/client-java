@@ -51,11 +51,11 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 		KubernetesClient client = createClient2(null);
 
 //		create(client);
-		updateStatus(client);
+//		updateStatus(client);
 //		update(client);
 //		get(client);
 //		list(client);
-//		delete(client);
+		delete(client);
 		
 	}
 

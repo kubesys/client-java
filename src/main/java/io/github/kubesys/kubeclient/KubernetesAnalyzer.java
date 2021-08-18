@@ -22,10 +22,14 @@ public final class KubernetesAnalyzer {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
-	protected final KubernetesClient client;
-	
+	/**
+	 * 
+	 */
 	protected final KubernetesConvertor convertor;
 	
+	/**
+	 * 
+	 */
 	protected final KubernetesRegistry registry;
 	
 	/*******************************************
@@ -36,18 +40,15 @@ public final class KubernetesAnalyzer {
 	 ********************************************/
 	
 	/**
-	 * @param  client              client
 	 * @throws Exception           exception 
 	 */
-	public KubernetesAnalyzer(KubernetesClient client) throws Exception {
-		this.client = client;
-		
+	public KubernetesAnalyzer() throws Exception {
 		KubernetesRuleBase ruleBase = new KubernetesRuleBase();
 		this.registry = new KubernetesRegistry(ruleBase);
 		this.convertor = new KubernetesConvertor(ruleBase);
 	}
 	
-	public void start() throws Exception {
+	public void doStart(KubernetesClient client) throws Exception {
 		
 		KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
 		extractor.start();
