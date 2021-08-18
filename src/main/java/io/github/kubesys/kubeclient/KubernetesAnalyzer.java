@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import io.github.kubesys.kubeclient.core.KubernetesConvertor;
 import io.github.kubesys.kubeclient.core.KubernetesExtractor;
+import io.github.kubesys.kubeclient.core.KubernetesListener;
 import io.github.kubesys.kubeclient.core.KubernetesRegistry;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 
@@ -21,11 +22,11 @@ public final class KubernetesAnalyzer {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAnalyzer.class.getName());
 
-	protected final KubernetesRuleBase ruleBase;
+	protected final KubernetesClient client;
 	
 	protected final KubernetesConvertor convertor;
 	
-	protected final KubernetesClient client;
+	protected final KubernetesRegistry registry;
 	
 	/*******************************************
 	 * 
@@ -40,30 +41,23 @@ public final class KubernetesAnalyzer {
 	 */
 	public KubernetesAnalyzer(KubernetesClient client) throws Exception {
 		this.client = client;
-		this.ruleBase = new KubernetesRuleBase();
-		this.convertor = new KubernetesConvertor(
-				client.getHttpCaller().getMasterUrl(), ruleBase);
+		
+		KubernetesRuleBase ruleBase = new KubernetesRuleBase();
+		this.registry = new KubernetesRegistry(ruleBase);
+		this.convertor = new KubernetesConvertor(ruleBase);
 	}
 	
 	public void start() throws Exception {
 		
-		KubernetesRegistry registry = new KubernetesRegistry(ruleBase);
-		
-		KubernetesExtractor extractor = new KubernetesExtractor(client.getHttpCaller(), registry);
+		KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
 		extractor.start();
 		
-//		KubernetesListener listener = new KubernetesListener(client, registry);
-//		listener.start();
+		KubernetesListener listener = new KubernetesListener(client, registry);
+		listener.start();
 	}
-
-	
-	public KubernetesRuleBase getRuleBase() {
-		return ruleBase;
-	}
-
 
 	public KubernetesConvertor getConvertor() {
 		return convertor;
 	}
-	
+
 }

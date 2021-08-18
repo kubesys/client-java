@@ -42,6 +42,10 @@ public class KubernetesRegistry {
 		this.ruleBase = ruleBase;
 	}
 	
+	public KubernetesRuleBase getRuleBase() {
+		return ruleBase;
+	}
+
 	
 	/**********************************************
 	 * 

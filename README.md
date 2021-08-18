@@ -45,14 +45,14 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.0.1</version> 
+  <version>2.0.2</version> 
 </dependency>
 
 <repositories>
    <repository>
        <id>pdos-repos</id>
        <name>PDOS Releases</name>
-       <url>http://182.92.208.39:31021/repository/maven-public/</url>
+       <url>http://39.100.71.73:31021/repository/maven-public/</url>
     </repository>
 </repositories>
 ```
@@ -173,4 +173,6 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 1.0.0:  using maven repository
+- 2.0.x: product ready
+  - 2.0.1: use new package name: io.github.kubesys.kubeclient
+  - 2.0.2: 

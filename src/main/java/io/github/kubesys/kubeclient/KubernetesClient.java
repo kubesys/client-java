@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 import io.github.kubesys.kubeclient.utils.HttpUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
 
@@ -462,7 +463,7 @@ public class KubernetesClient {
 	public JsonNode getKinds() throws Exception {
 		return new ObjectMapper().readTree(
 				new ObjectMapper().writeValueAsString(
-						getAnalyzer().getRuleBase().fullKindToKindMapper.values()));
+						getAnalyzer().getConvertor().getRuleBase().fullKindToKindMapper.values()));
 	}
 	
 	/**
@@ -472,7 +473,7 @@ public class KubernetesClient {
 	public JsonNode getFullKinds() throws Exception {
 		return new ObjectMapper().readTree(
 				new ObjectMapper().writeValueAsString(
-						getAnalyzer().getRuleBase().fullKindToKindMapper.keySet()));
+						getAnalyzer().getConvertor().getRuleBase().fullKindToKindMapper.keySet()));
 	}
 
 
@@ -482,14 +483,14 @@ public class KubernetesClient {
 	public JsonNode getKindDesc() {
 
 		ObjectNode map = new ObjectMapper().createObjectNode();
-
-
-		for (String kind : analyzer.getRuleBase().fullKindToNamespacedMapper.keySet()) {
+		KubernetesRuleBase ruleBase = analyzer.getConvertor().getRuleBase();
+		
+		for (String kind : ruleBase.fullKindToNamespacedMapper.keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
-			node.put("apiVersion", analyzer.getRuleBase().fullKindToVersionMapper.get(kind));
-			node.put("kind", analyzer.getRuleBase().fullKindToKindMapper.get(kind));
-			node.put("plural", analyzer.getRuleBase().fullKindToNameMapper.get(kind));
-			node.set("verbs", analyzer.getRuleBase().fullKindToVerbsMapper.get(kind));
+			node.put("apiVersion", ruleBase.fullKindToVersionMapper.get(kind));
+			node.put("kind", ruleBase.fullKindToKindMapper.get(kind));
+			node.put("plural", ruleBase.fullKindToNameMapper.get(kind));
+			node.set("verbs", ruleBase.fullKindToVerbsMapper.get(kind));
 
 			map.set(kind, node);
 		}

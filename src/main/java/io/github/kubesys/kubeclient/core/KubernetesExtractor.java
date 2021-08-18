@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.kubeclient.KubernetesConstants;
+import io.github.kubesys.kubeclient.KubernetesClient;
 import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
 import io.github.kubesys.kubeclient.utils.HttpUtil;
 
@@ -50,18 +51,17 @@ public class KubernetesExtractor {
 	
 
 	/**
-	 * @param caller                caller
+	 * @param client                client
 	 * @param registry              registry
 	 * @throws Exception            exception
 	 */
-	public KubernetesExtractor(HttpCaller caller, 
+	public KubernetesExtractor(KubernetesClient client, 
 			KubernetesRegistry registry) throws Exception {
 		
-		this.caller = caller;
+		this.caller = client.getHttpCaller();
 		this.registry = registry;
 		
 	}
-
 	
 	public void start() throws Exception {
 

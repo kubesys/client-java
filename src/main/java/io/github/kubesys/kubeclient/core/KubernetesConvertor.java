@@ -22,19 +22,13 @@ public class KubernetesConvertor {
 
 	
 	/**
-	 * masterUrl
-	 */
-	protected final String masterUrl;
-	
-	/**
 	 * ruleBase
 	 */
 	protected final KubernetesRuleBase ruleBase;
 	
 	
-	public KubernetesConvertor(String masterUrl, KubernetesRuleBase ruleBase) {
+	public KubernetesConvertor(KubernetesRuleBase ruleBase) {
 		super();
-		this.masterUrl = masterUrl;
 		this.ruleBase = ruleBase;
 	}
 
@@ -46,16 +40,13 @@ public class KubernetesConvertor {
 	public String createUrl(JsonNode json) throws Exception {
 
 		String version = getApiVersion(json);
-		String uri = (version.indexOf("/") == -1) 
-				? "api/" + version : "apis/" + version;
-
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 
 				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		return URLUtil.join(masterUrl, uri, 
-				getNamespace(ruleBase.isNamespaced(fullKind), 
-						getNamespace(json)),
-				ruleBase.getName(fullKind));
+		return URLUtil.join(ruleBase.getApiPrefix(fullKind),
+							getNamespace(ruleBase.isNamespaced(fullKind), 
+							getNamespace(json)),
+							ruleBase.getName(fullKind));
 	}
 
 	/**
@@ -66,16 +57,14 @@ public class KubernetesConvertor {
 	public String bindingUrl(JsonNode json) throws Exception {
 
 		String version = getApiVersion(json);
-		String uri = (version.indexOf("/") == -1) 
-				? "api/" + version : "apis/" + version;
 
 		String kind = getKind(json);
 		String fullKind = version.indexOf("/") == -1 
 				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
-		return URLUtil.join(masterUrl, uri, 
-				getNamespace(ruleBase.isNamespaced(fullKind), 
-						getNamespace(json)),"pods", 
-				json.get("metadata").get("name").asText(), "binding");
+		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
+							getNamespace(ruleBase.isNamespaced(fullKind), 
+							getNamespace(json)),"pods", 
+							json.get("metadata").get("name").asText(), "binding");
 	}
 
 	/**
@@ -89,8 +78,8 @@ public class KubernetesConvertor {
 		String fullKind = kind.indexOf(".") == -1 
 				? ruleBase.getFullKind(kind) : kind;
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-				getNamespace(ruleBase.isNamespaced(fullKind), ns),
-				ruleBase.getName(fullKind), name);
+				            getNamespace(ruleBase.isNamespaced(fullKind), ns),
+				            ruleBase.getName(fullKind), name);
 	}
 
 	/**
@@ -215,6 +204,10 @@ public class KubernetesConvertor {
 			return apiVersion.substring(0, apiVersion.indexOf("/"))+ "." + kind;
 		}
 		return kind;
+	}
+
+	public KubernetesRuleBase getRuleBase() {
+		return ruleBase;
 	}
 	
 }
