@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.kubeclient.KubernetesClient;
 import io.github.kubesys.kubeclient.KubernetesConstants;
-import io.github.kubesys.kubeclient.KubernetesWatcher;
 import io.github.kubesys.kubeclient.utils.URLUtil;
 
 

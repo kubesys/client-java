@@ -437,7 +437,7 @@ public class KubernetesClient {
 		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" 
 								+ (namespace == null || "".equals("") 
-								? "allnamespaces" : namespace));
+								? "all-namespaces" : namespace));
 		thread.start();
 		return thread;
 	}
