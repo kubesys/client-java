@@ -21,27 +21,30 @@ import io.github.kubesys.kubeclient.utils.URLUtil;
  * listen for Kubernetes kinds and their descriptions during runtime
  *
  */
-public class KubernetesListener extends KubernetesWatcher {
+public class KubernetesListener {
 
 	/**
 	 * m_logger
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesListener.class.getName());
 
+	protected final KubernetesClient client;
+	
 	protected final KubernetesRegistry registry;
 	
 	public KubernetesListener(KubernetesClient client, KubernetesRegistry registry) {
-		super(client);
+		this.client = client;
 		this.registry = registry;
 	}
 
 	public void start() throws Exception {
-		client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
-				KubernetesConstants.VALUE_ALL_NAMESPACES, this);
+		JsonNode items = client.listResources("apiextensions.k8s.io.CustomResourceDefinition").get("items");
+		for (int i = 0; i < items.size(); i++) {
+			register(items.get(i));
+		}
 	}
 	
-	@Override
-	public void doAdded(JsonNode node) {
+	public void register(JsonNode node) {
 		
 		JsonNode spec = node.get(KubernetesConstants.KUBE_SPEC);
 		
@@ -59,32 +62,6 @@ public class KubernetesListener extends KubernetesWatcher {
 			m_logger.warning(e.getMessage());
 		}
 		
-	}
-
-
-	@Override
-	public void doDeleted(JsonNode node) {
-		registry.unregisterKinds(node);
-	}
-
-	@Override
-	public void doModified(JsonNode node) {
-		// ignore here
-	}
-
-	@Override
-	public void doClose() {
-		try {
-			client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
-					KubernetesConstants.VALUE_ALL_NAMESPACES, 
-					new KubernetesListener(client, registry));
-		} catch (Exception e) {
-			try {
-				Thread.sleep(5000);
-			} catch (Exception e1) {
-				doClose();
-			}
-		}
 	}
 	
 }
