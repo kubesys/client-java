@@ -405,9 +405,9 @@ public class KubernetesClient {
 	 */
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
-
 		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
-		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + namespace + "-" + name);
+		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
+							? "all-namespaces" : namespace) + "-" + name);
 		thread.start();
 		return thread;
 	}
@@ -456,6 +456,13 @@ public class KubernetesClient {
 	 */
 	public HttpCaller getHttpCaller() {
 		return caller;
+	}
+	
+	/**
+	 * @return               httpCaller
+	 */
+	public HttpCaller clone() {
+		return new HttpCaller(caller);
 	}
 	
 	/**

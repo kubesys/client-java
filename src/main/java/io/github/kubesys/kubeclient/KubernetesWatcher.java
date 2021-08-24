@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,7 @@ public abstract class KubernetesWatcher implements Runnable {
 	protected KubernetesClient client;
 	
 	protected HttpGet request;
-
+	
 	public KubernetesWatcher(KubernetesClient client) {
 		super();
 		this.client = client;
@@ -41,8 +42,8 @@ public abstract class KubernetesWatcher implements Runnable {
 		
 		BufferedReader br = null;
 		try {
-			CloseableHttpResponse execute = client.getHttpCaller()
-								.getHttpClient().execute(request);
+			CloseableHttpClient httpClient = client.clone().getHttpClient();
+			CloseableHttpResponse execute = httpClient.execute(request);
 			
 			br = new BufferedReader(new InputStreamReader(
 						execute.getEntity().getContent()));
