@@ -544,14 +544,16 @@ public class KubernetesClient {
 		 */
 		protected CloseableHttpClient createDefaultHttpClient() {
 
-			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(0).setSoReuseAddress(true)
-					.build();
+			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true)
+							.setSoTimeout(0).setSoReuseAddress(true).build();
 
-			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(0).setConnectionRequestTimeout(0)
-					.setSocketTimeout(0).build();
+			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(0)
+							.setConnectionRequestTimeout(0).setSocketTimeout(0).build();
 
-			return createDefaultHttpClientBuilder().setConnectionTimeToLive(0, TimeUnit.SECONDS)
-					.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
+			return createDefaultHttpClientBuilder()
+					.setConnectionTimeToLive(0, TimeUnit.SECONDS)
+					.setDefaultSocketConfig(socketConfig)
+					.setDefaultRequestConfig(requestConfig)
 					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
 					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
 					.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();

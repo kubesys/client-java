@@ -4,6 +4,7 @@
 package io.github.kubesys.kubeclient;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,11 +39,12 @@ public abstract class KubernetesWatcher implements Runnable {
 	@Override
 	public void run() {
 		
+		BufferedReader br = null;
 		try {
 			CloseableHttpResponse execute = client.getHttpCaller()
 								.getHttpClient().execute(request);
 			
-			BufferedReader br = new BufferedReader(new InputStreamReader(
+			br = new BufferedReader(new InputStreamReader(
 						execute.getEntity().getContent()));
 		    String line = null;
 		    
@@ -63,6 +65,13 @@ public abstract class KubernetesWatcher implements Runnable {
 		    }
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 		
 	}
