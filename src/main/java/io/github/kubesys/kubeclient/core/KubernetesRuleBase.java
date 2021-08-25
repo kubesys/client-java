@@ -109,10 +109,26 @@ public class KubernetesRuleBase {
 	 */
 	public String getFullKind(String kind) throws Exception {
 		List<String> values = kindToFullKindMapper.get(kind);
+		// a fullname
 		if (values != null && values.size() == 1) {
 			return values.get(0);
 		}
-		throw new Exception("Please use fullKind, " + getFullKinds(kind));
+		// many fullnames are supported by Kubernetes, use a default one
+		String fullname = null;
+		for (String v : values) {
+			if ((v.indexOf(".") == -1) || (v.contains("k8s.io") && fullname == null)) {
+				fullname = v;
+			} else {
+				fullname = null;
+				break;
+			}
+		}
+		
+		if (fullname == null) {
+			throw new Exception("Please use fullKind, " + getFullKinds(kind));
+		} else {
+			return fullname;
+		}
 	}
 	
 	/**
