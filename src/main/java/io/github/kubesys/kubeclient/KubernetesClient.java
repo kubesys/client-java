@@ -32,8 +32,9 @@ import io.github.kubesys.kubeclient.utils.SSLUtil;
 
 /**
  * @author wuheng@iscas.ac.cn
+ * @since  2.0.0
  *
- * Support create, update, delete, get, list and watch [Kubernetes resources]
+ * Providing a unified API to create, update, delete, get, list and watch [Kubernetes resources]
  * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
  * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
  * 
@@ -52,7 +53,9 @@ public class KubernetesClient {
 	protected final HttpCaller httpCaller;
 	
 	/**
-	 * analyzer: it is used for 
+	 * analyzer: it is used for getting the metadata for each Kubernetes kind.
+	 * With the metadata, we can create, update, delete, get, list and watch it 
+	 * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)    
 	 */
 	protected final KubernetesAnalyzer analyzer;
 
@@ -60,19 +63,19 @@ public class KubernetesClient {
 	/**
 	 * invoke Kubernetes without token, which has been deprecated after Kubernetes 1.18
 	 * 
-	 * @param  url                 url
-	 * @throws Exception           exception 
+	 * @param  url                 default is https://IP:6443/
+	 * @throws Exception           wrong IP or port
 	 */
 	public KubernetesClient(String url) throws Exception {
 		this(url, null);
 	}
 
 	/**
-	 * invoke Kubernetes using token
+	 * invoke Kubernetes using token,see https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
-	 * @param url                   url
-	 * @param token                 token
-	 * @throws Exception            exception
+	 * @param url                   default is https://IP:6443/
+	 * @param token                 bearer token, you can create it using ServiceAccount and ClusterRoleBinding
+	 * @throws Exception            wrong IP, or port, or token
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this.httpCaller = new HttpCaller(url, token);
@@ -81,12 +84,13 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * invoke Kubernetes using token
+	 * invoke Kubernetes using token, see https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
-	 * @param url                   url
-	 * @param token                 token
-	 * @param analyzer              analyzer
-	 * @throws Exception            exception
+	 * 
+	 * @param url                   default is https://IP:6443/
+	 * @param token                 bearer token, you can create it using ServiceAccount and ClusterRoleBinding
+	 * @param analyzer              it is used for getting the metadata for each Kubernetes kind.
+	 * @throws Exception            wrong IP, or port, or token
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
 		super();
@@ -98,27 +102,53 @@ public class KubernetesClient {
 
 	/**********************************************************
 	 * 
-	 * Core
+	 * Create, Update, List, Get, Delete And Watch
 	 * 
 	 **********************************************************/
 
 	/**
-	 * create a Kubernetes resource using JSON
+	 * create a Kubernetes resource using JSON.<br>
+	 * 
+	 * for example, a jsonStr can be                        <br>
+	 * {                                       <br>
+	 *   "apiVersion": "v1",                   <br>
+	 *   "kind": "Pod",                        <br>
+	 *   "metadata": {                         <br>
+	 *      "name": "busybox",                 <br>
+	 *      "namespace": "default",            <br>
+	 *      "labels": {                        <br>
+	 *        "test": "test"                   <br>
+	 *     }                                   <br>
+	 *   }                                     <br>
+	 * }                                       <br>
 	 * 
 	 * @param jsonStr               jsonStr
-	 * @return json                 json
-	 * @throws Exception            exception
+	 * @return json                 json from Kubernetes, json = jsonStr + defaultValues
+	 * @throws Exception            Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode createResource(String jsonStr) throws Exception {
 		return createResource(new ObjectMapper().readTree(jsonStr));
 	}
 
 	/**
-	 * create a Kubernetes resource using JSON
+	 * create a Kubernetes resource using JSON. <br>
+	 * 
+	 * for example, a json can be                        <br>
+	 * {                                       <br>
+	 *   "apiVersion": "v1",                   <br>
+	 *   "kind": "Pod",                        <br>
+	 *   "metadata": {                         <br>
+	 *      "name": "busybox",                 <br>
+	 *      "namespace": "default",            <br>
+	 *      "labels": {                        <br>
+	 *        "test": "test"                   <br>
+	 *     }                                   <br>
+	 *   }                                     <br>
+	 * }                                       <br>
 	 * 
 	 * @param json                   json
-	 * @return json                  json
-	 * @throws Exception             exception
+	 * @return json                  json from Kubernetes, json = jsonStr + defaultValues
+	 * @throws Exception             Kubernetes cannot parsing this json
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
@@ -133,11 +163,24 @@ public class KubernetesClient {
 
 
 	/**
-	 * delete a Kubernetes resource using JSON
+	 * delete a Kubernetes resource using JSON <br>
+	 * 
+	 * for example, a json can be                        <br>
+	 * {                                       <br>
+	 *   "apiVersion": "v1",                   <br>
+	 *   "kind": "Pod",                        <br>
+	 *   "metadata": {                         <br>
+	 *      "name": "busybox",                 <br>
+	 *      "namespace": "default",            <br>
+	 *      "labels": {                        <br>
+	 *        "test": "test"                   <br>
+	 *     }                                   <br>
+	 *   }                                     <br>
+	 * }                                       <br>
 	 * 
 	 * @param json                   json
-	 * @return json                  json
-	 * @throws Exception             exception
+	 * @return json                  json from Kubernetes, it equals the input json
+	 * @throws Exception             Kubernetes cannot parsing this json
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
@@ -147,12 +190,13 @@ public class KubernetesClient {
 	}
 	
 	/**
-	 * delete a Kubernetes resource using JSON
+	 * delete a Kubernetes resource using kind and name
+	 * see https://kubernetes.io/docs/reference/kubectl/overview/
 	 * 
-	 * @param kind                    kind
-	 * @param name                    name
-	 * @return json                   json
-	 * @throws Exception              exception
+	 * @param kind                    kind or fullKind
+	 * @param name                    resource name in namespace 'default'
+	 * @return json                   json from Kubernetes
+	 * @throws Exception              Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode deleteResource(String kind, String name) throws Exception {
 		return deleteResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
@@ -160,13 +204,14 @@ public class KubernetesClient {
 
 
 	/**
-	 * delete a Kubernetes resource using JSON
+	 * delete a Kubernetes resource using kind, namespace and name
+	 * see https://kubernetes.io/docs/reference/kubectl/overview/
 	 * 
-	 * @param kind                    kind
-	 * @param namespace               namespace
-	 * @param name                    name
-	 * @return json                   json
-	 * @throws Exception              exception
+	 * @param kind                    kind or fullKind
+	 * @param namespace               resource namespace, "" means all-namespaces
+	 * @param name                    resource name
+	 * @return json                   json from Kubernetes
+	 * @throws Exception              Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
@@ -180,9 +225,22 @@ public class KubernetesClient {
 	/**
 	 * update a Kubernetes resource using JSON
 	 * 
-	 * @param json                     json
-	 * @return                         json
-	 * @throws Exception               exception
+	 * for example, a json can be                        <br>
+	 * {                                       <br>
+	 *   "apiVersion": "v1",                   <br>
+	 *   "kind": "Pod",                        <br>
+	 *   "metadata": {                         <br>
+	 *      "name": "busybox",                 <br>
+	 *      "namespace": "default",            <br>
+	 *      "labels": {                        <br>
+	 *        "test": "test"                   <br>
+	 *     }                                   <br>
+	 *   }                                     <br>
+	 * }                                       <br>
+	 * 
+	 * @param json                   json
+	 * @return json                  json from Kubernetes, json = jsonStr + defaultValues
+	 * @throws Exception             Kubernetes cannot parsing this json
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
@@ -201,36 +259,6 @@ public class KubernetesClient {
 		return httpCaller.getResponse(request);
 	}
 
-	/**
-	 * binding a Kubernetes resource using JSON
-	 * 
-	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
-	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
-	 * 
-	 * @param pod                        pod
-	 * @param host                       host
-	 * @return json                      json
-	 * @throws Exception                 exception
-	 */
-	public JsonNode bindingResource(JsonNode pod, String host) throws Exception {
-
-		ObjectNode binding = new ObjectMapper().createObjectNode();
-		binding.put("apiVersion", "v1");
-		binding.put("kind", "Binding");
-		
-		ObjectNode metadata = new ObjectMapper().createObjectNode();
-		metadata.put("name", pod.get("metadata").get("name").asText());
-		metadata.put("namespace", pod.get("metadata").get("namespace").asText());
-		binding.set("metadata", metadata);
-		
-		ObjectNode target = new ObjectMapper().createObjectNode();
-		target.put("apiVersion", "v1");
-		target.put("kind", "Node");
-		target.put("name", host);
-		binding.set("target", target);
-			
-		return createResource(binding);
-	}
 
 	/**
 	 * get a Kubernetes resource using kind, namespace and name
@@ -238,7 +266,7 @@ public class KubernetesClient {
 	 * @param kind                        kind
 	 * @param name                        name
 	 * @return json                       json
-	 * @throws Exception                  exception 
+	 * @throws Exception                  Kubernetes cannot parsing this jsonStr 
 	 */
 	public JsonNode getResource(String kind, String name) throws Exception {
 
@@ -252,7 +280,7 @@ public class KubernetesClient {
 	 * @param namespace                   namespace, if this kind unsupports namespace, it is null
 	 * @param name                        name
 	 * @return json                       json
-	 * @throws Exception                  exception
+	 * @throws Exception                  Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
 
@@ -270,7 +298,7 @@ public class KubernetesClient {
 	 * @param namespace                    namespace, if this kind unsupports namespace, it is null
 	 * @param name                         name
 	 * @return json                        json
-	 * @throws Exception                   exception
+	 * @throws Exception                   Kubernetes cannot parsing this jsonStr
 	 */
 	public boolean hasResource(String kind, String namespace, String name) throws Exception {
 
@@ -290,7 +318,7 @@ public class KubernetesClient {
 	 * 
 	 * @param kind                          kind
 	 * @return json                         json
-	 * @throws Exception                    exception 
+	 * @throws Exception                    Kubernetes cannot parsing this jsonStr 
 	 */
 	public JsonNode listResources(String kind) throws Exception {
 		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null);
@@ -302,7 +330,7 @@ public class KubernetesClient {
 	 * @param kind                          kind
 	 * @param namespace                     namespace
 	 * @return json                         json
-	 * @throws Exception                    exception
+	 * @throws Exception                    Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode listResources(String kind, String namespace) throws Exception {
 		return listResources(kind, namespace, null, null, 0, null);
@@ -317,7 +345,7 @@ public class KubernetesClient {
 	 * @param fieldSelector                 fieldSelector
 	 * @param labelSelector                 labelSelector
 	 * @return json                         json
-	 * @throws Exception                    exception
+	 * @throws Exception                    Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector)
 			throws Exception {
@@ -335,7 +363,7 @@ public class KubernetesClient {
 	 * @param limit                          limit
 	 * @param nextId                         nextId
 	 * @return json                          json
-	 * @throws Exception                     exception
+	 * @throws Exception                     Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit,
 			String nextId) throws Exception {
@@ -371,7 +399,7 @@ public class KubernetesClient {
 	 * 
 	 * @param json                          json
 	 * @return json                         json
-	 * @throws Exception                    exception
+	 * @throws Exception                    Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 
@@ -393,7 +421,7 @@ public class KubernetesClient {
 	 * @param name                           name
 	 * @param watcher                        watcher
 	 * @return thread                        thread
-	 * @throws Exception                     exception 
+	 * @throws Exception                     Kubernetes cannot parsing this jsonStr 
 	 */
 	public Thread watchResource(String kind, String name, KubernetesWatcher watcher) throws Exception {
 		return watchResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name, watcher);
@@ -407,7 +435,7 @@ public class KubernetesClient {
 	 * @param name                            name
 	 * @param watcher                         watcher
 	 * @return thread                         thread
-	 * @throws Exception                      exception
+	 * @throws Exception                      Kubernetes cannot parsing this jsonStr
 	 */
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
@@ -424,7 +452,7 @@ public class KubernetesClient {
 	 * @param kind                            kind
 	 * @param watcher                         watcher
 	 * @return thread                         thread
-	 * @throws Exception                      exception
+	 * @throws Exception                      Kubernetes cannot parsing this jsonStr
 	 */
 	public Thread watchResources(String kind, KubernetesWatcher watcher) throws Exception {
 		return watchResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
@@ -437,7 +465,7 @@ public class KubernetesClient {
 	 * @param namespace                        namespace
 	 * @param watcher                          watcher
 	 * @return thread                          thread
-	 * @throws Exception                       exception
+	 * @throws Exception                       Kubernetes cannot parsing this jsonStr
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
@@ -449,8 +477,17 @@ public class KubernetesClient {
 	}
 
 
+	/**********************************************************
+	 * 
+	 * Getter
+	 * 
+	 **********************************************************/
+	
 	/**
-	 * @return analyzer
+	 * 
+	 * @return analyzer. it is used for getting the metadata for each Kubernetes kind.
+	 * With the metadata, we can create, update, delete, get, list and watch it 
+	 * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)    
 	 */
 	public KubernetesAnalyzer getAnalyzer() {
 		return analyzer;
@@ -458,22 +495,61 @@ public class KubernetesClient {
 
 
 	/**
-	 * @return               httpCaller
+	 * @return httpCaller, it is used for sending request to Kuberenetes and receiving response from Kubernetes.
 	 */
 	public HttpCaller getHttpCaller() {
 		return httpCaller;
 	}
 	
 	/**
+	 * create a new HttpCaller for each WatchResource or WatchResources API
+	 * 
 	 * @return               httpCaller
 	 */
 	public HttpCaller clone() {
 		return new HttpCaller(httpCaller);
 	}
 	
+	/**********************************************************
+	 * 
+	 * Some useful APIs
+	 * 
+	 **********************************************************/
+	
 	/**
-	 * @return kinds           kinds
-	 * @throws Exception       exception
+	 * for Scheduler
+	 * 
+	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
+	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
+	 * 
+	 * @param pod                        pod json
+	 * @param host                       hostname
+	 * @return json                      json from Kubernetes
+	 * @throws Exception                 Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode bindingResource(JsonNode pod, String host) throws Exception {
+
+		ObjectNode binding = new ObjectMapper().createObjectNode();
+		binding.put("apiVersion", "v1");
+		binding.put("kind", "Binding");
+		
+		ObjectNode metadata = new ObjectMapper().createObjectNode();
+		metadata.put("name", pod.get("metadata").get("name").asText());
+		metadata.put("namespace", pod.get("metadata").get("namespace").asText());
+		binding.set("metadata", metadata);
+		
+		ObjectNode target = new ObjectMapper().createObjectNode();
+		target.put("apiVersion", "v1");
+		target.put("kind", "Node");
+		target.put("name", host);
+		binding.set("target", target);
+			
+		return createResource(binding);
+	}
+	
+	/**
+	 * @return kinds           kind, see Kubernetes kind
+	 * @throws Exception       Kubernetes unavailability
 	 */
 	public JsonNode getKinds() throws Exception {
 		return new ObjectMapper().readTree(
@@ -482,8 +558,8 @@ public class KubernetesClient {
 	}
 	
 	/**
-	 * @return fullkinds       fullkinds
-	 * @throws Exception       execption
+	 * @return fullkinds       fullkind = apiversion + "." + kind
+	 * @throws Exception       Kubernetes unavailability
 	 */
 	public JsonNode getFullKinds() throws Exception {
 		return new ObjectMapper().readTree(
@@ -493,7 +569,7 @@ public class KubernetesClient {
 
 
 	/**
-	 * @return json
+	 * @return json, which includes kind, apiversion, supported operators
 	 */
 	public JsonNode getKindDesc() {
 
