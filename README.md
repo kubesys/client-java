@@ -118,7 +118,7 @@ for example, the output is
 
 2. get fullkind
 
-Here, fullkind = [apiversion](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/) + "." + [kind]((https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/))
+Here, fullkind = [apiversion](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/) + "." + [kind]((https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/)
 
 ```java
 System.out.println(client.getFullKinds().toPrettyString());
