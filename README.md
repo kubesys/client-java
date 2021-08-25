@@ -61,7 +61,8 @@ Add this dependency to your project's POM:
 
 - [Creating a client](#creating-a-client)
 - [Get all kinds](#get-all-kinds)
-- [Simple example](#simple-example)
+- [Simple examples](#simple-examples)
+- [watch resourcs](#watch-resources)
 - [Work with other SDKs](#work-with-other-sdks)
     
 
@@ -137,7 +138,7 @@ for example, the output is
 	"batch.Job"
 ]
 ```
-### simple-example
+### simple-examples
 
 Assume you have a json:
 
@@ -184,6 +185,31 @@ Close client
 
 ```java
 client.close()
+```
+
+### watch-resources
+
+```java
+KubernetesWatcher watcher = new KubernetesWatcher(client) {
+			
+  public void doModified(JsonNode node) {
+    System.out.println(node);
+  }
+  
+  public void doDeleted(JsonNode node) {
+    System.out.println(node);
+  }
+  
+  public void doAdded(JsonNode node) {
+    System.out.println(node);
+  }
+  
+  public void doClose() {
+    System.out.println("close");
+  }
+};
+
+client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 ```
 
 ### work-with-other-sdks
