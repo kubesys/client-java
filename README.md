@@ -19,9 +19,9 @@ This project is based on the following softwares.
 
 |                           | [official](https://github.com/kubernetes-client/java/) | [fabric8](https://github.com/fabric8io/kubernetes-client) | [this project](https://github.com/kubesys/kubernetes-client)  | 
 |---------------------------|------------------|------------------|-------------------|
-|        Compatibility                      |  provide different SDK version | provide different SDK version |  one version for all |
-|  Support customized Kubernetes resources  |  a lot of development          | a lot of development          |  zero-deployment     |
-|    Works with the other SDKs              |  complex                       | complex                       |  simple              |     
+|        Compatibility                      |  provide different SDK versions | provide different SDK versions  |  one version for all |
+|  Support customized Kubernetes resources  |  a lot of development           | a lot of development            |  zero-deployment     |
+|    Works with the other SDKs              |  /                              | /                               |  simple              |     
 
 ## Architecture
 
@@ -32,7 +32,7 @@ This project is based on the following softwares.
 To install the Java client library to your local Maven repository, simply execute:
 
 ```shell
-git clone --recursive https://github.com/kubesys/client-java
+git clone --recursive https://github.com/kubesys/kubernetes-client-java
 cd java
 mvn install
 ```
@@ -57,14 +57,12 @@ Add this dependency to your project's POM:
 </repositories>
 ```
 
-## Usage
+## Quick start
 
-- [Usage](#usage)
-    - [中文文档](https://www.yuque.com/kubesys/kubernetes-client/overview)
-    - [Creating a client](#creating-a-client)
-    - [Simple example](#simple-example)
-    - [Get all kinds](#get-all-kinds)
-    - [Work with other SDKs](#work-with-other-sdks)
+- [Creating a client](#creating-a-client)
+- [Get all kinds](#get-all-kinds)
+- [Simple example](#simple-example)
+- [Work with other SDKs](#work-with-other-sdks)
     
 
 
@@ -77,10 +75,9 @@ The easiest way to create a client is:
 String url = "https://IP:6443/";
 String token = "xxx";
 KubernetesClient client = new KubernetesClient(url, token);
-client.watchResources(kind, new AutoDiscoverCustomizedResourcesWacther(client));
 ```
 
-Here, the token can be created and get by following commands:
+you can create and get a token by the following commands:
 
 1. create token
 
@@ -93,9 +90,53 @@ kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client-ja
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
 
 ```
+### get-all-kinds
 
+1. get kind
 
+Here, the 'kind' means the [Kubernetes kind](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/)
 
+```java
+System.out.println(client.getKinds().toPrettyString());
+```
+for example, the output is 
+```json
+[
+	"DaemonSet",
+	"Node",
+	"Pod",
+	"ClusterRole",
+	"StorageClass",
+	"PriorityClass",
+	"ReplicationController",
+	"PersistentVolume",
+	"ReplicaSet",
+	"Job"
+]
+```
+
+2. get fullkind
+
+Here, fullkind = [apiversion](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/) + "." + [kind]((https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/))
+
+```java
+System.out.println(client.getFullKinds().toPrettyString());
+```
+
+for example, the output is
+
+```json
+[
+	"apps.DaemonSet",
+	"Node",
+	"Pod",
+	"rbac.authorization.k8s.io.ClusterRole",
+	"storage.k8s.io.StorageClass",
+	"scheduling.k8s.io.PriorityClass",
+	"apps.ReplicaSet",
+	"batch.Job"
+]
+```
 ### simple-example
 
 Assume you have a json:
@@ -117,7 +158,7 @@ Assume you have a json:
 List resources:
 
 ```java
-client.listResources("Pod")
+client.listResources("Pod")       // kind or fullKind
 ```
 
 Create a resource:
@@ -129,13 +170,13 @@ client.createResource(new ObjectMapper().readTree(json));
 Get a resource:
 
 ```java
-client.getResource("Pod", "default", "busybox");
+client.getResource("Pod", "default", "busybox");       // kind or fullKind
 ```
 
 Delete a resource::
 
 ```java
-client.deleteResource("Pod", "default", "busybox")
+client.deleteResource("Pod", "default", "busybox")     // kind or fullKind
 ```
 
 
@@ -145,19 +186,13 @@ Close client
 client.close()
 ```
 
-### get-all-kinds
-
-```java
-System.out.println(client.getKinds());
-```
-
 ### work-with-other-sdks
 
-Unlike [fabric8](https://github.com/fabric8io/kubernetes-client), which need to learn fabric8 framework to support customized Kubernetes resources. Deveolpers use this SDK just need to focus on how to write JSON.
+Unlike [fabric8](https://github.com/fabric8io/kubernetes-client), you need to implement 'create, update, delete, list, get, watch' operators for customized Kubernetes resources. 
 
-It means that our novel design can automatically detect customized Kubernetes resources during runtime.
-In addition, if you want to use object (not JSON) to program, 
-you need to write JavaBean or reused it from the other SDKs. 
+This SDK peovides a unified API using JSON, and can automatically support customized Kubernetes resources.
+
+In addition, if you want to get object (not JSON), you just need to write a JavaBean or reused a JavaBean from an existing SDKs. 
 
 Let take fabric8 for example.
 
