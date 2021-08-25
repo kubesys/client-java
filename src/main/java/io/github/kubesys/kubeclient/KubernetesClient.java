@@ -33,9 +33,9 @@ import io.github.kubesys.kubeclient.utils.SSLUtil;
 /**
  * @author wuheng@iscas.ac.cn
  *
- * Support create, update, delete, get and list [Kubernetes resources]
+ * Support create, update, delete, get, list and watch [Kubernetes resources]
  * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * using [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
+ * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
  * 
  */
 public class KubernetesClient {
@@ -47,17 +47,19 @@ public class KubernetesClient {
 
 	
 	/**
-	 * caller
+	 * caller: it is used for sending request to Kuberenetes and receiving response from Kubernetes. 
 	 */
-	protected final HttpCaller caller;
+	protected final HttpCaller httpCaller;
 	
 	/**
-	 * analyzer
+	 * analyzer: it is used for 
 	 */
 	protected final KubernetesAnalyzer analyzer;
 
 
 	/**
+	 * invoke Kubernetes without token, which has been deprecated after Kubernetes 1.18
+	 * 
 	 * @param  url                 url
 	 * @throws Exception           exception 
 	 */
@@ -66,17 +68,21 @@ public class KubernetesClient {
 	}
 
 	/**
+	 * invoke Kubernetes using token
+	 * 
 	 * @param url                   url
 	 * @param token                 token
 	 * @throws Exception            exception
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
-		this.caller = new HttpCaller(url, token);
+		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = new KubernetesAnalyzer();
 		this.analyzer.doStart(this);
 	}
 
 	/**
+	 * invoke Kubernetes using token
+	 * 
 	 * @param url                   url
 	 * @param token                 token
 	 * @param analyzer              analyzer
@@ -84,7 +90,7 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
 		super();
-		this.caller = new HttpCaller(url, token);
+		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
 		this.analyzer.doStart(this);
 	}
@@ -119,10 +125,10 @@ public class KubernetesClient {
 		final String uri = analyzer.getConvertor().createUrl(json);
 		
 		HttpPost request = HttpUtil.post(
-						caller.getToken(), 
+						httpCaller.getToken(), 
 						uri, json.toString());
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 
@@ -166,9 +172,9 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().deleteUrl(kind, namespace, name);
 
-		HttpDelete request = HttpUtil.delete(caller.token, uri);
+		HttpDelete request = HttpUtil.delete(httpCaller.token, uri);
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -189,10 +195,10 @@ public class KubernetesClient {
 		}
 
 		HttpPut request = HttpUtil.put(
-						caller.getToken(), 
+						httpCaller.getToken(), 
 						uri, json.toString());
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -252,9 +258,9 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
-		HttpGet request = HttpUtil.get(caller.getToken(), uri);
+		HttpGet request = HttpUtil.get(httpCaller.getToken(), uri);
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -271,8 +277,8 @@ public class KubernetesClient {
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
 		try {
-			HttpGet request = HttpUtil.get(caller.getToken(), uri);
-			caller.getResponse(request);
+			HttpGet request = HttpUtil.get(httpCaller.getToken(), uri);
+			httpCaller.getResponse(request);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -355,9 +361,9 @@ public class KubernetesClient {
 			uri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 
-		HttpGet request = HttpUtil.get(caller.getToken(), uri.toString());
+		HttpGet request = HttpUtil.get(httpCaller.getToken(), uri.toString());
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -374,10 +380,10 @@ public class KubernetesClient {
 							analyzer.getConvertor().getName(json));
 
 		HttpPut request = HttpUtil.put(
-				caller.getToken(), 
+				httpCaller.getToken(), 
 				uri, json.toString());
 		
-		return caller.getResponse(request);
+		return httpCaller.getResponse(request);
 	}
 
 	/**
@@ -405,7 +411,7 @@ public class KubernetesClient {
 	 */
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
-		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
+		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
 							? "all-namespaces" : namespace) + "-" + name);
 		thread.start();
@@ -434,7 +440,7 @@ public class KubernetesClient {
 	 * @throws Exception                       exception
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		watcher.setRequest(HttpUtil.get(caller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
+		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" 
 								+ (namespace == null || "".equals("") 
 								? "all-namespaces" : namespace));
@@ -455,14 +461,14 @@ public class KubernetesClient {
 	 * @return               httpCaller
 	 */
 	public HttpCaller getHttpCaller() {
-		return caller;
+		return httpCaller;
 	}
 	
 	/**
 	 * @return               httpCaller
 	 */
 	public HttpCaller clone() {
-		return new HttpCaller(caller);
+		return new HttpCaller(httpCaller);
 	}
 	
 	/**
