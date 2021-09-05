@@ -6,6 +6,8 @@ package io.github.kubesys.kubeclient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  **/
 public abstract class KubernetesWatcher implements Runnable {
 
+	public static Logger m_logger = Logger.getLogger(KubernetesWatcher.class.getName());
 	/**
 	 * client
 	 */
@@ -46,7 +49,7 @@ public abstract class KubernetesWatcher implements Runnable {
 			CloseableHttpResponse execute = httpClient.execute(request);
 			
 			br = new BufferedReader(new InputStreamReader(
-						execute.getEntity().getContent()));
+						execute.getEntity().getContent(), Charset.forName("utf-8")));
 		    String line = null;
 		    
 		    while ((line = br.readLine()) != null) {
@@ -65,6 +68,7 @@ public abstract class KubernetesWatcher implements Runnable {
 				}
 		    }
 		} catch (Exception ex) {
+			m_logger.severe(ex.toString());
 			throw new RuntimeException(ex);
 		} finally {
 			if (br != null) {
