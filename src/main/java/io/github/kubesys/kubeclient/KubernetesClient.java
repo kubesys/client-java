@@ -78,9 +78,7 @@ public class KubernetesClient {
 	 * @throws Exception            wrong IP, or port, or token
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
-		this.httpCaller = new HttpCaller(url, token);
-		this.analyzer = new KubernetesAnalyzer();
-		this.analyzer.doStart(this);
+		this(url, token, new KubernetesAnalyzer());
 	}
 
 	/**
@@ -122,8 +120,8 @@ public class KubernetesClient {
 	 *   }                                     <br>
 	 * }                                       <br>
 	 * 
-	 * @param jsonStr               jsonStr
-	 * @return json                 json from Kubernetes, json = jsonStr + defaultValues
+	 * @param jsonStr               jsonStr, which meets the Kubernetes' specification
+	 * @return json                 Kubernetes may add some 
 	 * @throws Exception            Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode createResource(String jsonStr) throws Exception {
