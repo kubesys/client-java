@@ -4,6 +4,8 @@
 package io.github.kubesys.kubeclient;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 import io.github.kubesys.kubeclient.utils.HttpUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
@@ -120,9 +123,9 @@ public class KubernetesClient {
 	 *   }                                     <br>
 	 * }                                       <br>
 	 * 
-	 * @param jsonStr               jsonStr, which meets the Kubernetes' specification
-	 * @return json                 Kubernetes may add some 
-	 * @throws Exception            Kubernetes cannot parsing this jsonStr
+	 * @param jsonStr               jsonStr, which must meet the Kubernetes' specification
+	 * @return json                 Kubernetes may add come fields according to Kubernetes' context 
+	 * @throws Exception            see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode createResource(String jsonStr) throws Exception {
 		return createResource(new ObjectMapper().readTree(jsonStr));
@@ -144,9 +147,9 @@ public class KubernetesClient {
 	 *   }                                     <br>
 	 * }                                       <br>
 	 * 
-	 * @param json                   json
-	 * @return json                  json from Kubernetes, json = jsonStr + defaultValues
-	 * @throws Exception             Kubernetes cannot parsing this json
+	 * @param json                   json object, which must meet the Kubernetes' specification
+	 * @return json                  Kubernetes may add come fields according to Kubernetes' context 
+	 * @throws Exception             see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
@@ -158,7 +161,6 @@ public class KubernetesClient {
 		
 		return httpCaller.getResponse(request);
 	}
-
 
 	/**
 	 * delete a Kubernetes resource using JSON <br>
@@ -176,9 +178,33 @@ public class KubernetesClient {
 	 *   }                                     <br>
 	 * }                                       <br>
 	 * 
-	 * @param json                   json
-	 * @return json                  json from Kubernetes, it equals the input json
-	 * @throws Exception             Kubernetes cannot parsing this json
+	 * @param json                   json object, which must meet the Kubernetes' specification
+	 * @return json                  the deleted object with json style
+	 * @throws Exception             see {@link HttpCaller.getResponse}
+	 */
+	public JsonNode deleteResource(String jsonStr) throws Exception {
+		return deleteResource(new ObjectMapper().readTree(jsonStr));
+	}
+
+	/**
+	 * delete a Kubernetes resource using JSON <br>
+	 * 
+	 * for example, a json can be                        <br>
+	 * {                                       <br>
+	 *   "apiVersion": "v1",                   <br>
+	 *   "kind": "Pod",                        <br>
+	 *   "metadata": {                         <br>
+	 *      "name": "busybox",                 <br>
+	 *      "namespace": "default",            <br>
+	 *      "labels": {                        <br>
+	 *        "test": "test"                   <br>
+	 *     }                                   <br>
+	 *   }                                     <br>
+	 * }                                       <br>
+	 * 
+	 * @param json                   json object, which must meet the Kubernetes' specification
+	 * @return json                  the deleted object with json style
+	 * @throws Exception             see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
@@ -189,12 +215,13 @@ public class KubernetesClient {
 	
 	/**
 	 * delete a Kubernetes resource using kind and name
+	 * 
 	 * see https://kubernetes.io/docs/reference/kubectl/overview/
 	 * 
 	 * @param kind                    kind or fullKind
-	 * @param name                    resource name in namespace 'default'
-	 * @return json                   json from Kubernetes
-	 * @throws Exception              Kubernetes cannot parsing this jsonStr
+	 * @param name                    resource name
+	 * @return json                   the deleted object with json style
+	 * @throws Exception              see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode deleteResource(String kind, String name) throws Exception {
 		return deleteResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
@@ -206,10 +233,10 @@ public class KubernetesClient {
 	 * see https://kubernetes.io/docs/reference/kubectl/overview/
 	 * 
 	 * @param kind                    kind or fullKind
-	 * @param namespace               resource namespace, "" means all-namespaces
+	 * @param namespace               resource namespace, and "" means all-namespaces
 	 * @param name                    resource name
-	 * @return json                   json from Kubernetes
-	 * @throws Exception              Kubernetes cannot parsing this jsonStr
+	 * @return json                   the deleted object with json style
+	 * @throws Exception              see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
@@ -236,9 +263,9 @@ public class KubernetesClient {
 	 *   }                                     <br>
 	 * }                                       <br>
 	 * 
-	 * @param json                   json
-	 * @return json                  json from Kubernetes, json = jsonStr + defaultValues
-	 * @throws Exception             Kubernetes cannot parsing this json
+	 * @param json                   json object, which must meet the Kubernetes' specification
+	 * @return json                  updated object with json style
+	 * @throws Exception             see {@link HttpCaller.getResponse}
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
@@ -261,10 +288,10 @@ public class KubernetesClient {
 	/**
 	 * get a Kubernetes resource using kind, namespace and name
 	 * 
-	 * @param kind                        kind
+	 * @param kind                        kind or fullkind
 	 * @param name                        name
-	 * @return json                       json
-	 * @throws Exception                  Kubernetes cannot parsing this jsonStr 
+	 * @return json                       expected object with json style
+	 * @throws Exception                  json object, which must meet the Kubernetes' specification 
 	 */
 	public JsonNode getResource(String kind, String name) throws Exception {
 
@@ -274,8 +301,8 @@ public class KubernetesClient {
 	/**
 	 * get a Kubernetes resource using kind, namespace and name
 	 * 
-	 * @param kind                        kind
-	 * @param namespace                   namespace, if this kind unsupports namespace, it is null
+	 * @param kind                        kind or fullkind
+	 * @param namespace                   namespace, if this kind unsupports namespace, it is ""
 	 * @param name                        name
 	 * @return json                       json
 	 * @throws Exception                  Kubernetes cannot parsing this jsonStr
@@ -595,6 +622,17 @@ public class KubernetesClient {
 	 */
 	public static class HttpCaller {
 		
+		// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
+		static Map<Integer, String> statusDesc = new HashMap<>();
+		
+		static  {
+			statusDesc.put(400, "Bad Request. The server could not parse or understand the request.");
+			statusDesc.put(401, "Unauthorized. A request was received without a known authentication scheme.");
+			statusDesc.put(403, "Bad Request. Forbidden. The request was received and understood, but access is forbidden.");
+			statusDesc.put(409, "Conflict. The request was received, but it was a request to update an older version of the object.");
+			statusDesc.put(422, "Unprocessable entity. The request was parsed correctly but failed some sort of validation.");
+		}
+		
 		/**
 		 * master IP
 		 */
@@ -671,7 +709,9 @@ public class KubernetesClient {
 			try {
 				JsonNode result = new ObjectMapper().readTree(response.getEntity().getContent());
 				if (result.has("status") && result.get("status").asText().equals("Failure")) {
-					throw new Exception(result.toPrettyString());
+					int code = result.get("code").asInt();
+					String cause = statusDesc.get(code);
+					throw new Exception(cause != null ? cause : result.toPrettyString());
 				}
 				return result;
 			} catch (Exception ex) {
