@@ -135,7 +135,7 @@ public class KubernetesClient {
 	 * 
 	 * @param json                   json object, which must meet the Kubernetes' specification
 	 * @return json                  Kubernetes may add come fields according to Kubernetes' context 
-	 * @throws Exception             see {@link HttpCaller.getResponse}
+	 * @throws Exception             see link HttpCaller.getResponse
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
@@ -166,7 +166,7 @@ public class KubernetesClient {
 	 * 
 	 * @param json                   json object, which must meet the Kubernetes' specification
 	 * @return json                  the deleted object with json style
-	 * @throws Exception             see {@link HttpCaller.getResponse}
+	 * @throws Exception             see HttpCaller.getResponse
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
@@ -183,7 +183,7 @@ public class KubernetesClient {
 	 * @param kind                    kind or fullKind
 	 * @param name                    resource name
 	 * @return json                   the deleted object with json style
-	 * @throws Exception              see {@link HttpCaller.getResponse}
+	 * @throws Exception              see HttpCaller.getResponse
 	 */
 	public JsonNode deleteResource(String kind, String name) throws Exception {
 		return deleteResource(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
@@ -198,7 +198,7 @@ public class KubernetesClient {
 	 * @param namespace               resource namespace, and "" means all-namespaces
 	 * @param name                    resource name
 	 * @return json                   the deleted object with json style
-	 * @throws Exception              see {@link HttpCaller.getResponse}
+	 * @throws Exception              see HttpCaller.getResponse
 	 */
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
@@ -227,7 +227,7 @@ public class KubernetesClient {
 	 * 
 	 * @param json                   json object, which must meet the Kubernetes' specification
 	 * @return json                  updated object with json style
-	 * @throws Exception             see {@link HttpCaller.getResponse}
+	 * @throws Exception             see HttpCaller.getResponse
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
