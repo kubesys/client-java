@@ -5,6 +5,8 @@ package io.github.kubesys.kubeclient.examples;
 
 import java.net.InetAddress;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.github.kubesys.kubeclient.AbstractKubernetesClientTest;
 import io.github.kubesys.kubeclient.KubernetesClient;
 
@@ -41,7 +43,7 @@ public class EdgeKubelet extends AbstractKubernetesClientTest {
 					.getHostName().toLowerCase();
 		
 		if (!client.hasResource("Node", null, hostname)) {
-			client.createResource(NODE.replace("#NAME", hostname));
+			client.createResource(new ObjectMapper().readTree(NODE.replace("#NAME", hostname)));
 		}
 	}
 

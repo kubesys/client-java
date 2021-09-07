@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 import io.github.kubesys.kubeclient.utils.HttpUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
@@ -48,6 +47,17 @@ public class KubernetesClient {
 	 * m_logger
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
+	
+	
+	/**
+	 * all-namespaces
+	 */
+	public static final String ALL_NAMESPACES = "";
+	
+	/**
+	 * all-namespaces
+	 */
+	public static final String NO_NAMESPACE = "";
 
 	
 	/**
@@ -108,30 +118,6 @@ public class KubernetesClient {
 	 **********************************************************/
 
 	/**
-	 * create a Kubernetes resource using JSON.<br>
-	 * 
-	 * for example, a jsonStr can be                        <br>
-	 * {                                       <br>
-	 *   "apiVersion": "v1",                   <br>
-	 *   "kind": "Pod",                        <br>
-	 *   "metadata": {                         <br>
-	 *      "name": "busybox",                 <br>
-	 *      "namespace": "default",            <br>
-	 *      "labels": {                        <br>
-	 *        "test": "test"                   <br>
-	 *     }                                   <br>
-	 *   }                                     <br>
-	 * }                                       <br>
-	 * 
-	 * @param jsonStr               jsonStr, which must meet the Kubernetes' specification
-	 * @return json                 Kubernetes may add come fields according to Kubernetes' context 
-	 * @throws Exception            see {@link HttpCaller.getResponse}
-	 */
-	public JsonNode createResource(String jsonStr) throws Exception {
-		return createResource(new ObjectMapper().readTree(jsonStr));
-	}
-
-	/**
 	 * create a Kubernetes resource using JSON. <br>
 	 * 
 	 * for example, a json can be                        <br>
@@ -160,30 +146,6 @@ public class KubernetesClient {
 						uri, json.toString());
 		
 		return httpCaller.getResponse(request);
-	}
-
-	/**
-	 * delete a Kubernetes resource using JSON <br>
-	 * 
-	 * for example, a json can be                        <br>
-	 * {                                       <br>
-	 *   "apiVersion": "v1",                   <br>
-	 *   "kind": "Pod",                        <br>
-	 *   "metadata": {                         <br>
-	 *      "name": "busybox",                 <br>
-	 *      "namespace": "default",            <br>
-	 *      "labels": {                        <br>
-	 *        "test": "test"                   <br>
-	 *     }                                   <br>
-	 *   }                                     <br>
-	 * }                                       <br>
-	 * 
-	 * @param json                   json object, which must meet the Kubernetes' specification
-	 * @return json                  the deleted object with json style
-	 * @throws Exception             see {@link HttpCaller.getResponse}
-	 */
-	public JsonNode deleteResource(String jsonStr) throws Exception {
-		return deleteResource(new ObjectMapper().readTree(jsonStr));
 	}
 
 	/**
@@ -464,9 +426,26 @@ public class KubernetesClient {
 	 */
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
+		String watchName = kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
+							? "all-namespaces" : namespace) + "-" + name;
+		return watchResource(watchName, kind, namespace, watchName, watcher);
+	}
+	
+	/**
+	 * watch a Kubernetes resource using kind, namespace, name and WebSocketListener
+	 * 
+	 * @param watchName                       name
+	 * @param kind                            kind
+	 * @param namespace                       namespace
+	 * @param name                            name
+	 * @param watcher                         watcher
+	 * @return thread                         thread
+	 * @throws Exception                      Kubernetes cannot parsing this jsonStr
+	 */
+	public Thread watchResource(String watchName, String kind, String namespace, String name, KubernetesWatcher watcher)
+			throws Exception {
 		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
-		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
-							? "all-namespaces" : namespace) + "-" + name);
+		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
 	}
@@ -493,10 +472,25 @@ public class KubernetesClient {
 	 * @throws Exception                       Kubernetes cannot parsing this jsonStr
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
-		Thread thread = new Thread(watcher, kind.toLowerCase() + "-" 
+		String watchName = kind.toLowerCase() + "-" 
 								+ (namespace == null || "".equals("") 
-								? "all-namespaces" : namespace));
+								? "all-namespaces" : namespace);
+		return watchResources(watchName, kind, namespace, watcher);
+	}
+	
+	/**
+	 * watch a Kubernetes resources using kind, namespace, and WebSocketListener
+	 * 
+	 * @param watchName                        name
+	 * @param kind                             kind
+	 * @param namespace                        namespace
+	 * @param watcher                          watcher
+	 * @return thread                          thread
+	 * @throws Exception                       Kubernetes cannot parsing this jsonStr
+	 */
+	public Thread watchResources(String watchName, String kind, String namespace, KubernetesWatcher watcher) throws Exception {
+		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
+		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
 	}
