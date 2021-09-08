@@ -113,6 +113,11 @@ public class KubernetesRuleBase {
 		if (values != null && values.size() == 1) {
 			return values.get(0);
 		}
+		
+		if (values.contains(kind)) {
+			return kind;
+		}
+		
 		// many fullnames are supported by Kubernetes, use a default one
 		String fullname = null;
 		for (String v : values) {
