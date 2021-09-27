@@ -124,7 +124,7 @@ public class KubernetesRegistry {
 	 * @param url                url
 	 * @return                   group
 	 */
-	public String getGroupByUrl(String url) {
+	private String getGroupByUrl(String url) {
 		if (url.endsWith(KubernetesConstants.KUBEAPI_CORE_PATTERN)) {
 			return "";
 		}
