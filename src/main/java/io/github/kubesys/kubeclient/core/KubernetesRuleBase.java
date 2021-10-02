@@ -127,7 +127,7 @@ public class KubernetesRuleBase {
 			return values.get(0);
 		}
 		
-		if (values.contains(kind)) {
+		if (values != null &&values.contains(kind)) {
 			return kind;
 		}
 		

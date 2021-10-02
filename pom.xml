@@ -182,6 +182,11 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.9.0.2155</version>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -196,4 +201,21 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<sonar.jdbc.url>jdbc:postgresql://39.100.71.73:30306/sonar</sonar.jdbc.url>
+				<sonar.jdbc.username>postgres</sonar.jdbc.username>
+				<sonar.jdbc.password>onceas</sonar.jdbc.password>
+				<sonar.host.url>http://39.100.71.73:31014</sonar.host.url>
+				<sonar.login>admin</sonar.login>
+				<sonar.password>admin123</sonar.password>
+			</properties>
+		</profile>
+	</profiles>
 </project>

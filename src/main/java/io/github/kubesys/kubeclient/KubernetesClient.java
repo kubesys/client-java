@@ -428,7 +428,7 @@ public class KubernetesClient {
 	 */
 	public Thread watchResource(String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
-		String watchName = kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
+		String watchName = kind.toLowerCase() + "-" + (namespace == null || "".equals(namespace) 
 							? "all-namespaces" : namespace) + "-" + name;
 		return watchResource(watchName, kind, namespace, name, watcher);
 	}
@@ -475,7 +475,7 @@ public class KubernetesClient {
 	 */
 	public Thread watchResources(String kind, String namespace, KubernetesWatcher watcher) throws Exception {
 		String watchName = kind.toLowerCase() + "-" 
-								+ (namespace == null || "".equals("") 
+								+ (namespace == null || "".equals(namespace) 
 								? "all-namespaces" : namespace);
 		return watchResources(watchName, kind, namespace, watcher);
 	}

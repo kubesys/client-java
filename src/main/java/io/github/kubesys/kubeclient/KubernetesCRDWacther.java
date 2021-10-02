@@ -85,11 +85,14 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 					KubernetesConstants.VALUE_ALL_NAMESPACES, 
 					new KubernetesCRDWacther(client));
 		} catch (Exception e) {
+			m_logger.info("watcher apiextensions.k8s.io.CustomResourceDefinition is crash: " + e.toString());
+			m_logger.info("wait 5 seconds to restart watcher apiextensions.k8s.io.CustomResourceDefinition ");
 			try {
 				Thread.sleep(5000);
-			} catch (Exception e1) {
-				doClose();
+			} catch (InterruptedException e1) {
+				
 			}
+			doClose();
 		}
 	}
 
