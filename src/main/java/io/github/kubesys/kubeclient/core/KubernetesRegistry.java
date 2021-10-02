@@ -10,8 +10,8 @@ import org.apache.http.client.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.github.kubesys.kubeclient.KubernetesConstants;
 import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
+import io.github.kubesys.kubeclient.KubernetesConstants;
 import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.URLUtil;
 

@@ -3,116 +3,57 @@
  */
 package io.github.kubesys.kubeclient.utils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Logger;
 
 /**
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
- * @author wuheng@iscas.ac.cn
- * @since  2.0.5 
+ * 
  **/
 public class URLUtil {
 
+	protected static final Logger m_logger = Logger.getLogger(URLUtil.class.getName()); 
+	
 	/**
 	 * @param parts path
 	 * @return url
 	 */
 	public static String join(String... parts) {
+		if (parts == null) {
+			return null;
+		}
+		
 		StringBuilder sb = new StringBuilder();
-
-		String urlQueryParams = "";
-		if (parts.length > 0) {
-			String urlWithoutQuery = parts[0];
-			try {
-				URI uri = new URI(parts[0]);
-				if (containsQueryParam(uri)) {
-					urlQueryParams = uri.getQuery();
-					urlWithoutQuery = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null,
-							uri.getFragment()).toString();
-				}
-			} catch (URISyntaxException e) {
-				// Not all first parameters are URL
-			}
-			sb.append(urlWithoutQuery).append("/");
+		try {
+			URL url = new URL(parts[0]);
+			sb.append(url.getProtocol()).append("://")
+					.append(url.getHost()).append(":")
+					.append(url.getPort() == -1 
+						? url.getDefaultPort() 
+								: url.getPort());
+		} catch (MalformedURLException e) {
+			m_logger.warning("invalid url: " + e);
+			return null;
 		}
-
-		StringBuilder queryParams = new StringBuilder();
-		for (int i = 1; i < parts.length; i++) {
-			try {
-				URI partUri = new URI(parts[i]);
-				if (containsQueryParam(partUri)) {
-					queryParams = getQueryParams(partUri, parts, i + 1);
-					// If we start detecting query params then everything will be query params part
-					break;
-				}
-
-				sb.append(parts[i]);
-
-			} catch (URISyntaxException e) {
-				sb.append(parts[i]);
+		
+		
+		int len = parts.length;
+		
+		for (int i = 1; i < len - 1; i++) {
+			while (parts[i].startsWith("/")) {
+				parts[i] = parts[i].substring(1);
 			}
-
-			if (i < parts.length - 1) {
-				sb.append("/");
+			while (parts[i].endsWith("/")) {
+				parts[i] = parts[i].substring(0, parts[i].length() - 1);
 			}
-
+			sb.append("/").append(parts[i]);
 		}
-
-		appendQueryParametersFromOriginalUrl(sb, urlQueryParams, queryParams);
-		String joined = sb.toString();
-
-		// And normalize it...
-		return joined.replaceAll("/+", "/").replaceAll("/\\?", "?").replaceAll("/#", "#").replaceAll(":/", "://");
-
-	}
-
-	/**
-	 * @param sb             stringbuffer
-	 * @param urlQueryParams params
-	 * @param queryParams    params
-	 */
-	private static void appendQueryParametersFromOriginalUrl(StringBuilder sb, String urlQueryParams,
-			StringBuilder queryParams) {
-		if (!urlQueryParams.isEmpty()) {
-			if (queryParams.length() == 0) {
-				queryParams.append("?");
-			} else {
-				queryParams.append("&");
-			}
-			queryParams.append(urlQueryParams);
+		
+		if (len != 1) {
+			sb.append("/").append(parts[len - 1]);
 		}
-
-		sb.append(queryParams);
-	}
-
-	/**
-	 * @param firstPart first part
-	 * @param parts     parts
-	 * @param index     index
-	 * @return url
-	 */
-	private static StringBuilder getQueryParams(URI firstPart, String[] parts, int index) {
-		StringBuilder queryParams = new StringBuilder();
-		queryParams.append(firstPart.toString());
-
-		for (int i = index; i < parts.length; i++) {
-			String param = parts[i];
-
-			if (!param.startsWith("&")) {
-				queryParams.append("&");
-			}
-			queryParams.append((param));
-		}
-
-		return queryParams;
-	}
-
-	/**
-	 * @param uri uri
-	 * @return true or false
-	 */
-	private static boolean containsQueryParam(URI uri) {
-		return uri.getQuery() != null;
+		return sb.toString();
 	}
 }

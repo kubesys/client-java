@@ -26,11 +26,20 @@ public class KubernetesConvertor {
 	protected final KubernetesRuleBase ruleBase;
 	
 	
+	/**
+	 * @param ruleBase
+	 */
 	public KubernetesConvertor(KubernetesRuleBase ruleBase) {
 		super();
 		this.ruleBase = ruleBase;
 	}
 
+	/*******************************************
+	 * 
+	 *            Core
+	 * 
+	 ********************************************/
+	
 	/**
 	 * @param json json
 	 * @return Url
@@ -38,15 +47,13 @@ public class KubernetesConvertor {
 	 */
 	public String createUrl(JsonNode json) throws Exception {
 
-		String version = getApiVersion(json);
-		String kind = getKind(json);
-		String fullKind = version.indexOf("/") == -1 
-				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
+		String fullKind = fullkind(json);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind),
 							getNamespace(ruleBase.isNamespaced(fullKind), 
 							getNamespace(json)),
 							ruleBase.getName(fullKind));
 	}
+
 
 	/**
 	 * @param json json
@@ -54,12 +61,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String bindingUrl(JsonNode json) throws Exception {
-
-		String version = getApiVersion(json);
-
-		String kind = getKind(json);
-		String fullKind = version.indexOf("/") == -1 
-				? kind : version.substring(0, version.indexOf("/")) + "." + kind;
+		String fullKind = fullkind(json);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
 							getNamespace(ruleBase.isNamespaced(fullKind), 
 							getNamespace(json)),"pods", 
@@ -74,8 +76,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String deleteUrl(String kind, String ns, String name) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 
-				? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
 				            getNamespace(ruleBase.isNamespaced(fullKind), ns),
 				            ruleBase.getName(fullKind), name);
@@ -89,7 +90,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String updateUrl(String kind, String ns, String name) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
 				getNamespace(ruleBase.isNamespaced(fullKind), ns),
 				ruleBase.getName(fullKind), name);
@@ -103,7 +104,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String getUrl(String kind, String ns, String name) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
 				getNamespace(ruleBase.isNamespaced(fullKind), ns),
 				ruleBase.getName(fullKind), name);
@@ -116,7 +117,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String listUrl(String kind, String ns) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), getNamespace(ruleBase.isNamespaced(fullKind), ns),
 				ruleBase.getName(fullKind));
 	}
@@ -129,7 +130,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String updateStatusUrl(String kind, String ns, String name) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
 				getNamespace(ruleBase.isNamespaced(fullKind), ns),
 				ruleBase.getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
@@ -143,7 +144,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String watchOneUrl(String kind, String ns, String name) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
 				getNamespace(ruleBase.isNamespaced(fullKind), ns), 
 				ruleBase.getName(fullKind), name,
@@ -157,7 +158,7 @@ public class KubernetesConvertor {
 	 * @throws Exception exception
 	 */
 	public String watchAllUrl(String kind, String ns) throws Exception {
-		String fullKind = kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+		String fullKind = fullkind(kind);
 		return URLUtil.join(ruleBase.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
 				getNamespace(ruleBase.isNamespaced(fullKind), ns), 
 				ruleBase.getName(fullKind),
@@ -165,17 +166,46 @@ public class KubernetesConvertor {
 	}
 	
 	
+	/*******************************************
+	 * 
+	 *            Util
+	 * 
+	 ********************************************/
 	/**
 	 * @param json json
-	 * @return full path
+	 * @return apiVersion
 	 */
-	protected String getApiVersion(JsonNode json) {
-		return json.get("apiVersion").asText();
+	protected String apiVersion(JsonNode json) {
+		return json.get(KubernetesConstants.KUBE_APIVERSION).asText();
 
 	}
+
+	/**
+	 * @param kind        kind
+	 * @return fullkind
+	 */
+	protected String fullkind(String kind) {
+		return kind.indexOf(".") == -1 ? ruleBase.getFullKind(kind) : kind;
+	}
 	
-	public String getName(JsonNode json) {
-		return json.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAME).asText();
+	/**
+	 * @param json         json
+	 * @return fullkind
+	 */
+	protected String fullkind(JsonNode json) {
+		String apiVersion = apiVersion(json);
+		String kind = kind(json);
+		return apiVersion.indexOf("/") == -1 ? kind : 
+			apiVersion.substring(0, apiVersion.indexOf("/")) + "." + kind;
+	}
+	
+	/**
+	 * @param json              json
+ 	 * @return metadata.name
+	 */
+	public String name(JsonNode json) {
+		return json.get(KubernetesConstants.KUBE_METADATA)
+				.get(KubernetesConstants.KUBE_METADATA_NAME).asText();
 	}
 
 	public String getNamespace(JsonNode json) {
@@ -192,7 +222,7 @@ public class KubernetesConvertor {
 				: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}
 	
-	public String getKind(JsonNode json) {
+	public String kind(JsonNode json) {
 		return json.get(KubernetesConstants.KUBE_KIND).asText();
 	}
 

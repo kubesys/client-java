@@ -22,66 +22,70 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
  * it is used for supporting ssl connections
  * 
  * @author wuheng@iscas.ac.cn
- * @since  2.0.5 
+ * @since 2.0.5
  **/
 public class SSLUtil {
 
 	public static final Logger m_logger = Logger.getLogger(SSLUtil.class.getName());
-	
+
 	/**
-	 * @return                                 SocketFactory
+	 * @return SocketFactory
 	 */
 	public static org.apache.http.conn.ssl.SSLConnectionSocketFactory createSocketFactory() {
 		return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(
 				createX509SocketFactory(), new NoopHostnameVerifier());
 	}
-	
+
 	/**
-	 * @return                                  SocketFactory
+	 * @return SocketFactory
 	 */
 	public static SSLSocketFactory createX509SocketFactory() {
-		TrustManager[] managers = new TrustManager[] {
-								new X509TrustManager() {
-
-									@Override
-									public void checkClientTrusted(X509Certificate[] chain, String authType)
-											throws CertificateException {
-										m_logger.info("check client trusted.");
-									}
-
-									@Override
-									public void checkServerTrusted(X509Certificate[] chain, String authType)
-											throws CertificateException {
-										m_logger.info("check server trusted.");
-									}
-
-									@Override
-									public X509Certificate[] getAcceptedIssuers() {
-										return new X509Certificate[] {};
-									}
-									
-								}};
 		try {
 			SSLContext sc = SSLContext.getInstance("TLS");
-			sc.init(null, managers, new SecureRandom());
-		return sc.getSocketFactory();
+			sc.init(null, createDefaultTrustManager(), new SecureRandom());
+			return sc.getSocketFactory();
 		} catch (Exception ex) {
+			m_logger.severe("unable to create X509 SocketFactory, " + ex);
 			return null;
 		}
 	}
-	
-	
+
 	/**
-	 * @return                                  HostnameVerifier
+	 * @return TrustManager[]
 	 */
-	public static HostnameVerifier createHostnameVerifier() {
+	public static TrustManager[] createDefaultTrustManager() {
+		return new TrustManager[] { new X509TrustManager() {
+
+			@Override
+			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				m_logger.info("client is trusted.");
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				m_logger.info("server is trusted.");
+			}
+
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[] {};
+			}
+
+		} };
+	}
+
+	/**
+	 * @return HostnameVerifier
+	 */
+	public static HostnameVerifier createDefaultHostnameVerifier() {
 		return new HostnameVerifier() {
-			
+
 			public String toString() {
 				return super.toString();
 			}
 
 			public boolean verify(String hostname, SSLSession session) {
+				m_logger.info("hostname is trusted.");
 				return (hostname != null);
 			}
 

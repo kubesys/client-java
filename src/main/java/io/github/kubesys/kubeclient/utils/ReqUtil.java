@@ -14,7 +14,7 @@ import org.apache.http.entity.StringEntity;
 
 /**
  * 
- * it is used for creating various HttpRequest
+ * It is used for creating various HttpRequest
  * 
  * @author wuheng@iscas.ac.cn
  * @since  2.0.5 
@@ -33,7 +33,7 @@ public class ReqUtil {
 	 * @param body                     body
 	 * @return                         request
 	 */
-	static HttpRequestBase createRequest(HttpRequestBase req, String token, String body) {
+	private static HttpRequestBase createRequest(HttpRequestBase req, String token, String body) {
 		if (req instanceof HttpEntityEnclosingRequestBase) {
 			setHttpEntity((HttpEntityEnclosingRequestBase) req, body);
 		}
@@ -45,15 +45,17 @@ public class ReqUtil {
 	 * @param req                        request
 	 * @param body                       body
 	 */
-	static void setHttpEntity(HttpEntityEnclosingRequestBase req, String body) {
-		req.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
+	private static void setHttpEntity(HttpEntityEnclosingRequestBase req, String body) {
+		req.setEntity(new StringEntity(
+					body == null ? "" : body, 
+					ContentType.APPLICATION_JSON));
 	}
 	
 	/**
 	 * @param request                     request
 	 * @param token                       token
 	 */
-	static void setBearerHeader(HttpRequestBase request, String token) {
+	private static void setBearerHeader(HttpRequestBase request, String token) {
 		if (token != null) {
 			request.addHeader("Authorization", "Bearer " + token);
 		}
@@ -69,9 +71,11 @@ public class ReqUtil {
 	 * @param token                       token
 	 * @param uri                         uri
 	 * @param body                        body
-	 * @return                            request
+	 * @return                            request or null
+	 * @throws NullPointerException       null
+	 * @throws RuntimeException           runtime
 	 */
-	public static HttpPost post(String token, String uri, String body) {
+	public static HttpPost post(String token, String uri, String body) throws NullPointerException, RuntimeException {
 		return (HttpPost) createRequest(new HttpPost(uri), token, body);
 	}
 	
@@ -79,27 +83,33 @@ public class ReqUtil {
 	 * @param token                       token
 	 * @param uri                         uri
 	 * @param body                        body
-	 * @return                            request
+	 * @return                            request or null
+	 * @throws NullPointerException       null
+	 * @throws RuntimeException           runtime
 	 */
-	public static HttpPut put(String token, String uri, String body) {
+	public static HttpPut put(String token, String uri, String body) throws NullPointerException, RuntimeException {
 		return (HttpPut) createRequest(new HttpPut(uri), token, body);
 	}
 	
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
-	 * @return                            request
+	 * @return                            request or null
+	 * @throws NullPointerException       null
+	 * @throws RuntimeException           runtime
 	 */
-	public static HttpDelete delete(String token, String uri) {
+	public static HttpDelete delete(String token, String uri) throws NullPointerException, RuntimeException {
 		return (HttpDelete) createRequest(new HttpDelete(uri), token, null);
 	}
 	
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
-	 * @return                            request
+	 * @return                            request or null
+	 * @throws NullPointerException       null
+	 * @throws RuntimeException           runtime
 	 */
-	public static HttpGet get(String token, String uri) {
+	public static HttpGet get(String token, String uri) throws NullPointerException, RuntimeException {
 		return (HttpGet) createRequest(new HttpGet(uri), token, null);
 	}
 	

@@ -94,6 +94,7 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this(url, token, new KubernetesAnalyzer());
+		this.analyzer.analyseServerBy(this);
 	}
 
 	/**
@@ -106,10 +107,8 @@ public class KubernetesClient {
 	 * @throws Exception            wrong IP, or port, or token
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
-		super();
 		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
-		this.analyzer.doStart(this);
 	}
 
 
@@ -175,7 +174,7 @@ public class KubernetesClient {
 		
 		return deleteResource(analyzer.getConvertor().getFullKind(json), 
 							  analyzer.getConvertor().getNamespace(json), 
-							  analyzer.getConvertor().getName(json));
+							  analyzer.getConvertor().name(json));
 	}
 	
 	/**
@@ -234,9 +233,10 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
-		final String uri = analyzer.getConvertor().updateUrl(analyzer.getConvertor().getFullKind(json), 
-										      analyzer.getConvertor().getNamespace(json), 
-										      analyzer.getConvertor().getName(json));
+		final String uri = analyzer.getConvertor().updateUrl(
+							 	analyzer.getConvertor().getFullKind(json), 
+							 	analyzer.getConvertor().getNamespace(json), 
+							 	analyzer.getConvertor().name(json));
 
 		if (json.has(KubernetesConstants.KUBE_STATUS)) {
 			((ObjectNode) json).remove(KubernetesConstants.KUBE_STATUS);
@@ -393,9 +393,9 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 
-		final String uri = analyzer.getConvertor().updateStatusUrl(analyzer.getConvertor().getKind(json), 
+		final String uri = analyzer.getConvertor().updateStatusUrl(analyzer.getConvertor().kind(json), 
 							analyzer.getConvertor().getNamespace(json), 
-							analyzer.getConvertor().getName(json));
+							analyzer.getConvertor().name(json));
 
 		HttpPut request = ReqUtil.put(
 				httpCaller.getToken(), 
@@ -683,7 +683,7 @@ public class KubernetesClient {
 			HttpClientBuilder builder = HttpClients.custom();
 
 			if (this.token != null) {
-				builder.setSSLHostnameVerifier(SSLUtil.createHostnameVerifier())
+				builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
 						.setSSLSocketFactory(SSLUtil.createSocketFactory());
 			}
 

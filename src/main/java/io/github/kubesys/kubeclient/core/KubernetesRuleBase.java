@@ -121,7 +121,7 @@ public class KubernetesRuleBase {
 	 * @return                    fullKinds
 	 * @throws Exception          exception
 	 */
-	public String getFullKind(String kind) throws Exception {
+	public String getFullKind(String kind) {
 		List<String> values = kindToFullKindMapper.get(kind);
 		// a fullname
 		if (values != null && values.size() == 1) {
@@ -144,7 +144,7 @@ public class KubernetesRuleBase {
 		}
 		
 		if (fullname == null) {
-			throw new Exception("Please use fullKind, " + getFullKinds(kind));
+			throw new RuntimeException("Please use fullKind, " + getFullKinds(kind));
 		} else {
 			return fullname;
 		}
