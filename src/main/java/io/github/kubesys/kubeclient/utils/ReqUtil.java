@@ -4,6 +4,7 @@
 package io.github.kubesys.kubeclient.utils;
 
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -20,6 +21,34 @@ import org.apache.http.entity.StringEntity;
  **/
 public class ReqUtil {
 
+	/**********************************************************
+	 * 
+	 *                     Commons
+	 * 
+	 **********************************************************/
+	
+	/**
+	 * @param req                      request
+	 * @param token                    token
+	 * @param body                     body
+	 * @return                         request
+	 */
+	static HttpRequestBase createRequest(HttpRequestBase req, String token, String body) {
+		if (req instanceof HttpEntityEnclosingRequestBase) {
+			setHttpEntity((HttpEntityEnclosingRequestBase) req, body);
+		}
+		setBearerHeader(req, token);
+		return req;
+	}
+	
+	/**
+	 * @param req                        request
+	 * @param body                       body
+	 */
+	static void setHttpEntity(HttpEntityEnclosingRequestBase req, String body) {
+		req.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
+	}
+	
 	/**
 	 * @param request                     request
 	 * @param token                       token
@@ -28,10 +57,14 @@ public class ReqUtil {
 		if (token != null) {
 			request.addHeader("Authorization", "Bearer " + token);
 		}
-		
 		request.addHeader("Connection", "keep-alive");
 	}
 	
+	/**********************************************************
+	 * 
+	 *                     Core
+	 * 
+	 **********************************************************/
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
@@ -39,10 +72,7 @@ public class ReqUtil {
 	 * @return                            request
 	 */
 	public static HttpPost post(String token, String uri, String body) {
-		HttpPost request = new HttpPost(uri);
-		request.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
-		setBearerHeader(request, token);
-		return request;
+		return (HttpPost) createRequest(new HttpPost(uri), token, body);
 	}
 	
 	/**
@@ -52,10 +82,7 @@ public class ReqUtil {
 	 * @return                            request
 	 */
 	public static HttpPut put(String token, String uri, String body) {
-		HttpPut request = new HttpPut(uri);
-		request.setEntity(new StringEntity(body, ContentType.APPLICATION_JSON));
-		setBearerHeader(request, token);
-		return request;
+		return (HttpPut) createRequest(new HttpPut(uri), token, body);
 	}
 	
 	/**
@@ -64,9 +91,7 @@ public class ReqUtil {
 	 * @return                            request
 	 */
 	public static HttpDelete delete(String token, String uri) {
-		HttpDelete request = new HttpDelete(uri);
-		setBearerHeader(request, token);
-		return request;
+		return (HttpDelete) createRequest(new HttpDelete(uri), token, null);
 	}
 	
 	/**
@@ -75,10 +100,7 @@ public class ReqUtil {
 	 * @return                            request
 	 */
 	public static HttpGet get(String token, String uri) {
-		HttpGet request = new HttpGet(uri);
-		setBearerHeader(request, token);
-		return request;
+		return (HttpGet) createRequest(new HttpGet(uri), token, null);
 	}
-	
 	
 }
