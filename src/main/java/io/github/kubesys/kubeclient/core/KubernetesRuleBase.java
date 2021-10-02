@@ -34,7 +34,7 @@ public class KubernetesRuleBase {
 	 ********************************************************/
 	
 	/**
-	 * {"Deployment", ["apps.Deployment", "extensions.Deployment"}>
+	 * {"Deployment", ["apps.Deployment", "extensions.Deployment"}
 	 */
 	public Map<String, List<String>>   kindToFullKindMapper        = new HashMap<>();
 	
@@ -119,7 +119,6 @@ public class KubernetesRuleBase {
 	/**
 	 * @param kind                kind
 	 * @return                    fullKinds
-	 * @throws Exception          exception
 	 */
 	public String getFullKind(String kind) {
 		List<String> values = kindToFullKindMapper.get(kind);

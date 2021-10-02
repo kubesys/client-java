@@ -36,7 +36,6 @@ import io.github.kubesys.kubeclient.utils.SSLUtil;
  * <p>
  * Providing a unified API to create, update, delete, get, list and watch Kubernetes' kinds
  * according to Kubernetes' APIs.
- * <p>
  * <ul>
  * <li><p>
  *     Kubernetes kinds: https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/
