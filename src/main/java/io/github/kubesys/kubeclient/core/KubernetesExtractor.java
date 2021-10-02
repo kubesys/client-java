@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github.kubesys.kubeclient.KubernetesConstants;
 import io.github.kubesys.kubeclient.KubernetesClient;
 import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
-import io.github.kubesys.kubeclient.utils.HttpUtil;
+import io.github.kubesys.kubeclient.utils.ReqUtil;
 
 
 /**
@@ -64,7 +64,7 @@ public class KubernetesExtractor {
 	
 	public void start() throws Exception {
 
-		HttpGet request = HttpUtil.get(caller.getToken(), caller.getMasterUrl());
+		HttpGet request = ReqUtil.get(caller.getToken(), caller.getMasterUrl());
 		
 		JsonNode resp = caller.getResponse(request);
 		

@@ -29,17 +29,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
-import io.github.kubesys.kubeclient.utils.HttpUtil;
+import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
 
 /**
+ * <p>
+ * Providing a unified API to create, update, delete, get, list and watch Kubernetes' kinds
+ * according to Kubernetes' APIs.
+ * <p>
+ * <ul>
+ * <li><p>
+ *     Kubernetes kinds: https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/
+ * <li><p>
+ *     Kubernetes APIs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/
+ * </ul>
+ * fullKind = "group" + "." + kind
+ * 
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0
- *
- * Providing a unified API to create, update, delete, get, list and watch [Kubernetes resources]
- * (https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/)
- * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
- * 
  */
 public class KubernetesClient {
 
@@ -54,11 +61,6 @@ public class KubernetesClient {
 	 */
 	public static final String ALL_NAMESPACES = "";
 	
-	/**
-	 * all-namespaces
-	 */
-	public static final String NO_NAMESPACE = "";
-
 	
 	/**
 	 * caller: it is used for sending request to Kuberenetes and receiving response from Kubernetes. 
@@ -107,12 +109,12 @@ public class KubernetesClient {
 		super();
 		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
-		this.analyzer.doStart(this);
 	}
 
 
 	/**********************************************************
 	 * 
+	 *                     APIs
 	 * Create, Update, List, Get, Delete And Watch
 	 * 
 	 **********************************************************/
@@ -141,7 +143,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().createUrl(json);
 		
-		HttpPost request = HttpUtil.post(
+		HttpPost request = ReqUtil.post(
 						httpCaller.getToken(), 
 						uri, json.toString());
 		
@@ -204,7 +206,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().deleteUrl(kind, namespace, name);
 
-		HttpDelete request = HttpUtil.delete(httpCaller.token, uri);
+		HttpDelete request = ReqUtil.delete(httpCaller.token, uri);
 		
 		return httpCaller.getResponse(request);
 	}
@@ -239,7 +241,7 @@ public class KubernetesClient {
 			((ObjectNode) json).remove(KubernetesConstants.KUBE_STATUS);
 		}
 
-		HttpPut request = HttpUtil.put(
+		HttpPut request = ReqUtil.put(
 						httpCaller.getToken(), 
 						uri, json.toString());
 		
@@ -273,7 +275,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
-		HttpGet request = HttpUtil.get(httpCaller.getToken(), uri);
+		HttpGet request = ReqUtil.get(httpCaller.getToken(), uri);
 		
 		return httpCaller.getResponse(request);
 	}
@@ -292,7 +294,7 @@ public class KubernetesClient {
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 
 		try {
-			HttpGet request = HttpUtil.get(httpCaller.getToken(), uri);
+			HttpGet request = ReqUtil.get(httpCaller.getToken(), uri);
 			httpCaller.getResponse(request);
 			return true;
 		} catch (Exception ex) {
@@ -376,7 +378,7 @@ public class KubernetesClient {
 			uri.append(KubernetesConstants.HTTP_QUERY_LABELSELECTOR).append(labelSelector);
 		}
 
-		HttpGet request = HttpUtil.get(httpCaller.getToken(), uri.toString());
+		HttpGet request = ReqUtil.get(httpCaller.getToken(), uri.toString());
 		
 		return httpCaller.getResponse(request);
 	}
@@ -394,7 +396,7 @@ public class KubernetesClient {
 							analyzer.getConvertor().getNamespace(json), 
 							analyzer.getConvertor().getName(json));
 
-		HttpPut request = HttpUtil.put(
+		HttpPut request = ReqUtil.put(
 				httpCaller.getToken(), 
 				uri, json.toString());
 		
@@ -444,7 +446,7 @@ public class KubernetesClient {
 	 */
 	public Thread watchResource(String watchName, String kind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
-		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
+		watcher.setRequest(ReqUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchOneUrl(kind, namespace, name)));
 		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
@@ -489,52 +491,12 @@ public class KubernetesClient {
 	 * @throws Exception                       Kubernetes cannot parsing this jsonStr
 	 */
 	public Thread watchResources(String watchName, String kind, String namespace, KubernetesWatcher watcher) throws Exception {
-		watcher.setRequest(HttpUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
+		watcher.setRequest(ReqUtil.get(httpCaller.getToken(), analyzer.getConvertor().watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
 	}
 
-
-	/**********************************************************
-	 * 
-	 * Getter
-	 * 
-	 **********************************************************/
-	
-	/**
-	 * 
-	 * @return analyzer. it is used for getting the metadata for each Kubernetes kind.
-	 * With the metadata, we can create, update, delete, get, list and watch it 
-	 * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)    
-	 */
-	public KubernetesAnalyzer getAnalyzer() {
-		return analyzer;
-	}
-
-
-	/**
-	 * @return httpCaller, it is used for sending request to Kuberenetes and receiving response from Kubernetes.
-	 */
-	public HttpCaller getHttpCaller() {
-		return httpCaller;
-	}
-	
-	/**
-	 * create a new HttpCaller for each WatchResource or WatchResources API
-	 * 
-	 * @return               httpCaller
-	 */
-	public HttpCaller clone() {
-		return new HttpCaller(httpCaller);
-	}
-	
-	/**********************************************************
-	 * 
-	 * Some useful APIs
-	 * 
-	 **********************************************************/
-	
 	/**
 	 * for Scheduler
 	 * 
@@ -608,6 +570,39 @@ public class KubernetesClient {
 		return map;
 	}
 	
+
+	/**********************************************************
+	 * 
+	 * Getter
+	 * 
+	 **********************************************************/
+	
+	/**
+	 * 
+	 * @return analyzer. it is used for getting the metadata for each Kubernetes kind.
+	 * With the metadata, we can create, update, delete, get, list and watch it 
+	 * according to the description of [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)    
+	 */
+	public KubernetesAnalyzer getAnalyzer() {
+		return analyzer;
+	}
+
+
+	/**
+	 * @return httpCaller, it is used for sending request to Kuberenetes and receiving response from Kubernetes.
+	 */
+	public HttpCaller getHttpCaller() {
+		return httpCaller;
+	}
+	
+	/**
+	 * create a new HttpCaller for each WatchResource or WatchResources API
+	 * 
+	 * @return               httpCaller
+	 */
+	public HttpCaller clone() {
+		return new HttpCaller(httpCaller);
+	}
 	
 
 	/**

@@ -36,7 +36,6 @@ public final class KubernetesAnalyzer {
 	 * 
 	 *            Core
 	 * 
-	
 	 ********************************************/
 	
 	/**

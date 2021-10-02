@@ -8,10 +8,11 @@ import java.util.logging.Logger;
 import org.apache.http.client.methods.HttpGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.github.kubesys.kubeclient.KubernetesConstants;
 import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
-import io.github.kubesys.kubeclient.utils.HttpUtil;
+import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.URLUtil;
 
 
@@ -60,7 +61,7 @@ public class KubernetesRegistry {
 		
 		String uri = URLUtil.join(caller.getMasterUrl(), path);
 		
-		HttpGet request = HttpUtil.get(caller.getToken(), uri);
+		HttpGet request = ReqUtil.get(caller.getToken(), uri);
 		
 		JsonNode response  = caller.getResponse(request);
 		
@@ -89,7 +90,7 @@ public class KubernetesRegistry {
 			ruleBase.addNamespaced(fullKind, resource.get(
 							KubernetesConstants.KUBE_RESOURCES_NAMESPACED).asBoolean());
 			ruleBase.addVersion(fullKind, apiVersion);
-			ruleBase.addVerbs(fullKind, resource.get("verbs"));
+			ruleBase.addVerbs(fullKind, (ArrayNode) resource.get("verbs"));
 			
 			m_logger.info("register " + fullKind + ": <" + getGroupByUrl(uri) + "," 
 					+ apiVersion + ","

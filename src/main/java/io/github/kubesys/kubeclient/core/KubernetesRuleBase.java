@@ -11,14 +11,13 @@ import java.util.logging.Logger;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 /**
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0
  *
- * see [Kubernetes native API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/)
- * 
  */
 public class KubernetesRuleBase {
 
@@ -35,43 +34,58 @@ public class KubernetesRuleBase {
 	 ********************************************************/
 	
 	/**
-	 * mapper
+	 * {"Deployment", ["apps.Deployment", "extensions.Deployment"}>
 	 */
 	public Map<String, List<String>>   kindToFullKindMapper        = new HashMap<>();
 	
 	/**
-	 * kind
+	 * {
+	 *    "apps.Deployment": "Deployment",
+	 *    "extensions.Deployment", "Deployment"
+	 * }
 	 */
 	public final Map<String, String>   fullKindToKindMapper        = new HashMap<>();
 	
 	/**
-	 * name
+	 * {
+	 *    "apps.Deployment": "deployments"
+	 * }
 	 */
 	public final Map<String, String>   fullKindToNameMapper        = new HashMap<>();
 	
 	/**
-	 * namespace
+	 * {
+	 *    "apps.Deployment": "true"
+	 * }
 	 */
 	public final Map<String, Boolean>  fullKindToNamespacedMapper  = new HashMap<>();
 	
 	/**
-	 * version
+	 * {
+	 *    "apps.Deployment": "v1"
+	 * }
 	 */
 	public final Map<String, String>   fullKindToVersionMapper     = new HashMap<>();
 	
 	/**
-	 * group
+	 * {
+	 *    "apps.Deployment": "apps"
+	 * }
 	 */
 	public final Map<String, String>   fullKindToGroupMapper       = new HashMap<>();
 
 	/**
-	 * verbs
+	 * {
+	 *    "apps.Deployment": ["list", "watch"]
+	 * }
 	 */
-	public final Map<String, JsonNode> fullKindToVerbsMapper       = new HashMap<>();
+	public final Map<String, ArrayNode> fullKindToVerbsMapper       = new HashMap<>();
 
 
 	/**
-	 * apiPrefix
+	 * {
+	 *    "apps.Deployment": "https://IP:6443/apis/apps.deployments/v1"
+	 * }
 	 */
 	public final Map<String, String>   fullKindToApiPrefixMapper   = new HashMap<>();
 	
@@ -278,7 +292,7 @@ public class KubernetesRuleBase {
 	 * @param fullKind               fullKind
 	 * @param verbs                   verbs
 	 */
-	public void addVerbs(String fullKind, JsonNode verbs) {
+	public void addVerbs(String fullKind, ArrayNode verbs) {
 		this.fullKindToVerbsMapper.put(fullKind, verbs);
 	}
 	
@@ -353,7 +367,7 @@ public class KubernetesRuleBase {
 	/**
 	 * @return                       verbsMapping
 	 */
-	public Map<String, JsonNode> getVerbsMapping() {
+	public Map<String, ArrayNode> getVerbsMapping() {
 		return fullKindToVerbsMapper;
 	}
 

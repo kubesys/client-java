@@ -14,12 +14,23 @@ import org.apache.http.entity.StringEntity;
 /**
  * @author wuheng@otcaix.iscas.ac.cn
  * 
- * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
+ * it is used for creating various HttpRequest
  * 
  **/
-public class HttpUtil {
+public class ReqUtil {
 
-
+	/**
+	 * @param request                     request
+	 * @param token                       token
+	 */
+	static void setBearerHeader(HttpRequestBase request, String token) {
+		if (token != null) {
+			request.addHeader("Authorization", "Bearer " + token);
+		}
+		
+		request.addHeader("Connection", "keep-alive");
+	}
+	
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
@@ -68,15 +79,5 @@ public class HttpUtil {
 		return request;
 	}
 	
-	/**
-	 * @param request                     request
-	 * @param token                       token
-	 */
-	public static void setBearerHeader(HttpRequestBase request, String token) {
-		if (token != null) {
-			request.addHeader("Authorization", "Bearer " + token);
-		}
-		
-		request.addHeader("Connection", "keep-alive");
-	}
+	
 }
