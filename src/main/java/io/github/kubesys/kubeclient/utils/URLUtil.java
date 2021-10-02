@@ -31,37 +31,38 @@ public class URLUtil {
 		// protocol + "://" + host : ":" + "port"
 		// https://1.1.1.1:6443
 		try {
-			URL url = new URL(parts[0]);
-			sb.append(url.getProtocol()).append("://")
-					.append(url.getHost()).append(":")
-					.append(url.getPort() == -1 
-						? url.getDefaultPort() 
-								: url.getPort());
+			String url = new URL(parts[0]).toString().trim();
+			while (url.endsWith("/")) {
+				url = url.substring(0, url.length() - 1);
+			}
+			sb.append(url);
 		} catch (MalformedURLException e) {
 			m_logger.warning("invalid url: " + e);
 			return null;
 		}
 		
 
-		// add all paths except the last one
+		// add all paths
 		// the path is /a/b/c
 		int len = parts.length;
-		for (int i = 1; i < len - 1; i++) {
+		for (int i = 1; i < len; i++) {
+			parts[i] = parts[i].trim();
 			while (parts[i].startsWith("/")) {
 				parts[i] = parts[i].substring(1);
 			}
 			while (parts[i].endsWith("/")) {
 				parts[i] = parts[i].substring(0, parts[i].length() - 1);
 			}
-			if (parts[i].length() != 0) {
+			
+			if (parts[i].length() == 0) {
+				continue;
+			} else if (parts[i].startsWith("?")) {
+				sb.append(parts[i]);
+			} else {
 				sb.append("/").append(parts[i]);
 			}
 		}
 		
-		// add last path
-		if (len != 1) {
-			sb.append("/").append(parts[len - 1]);
-		}
 		return sb.toString();
 	}
 	

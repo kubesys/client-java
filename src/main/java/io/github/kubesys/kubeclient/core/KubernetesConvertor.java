@@ -40,17 +40,29 @@ public class KubernetesConvertor {
 	 * 
 	 ********************************************/
 	
+	
+	/**
+	 * @param fullKind        fullKind
+	 * @param namespace       namespace
+	 * @param isWatch         isWatch
+	 * @return                url
+	 */
+	protected String baseUrl(String fullKind, String namespace, boolean isWatch) {
+
+		return URLUtil.join(ruleBase.getApiPrefix(fullKind),
+							isWatch ? KubernetesConstants.KUBEAPI_WATCHER_PATTERN : "",
+							URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), namespace),
+							ruleBase.getName(fullKind));
+	}
+	
 	/**
 	 * @param json json
 	 * @return Url
 	 * @throws Exception exception
 	 */
 	public String createUrl(JsonNode json) throws Exception {
-
 		String fullKind = fullkind(json);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind),
-							URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), namespace(json)),
-							ruleBase.getName(fullKind));
+		return URLUtil.join(baseUrl(fullKind, namespace(json), false));
 	}
 
 
@@ -61,10 +73,8 @@ public class KubernetesConvertor {
 	 */
 	public String bindingUrl(JsonNode json) throws Exception {
 		String fullKind = fullkind(json);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-							URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), 
-							namespace(json)),"pods", 
-							json.get("metadata").get("name").asText(), "binding");
+		return URLUtil.join(baseUrl(fullKind, namespace(json), false),
+							"pods", name(json), "binding");
 	}
 
 	/**
@@ -76,9 +86,7 @@ public class KubernetesConvertor {
 	 */
 	public String deleteUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-				            URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns),
-				            ruleBase.getName(fullKind), name);
+		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
 
 	/**
@@ -90,9 +98,7 @@ public class KubernetesConvertor {
 	 */
 	public String updateUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-				URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns),
-				ruleBase.getName(fullKind), name);
+		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
 
 	/**
@@ -104,9 +110,7 @@ public class KubernetesConvertor {
 	 */
 	public String getUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-				URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns),
-				ruleBase.getName(fullKind), name);
+		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
 
 	/**
@@ -117,8 +121,7 @@ public class KubernetesConvertor {
 	 */
 	public String listUrl(String kind, String ns) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns),
-				ruleBase.getName(fullKind));
+		return URLUtil.join(baseUrl(fullKind, ns, false));
 	}
 
 	/**
@@ -130,9 +133,8 @@ public class KubernetesConvertor {
 	 */
 	public String updateStatusUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), 
-				URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns),
-				ruleBase.getName(fullKind), name, KubernetesConstants.HTTP_RESPONSE_STATUS);
+		return URLUtil.join(baseUrl(fullKind, ns, false), 
+				name, KubernetesConstants.HTTP_RESPONSE_STATUS);
 	}
 
 	/**
@@ -144,9 +146,7 @@ public class KubernetesConvertor {
 	 */
 	public String watchOneUrl(String kind, String ns, String name) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
-				URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns), 
-				ruleBase.getName(fullKind), name,
+		return URLUtil.join(baseUrl(fullKind, ns, true), name,
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
 
@@ -158,9 +158,7 @@ public class KubernetesConvertor {
 	 */
 	public String watchAllUrl(String kind, String ns) throws Exception {
 		String fullKind = fullkind(kind);
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind), KubernetesConstants.KUBEAPI_WATCHER_PATTERN,
-				URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), ns), 
-				ruleBase.getName(fullKind),
+		return URLUtil.join(baseUrl(fullKind, ns, true),
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
 	

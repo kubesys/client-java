@@ -431,7 +431,7 @@ public class KubernetesClient {
 			throws Exception {
 		String watchName = kind.toLowerCase() + "-" + (namespace == null || "".equals("") 
 							? "all-namespaces" : namespace) + "-" + name;
-		return watchResource(watchName, kind, namespace, watchName, watcher);
+		return watchResource(watchName, kind, namespace, name, watcher);
 	}
 	
 	/**
