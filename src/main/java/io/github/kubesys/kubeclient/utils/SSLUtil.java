@@ -15,17 +15,15 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-
-import sun.security.x509.X509CertImpl;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
  * 
- * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
+ * it is used for supporting ssl connections
  * 
+ * @author wuheng@iscas.ac.cn
+ * @since  2.0.5 
  **/
-@SuppressWarnings({ "deprecation", "restriction"})
 public class SSLUtil {
 
 	public static final Logger m_logger = Logger.getLogger(SSLUtil.class.getName());
@@ -33,9 +31,9 @@ public class SSLUtil {
 	/**
 	 * @return                                 SocketFactory
 	 */
-	public static org.apache.http.conn.ssl.SSLSocketFactory createSocketFactory() {
-		return new org.apache.http.conn.ssl.SSLSocketFactory(
-				createX509SocketFactory(), new AllowAllHostnameVerifier());
+	public static org.apache.http.conn.ssl.SSLConnectionSocketFactory createSocketFactory() {
+		return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(
+				createX509SocketFactory(), new NoopHostnameVerifier());
 	}
 	
 	/**
@@ -59,8 +57,7 @@ public class SSLUtil {
 
 									@Override
 									public X509Certificate[] getAcceptedIssuers() {
-										X509CertImpl xc =  new X509CertImpl();
-										return new X509Certificate[] {xc};
+										return new X509Certificate[] {};
 									}
 									
 								}};
@@ -80,12 +77,10 @@ public class SSLUtil {
 	public static HostnameVerifier createHostnameVerifier() {
 		return new HostnameVerifier() {
 			
-			@Override
 			public String toString() {
 				return super.toString();
 			}
 
-			@Override
 			public boolean verify(String hostname, SSLSession session) {
 				return (hostname != null);
 			}

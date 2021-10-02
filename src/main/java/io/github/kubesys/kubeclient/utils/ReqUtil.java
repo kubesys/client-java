@@ -12,10 +12,11 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
  * 
  * it is used for creating various HttpRequest
  * 
+ * @author wuheng@iscas.ac.cn
+ * @since  2.0.5 
  **/
 public class ReqUtil {
 

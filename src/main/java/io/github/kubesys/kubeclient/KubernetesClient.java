@@ -109,6 +109,7 @@ public class KubernetesClient {
 		super();
 		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
+		this.analyzer.doStart(this);
 	}
 
 

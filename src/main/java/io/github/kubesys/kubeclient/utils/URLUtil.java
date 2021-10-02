@@ -7,10 +7,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
- * 
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
+ * @author wuheng@iscas.ac.cn
+ * @since  2.0.5 
  **/
 public class URLUtil {
 
@@ -115,5 +115,4 @@ public class URLUtil {
 	private static boolean containsQueryParam(URI uri) {
 		return uri.getQuery() != null;
 	}
-
 }
