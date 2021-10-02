@@ -58,9 +58,9 @@ public class KubernetesConvertor {
 	/**
 	 * @param json json
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String createUrl(JsonNode json) throws Exception {
+	public String createUrl(JsonNode json) throws NullPointerException {
 		String fullKind = fullkind(json);
 		return URLUtil.join(baseUrl(fullKind, namespace(json), false));
 	}
@@ -69,9 +69,9 @@ public class KubernetesConvertor {
 	/**
 	 * @param json json
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String bindingUrl(JsonNode json) throws Exception {
+	public String bindingUrl(JsonNode json) throws NullPointerException {
 		String fullKind = fullkind(json);
 		return URLUtil.join(baseUrl(fullKind, namespace(json), false),
 							"pods", name(json), "binding");
@@ -82,9 +82,9 @@ public class KubernetesConvertor {
 	 * @param ns   ns
 	 * @param name name
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String deleteUrl(String kind, String ns, String name) throws Exception {
+	public String deleteUrl(String kind, String ns, String name) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
@@ -94,9 +94,9 @@ public class KubernetesConvertor {
 	 * @param ns   ns
 	 * @param name name
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String updateUrl(String kind, String ns, String name) throws Exception {
+	public String updateUrl(String kind, String ns, String name) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
@@ -106,9 +106,9 @@ public class KubernetesConvertor {
 	 * @param ns   ns
 	 * @param name name
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String getUrl(String kind, String ns, String name) throws Exception {
+	public String getUrl(String kind, String ns, String name) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, false), name);
 	}
@@ -117,9 +117,9 @@ public class KubernetesConvertor {
 	 * @param kind kind
 	 * @param ns   ns
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String listUrl(String kind, String ns) throws Exception {
+	public String listUrl(String kind, String ns) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, false));
 	}
@@ -129,9 +129,9 @@ public class KubernetesConvertor {
 	 * @param ns   ns
 	 * @param name name
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String updateStatusUrl(String kind, String ns, String name) throws Exception {
+	public String updateStatusUrl(String kind, String ns, String name) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, false), 
 				name, KubernetesConstants.HTTP_RESPONSE_STATUS);
@@ -142,9 +142,9 @@ public class KubernetesConvertor {
 	 * @param ns   ns
 	 * @param name name
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String watchOneUrl(String kind, String ns, String name) throws Exception {
+	public String watchOneUrl(String kind, String ns, String name) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, true), name,
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
@@ -154,9 +154,9 @@ public class KubernetesConvertor {
 	 * @param kind kind
 	 * @param ns   ns
 	 * @return Url
-	 * @throws Exception exception
+	 * @throws NullPointerException exception
 	 */
-	public String watchAllUrl(String kind, String ns) throws Exception {
+	public String watchAllUrl(String kind, String ns) throws NullPointerException {
 		String fullKind = fullkind(kind);
 		return URLUtil.join(baseUrl(fullKind, ns, true),
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);

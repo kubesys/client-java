@@ -4,9 +4,6 @@
 package io.github.kubesys.kubeclient.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.net.MalformedURLException;
 
 import org.junit.Test;
 

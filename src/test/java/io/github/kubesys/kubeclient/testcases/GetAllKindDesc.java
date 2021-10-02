@@ -18,7 +18,17 @@ public class GetAllKindDesc extends AbstractKubernetesClientTest {
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient2(null);
-		System.out.println(client.getKindDesc().toPrettyString());
+//		System.out.println(client.getKinds().toPrettyString());
+//		System.out.println(client.getKindDesc().toPrettyString());
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getApiPrefix("Pod"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().isNamespaced("Pod"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getName("Pod"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getApiPrefix("apps.Deployment"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().isNamespaced("apps.Deployment"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getName("apps.Deployment"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getApiPrefix("Node"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().isNamespaced("Node"));
+		System.out.println(client.getAnalyzer().getConvertor().getRuleBase().getName("Node"));
 	}
 
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.kubeclient.AbstractKubernetesClientTest;
 import io.github.kubesys.kubeclient.KubernetesClient;
+import io.github.kubesys.kubeclient.KubernetesWatcher;
 
 
 /**
@@ -55,8 +56,36 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 //		update(client);
 //		get(client);
 //		list(client);
-		delete(client);
-		
+//		delete(client);
+		watch(client);
+	}
+
+
+	private static void watch(KubernetesClient client) throws Exception {
+		client.watchResource("Pod", "busybox", new KubernetesWatcher(client) {
+			
+			@Override
+			public void doModified(JsonNode node) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void doDeleted(JsonNode node) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void doClose() {
+				
+			}
+			
+			@Override
+			public void doAdded(JsonNode node) {
+				System.out.println(node.toPrettyString());
+			}
+		});
 	}
 
 
