@@ -3,6 +3,9 @@
  */
 package io.github.kubesys.kubeclient.utils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -72,11 +75,10 @@ public class ReqUtil {
 	 * @param uri                         uri
 	 * @param body                        body
 	 * @return                            request or null
-	 * @throws NullPointerException       null
-	 * @throws RuntimeException           runtime
+	 * @throws MalformedURLException      MalformedURLException
 	 */
-	public static HttpPost post(String token, String uri, String body) throws NullPointerException, RuntimeException {
-		return (HttpPost) createRequest(new HttpPost(uri), token, body);
+	public static HttpPost post(String token, String uri, String body) throws MalformedURLException {
+		return (HttpPost) createRequest(new HttpPost(new URL(uri).toString()), token, body);
 	}
 	
 	/**
@@ -84,33 +86,30 @@ public class ReqUtil {
 	 * @param uri                         uri
 	 * @param body                        body
 	 * @return                            request or null
-	 * @throws NullPointerException       null
-	 * @throws RuntimeException           runtime
+	 * @throws MalformedURLException      MalformedURLException
 	 */
-	public static HttpPut put(String token, String uri, String body) throws NullPointerException, RuntimeException {
-		return (HttpPut) createRequest(new HttpPut(uri), token, body);
+	public static HttpPut put(String token, String uri, String body) throws MalformedURLException {
+		return (HttpPut) createRequest(new HttpPut(new URL(uri).toString()), token, body);
 	}
 	
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
 	 * @return                            request or null
-	 * @throws NullPointerException       null
-	 * @throws RuntimeException           runtime
+	 * @throws MalformedURLException      MalformedURLException
 	 */
-	public static HttpDelete delete(String token, String uri) throws NullPointerException, RuntimeException {
-		return (HttpDelete) createRequest(new HttpDelete(uri), token, null);
+	public static HttpDelete delete(String token, String uri) throws MalformedURLException {
+		return (HttpDelete) createRequest(new HttpDelete(new URL(uri).toString()), token, null);
 	}
 	
 	/**
 	 * @param token                       token
 	 * @param uri                         uri
 	 * @return                            request or null
-	 * @throws NullPointerException       null
-	 * @throws RuntimeException           runtime
+	 * @throws MalformedURLException      MalformedURLException
 	 */
-	public static HttpGet get(String token, String uri) throws NullPointerException, RuntimeException {
-		return (HttpGet) createRequest(new HttpGet(uri), token, null);
+	public static HttpGet get(String token, String uri) throws MalformedURLException {
+		return (HttpGet) createRequest(new HttpGet(new URL(uri).toString()), token, null);
 	}
 	
 }
