@@ -172,7 +172,7 @@ public class KubernetesClient {
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
-		return deleteResource(analyzer.getConvertor().getFullKind(json), 
+		return deleteResource(analyzer.getConvertor().fullkind(json), 
 							  analyzer.getConvertor().namespace(json), 
 							  analyzer.getConvertor().name(json));
 	}
@@ -234,7 +234,7 @@ public class KubernetesClient {
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().updateUrl(
-							 	analyzer.getConvertor().getFullKind(json), 
+							 	analyzer.getConvertor().fullkind(json), 
 							 	analyzer.getConvertor().namespace(json), 
 							 	analyzer.getConvertor().name(json));
 

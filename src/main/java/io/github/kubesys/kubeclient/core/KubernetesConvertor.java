@@ -197,7 +197,7 @@ public class KubernetesConvertor {
 	 * @param json         json
 	 * @return fullkind
 	 */
-	protected String fullkind(JsonNode json) {
+	public String fullkind(JsonNode json) {
 		String apiVersion = apiVersion(json);
 		String kind = kind(json);
 		return apiVersion.indexOf("/") == -1 ? kind : 
@@ -213,6 +213,10 @@ public class KubernetesConvertor {
 				.get(KubernetesConstants.KUBE_METADATA_NAME).asText();
 	}
 
+	/**
+	 * @param json            json
+	 * @return                namespace
+	 */
 	public String namespace(JsonNode json) {
 		JsonNode meta = json.get(KubernetesConstants.KUBE_METADATA);
 		return meta.has(KubernetesConstants.KUBE_METADATA_NAMESPACE)
@@ -222,15 +226,9 @@ public class KubernetesConvertor {
 	}
 	
 
-	public String getFullKind(JsonNode json) {
-		String apiVersion = json.get(KubernetesConstants.KUBE_APIVERSION).asText();
-		String kind = json.get(KubernetesConstants.KUBE_KIND).asText();
-		if(apiVersion.indexOf("/") > 0) {
-			return apiVersion.substring(0, apiVersion.indexOf("/"))+ "." + kind;
-		}
-		return kind;
-	}
-
+	/**
+	 * @return  rulebase
+	 */
 	public KubernetesRuleBase getRuleBase() {
 		return ruleBase;
 	}

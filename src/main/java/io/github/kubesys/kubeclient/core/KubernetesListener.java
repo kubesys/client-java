@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.kubeclient.KubernetesClient;
 import io.github.kubesys.kubeclient.KubernetesConstants;
-import io.github.kubesys.kubeclient.utils.URLUtil;
 
 
 /**
@@ -52,13 +51,12 @@ public class KubernetesListener {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtil.join(KubernetesConstants
-							.VALUE_APIS, apiGroup, version);
+		String path = KubernetesConstants.VALUE_APIS + "/" +  apiGroup + "/" + version;
 		
 		try {
-			registry.registerKinds(client.getHttpCaller(), url);
+			registry.registerKinds(client.getHttpCaller(), path);
 		} catch (Exception e) {
-			m_logger.warning(e.getMessage());
+			m_logger.warning("fail to register: " + e);
 		}
 		
 	}

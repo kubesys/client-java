@@ -45,8 +45,8 @@ public final class KubernetesAnalyzer {
 		KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
 		extractor.start();
 		
-//		KubernetesListener listener = new KubernetesListener(client, registry);
-//		listener.start();
+		KubernetesListener listener = new KubernetesListener(client, registry);
+		listener.start();
 	}
 
 	/*******************************************
