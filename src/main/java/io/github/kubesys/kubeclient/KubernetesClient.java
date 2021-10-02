@@ -173,7 +173,7 @@ public class KubernetesClient {
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 		
 		return deleteResource(analyzer.getConvertor().getFullKind(json), 
-							  analyzer.getConvertor().getNamespace(json), 
+							  analyzer.getConvertor().namespace(json), 
 							  analyzer.getConvertor().name(json));
 	}
 	
@@ -235,7 +235,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().updateUrl(
 							 	analyzer.getConvertor().getFullKind(json), 
-							 	analyzer.getConvertor().getNamespace(json), 
+							 	analyzer.getConvertor().namespace(json), 
 							 	analyzer.getConvertor().name(json));
 
 		if (json.has(KubernetesConstants.KUBE_STATUS)) {
@@ -394,7 +394,7 @@ public class KubernetesClient {
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().updateStatusUrl(analyzer.getConvertor().kind(json), 
-							analyzer.getConvertor().getNamespace(json), 
+							analyzer.getConvertor().namespace(json), 
 							analyzer.getConvertor().name(json));
 
 		HttpPut request = ReqUtil.put(

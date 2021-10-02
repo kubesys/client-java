@@ -7,6 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import io.github.kubesys.kubeclient.KubernetesConstants;
+
 /**
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
@@ -26,6 +28,8 @@ public class URLUtil {
 		}
 		
 		StringBuilder sb = new StringBuilder();
+		// protocol + "://" + host : ":" + "port"
+		// https://1.1.1.1:6443
 		try {
 			URL url = new URL(parts[0]);
 			sb.append(url.getProtocol()).append("://")
@@ -38,9 +42,10 @@ public class URLUtil {
 			return null;
 		}
 		
-		
+
+		// add all paths except the last one
+		// the path is /a/b/c
 		int len = parts.length;
-		
 		for (int i = 1; i < len - 1; i++) {
 			while (parts[i].startsWith("/")) {
 				parts[i] = parts[i].substring(1);
@@ -48,12 +53,21 @@ public class URLUtil {
 			while (parts[i].endsWith("/")) {
 				parts[i] = parts[i].substring(0, parts[i].length() - 1);
 			}
-			sb.append("/").append(parts[i]);
+			if (parts[i].length() != 0) {
+				sb.append("/").append(parts[i]);
+			}
 		}
 		
+		// add last path
 		if (len != 1) {
 			sb.append("/").append(parts[len - 1]);
 		}
 		return sb.toString();
+	}
+	
+	public static String namespacePath(boolean namespaced, String namespace) {
+		return (namespaced && namespace != null && namespace.length() != 0)
+				? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
+				: KubernetesConstants.VALUE_ALL_NAMESPACES;
 	}
 }
