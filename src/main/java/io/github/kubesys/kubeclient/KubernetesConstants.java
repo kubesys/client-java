@@ -9,13 +9,16 @@ package io.github.kubesys.kubeclient;
  */
 public final class KubernetesConstants {
 	
+	
+	private KubernetesConstants() {
+		super();
+	}
+
 	/*************************************
 	 * 
 	 * HTTP request
 	 * 
 	 *************************************/
-
-	
 
 	public static final String HTTP_RESPONSE_PATHS          = "paths";
 	

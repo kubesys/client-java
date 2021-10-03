@@ -24,12 +24,17 @@ import org.apache.http.entity.StringEntity;
  **/
 public class ReqUtil {
 
+	
 	/**********************************************************
 	 * 
 	 *                     Commons
 	 * 
 	 **********************************************************/
 	
+	private ReqUtil() {
+		super();
+	}
+
 	/**
 	 * @param req                      request
 	 * @param token                    token

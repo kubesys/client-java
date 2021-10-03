@@ -19,7 +19,7 @@ public abstract class KubernetesController<O> {
 	
 	protected final KubernetesClient client;
 	
-	public KubernetesController(String kind, KubernetesClient client) throws Exception {
+	protected KubernetesController(String kind, KubernetesClient client) throws Exception {
 		this.client = client;
 		client.watchResources(kind, new KubernetesObjectWatcher<O>(client) {
 

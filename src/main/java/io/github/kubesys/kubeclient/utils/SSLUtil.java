@@ -28,6 +28,10 @@ public class SSLUtil {
 
 	public static final Logger m_logger = Logger.getLogger(SSLUtil.class.getName());
 
+	private SSLUtil() {
+		super();
+	}
+
 	/**
 	 * @return SocketFactory
 	 */

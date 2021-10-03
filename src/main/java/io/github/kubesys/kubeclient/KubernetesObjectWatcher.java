@@ -23,7 +23,7 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 	
 	protected final Class<?> clz;
 	
-	public KubernetesObjectWatcher(KubernetesClient client) throws Exception {
+	protected KubernetesObjectWatcher(KubernetesClient client) throws Exception {
 		super(client);
 		String gSclz = getClass().getGenericSuperclass().getTypeName();
 		int idx = gSclz.indexOf("<");

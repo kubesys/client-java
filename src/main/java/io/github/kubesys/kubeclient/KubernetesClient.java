@@ -6,7 +6,7 @@ package io.github.kubesys.kubeclient;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;import java.util.logging.Level;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.http.client.config.RequestConfig;
@@ -78,7 +78,7 @@ public class KubernetesClient {
 	 * invoke Kubernetes without token, which has been deprecated after Kubernetes 1.18
 	 * 
 	 * @param  url                 default is https://IP:6443/
-	 * @throws Exception           wrong IP or port
+	 * @throws Exception           exception
 	 */
 	public KubernetesClient(String url) throws Exception {
 		this(url, null);
@@ -89,7 +89,7 @@ public class KubernetesClient {
 	 * 
 	 * @param url                   default is https://IP:6443/
 	 * @param token                 bearer token, you can create it using ServiceAccount and ClusterRoleBinding
-	 * @throws Exception            wrong IP, or port, or token
+	 * @throws Exception            exception
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this(url, token, new KubernetesAnalyzer());
@@ -103,9 +103,8 @@ public class KubernetesClient {
 	 * @param url                   default is https://IP:6443/
 	 * @param token                 bearer token, you can create it using ServiceAccount and ClusterRoleBinding
 	 * @param analyzer              it is used for getting the metadata for each Kubernetes kind.
-	 * @throws Exception            wrong IP, or port, or token
 	 */
-	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
+	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) {
 		this.httpCaller = new HttpCaller(url, token);
 		this.analyzer = analyzer;
 	}
@@ -515,9 +514,9 @@ public class KubernetesClient {
 		binding.put("kind", "Binding");
 		
 		ObjectNode metadata = new ObjectMapper().createObjectNode();
-		metadata.put("name", pod.get("metadata").get("name").asText());
-		metadata.put("namespace", pod.get("metadata").get("namespace").asText());
-		binding.set("metadata", metadata);
+		metadata.put("name", pod.get(KubernetesConstants.KUBE_METADATA).get("name").asText());
+		metadata.put("namespace", pod.get(KubernetesConstants.KUBE_METADATA).get("namespace").asText());
+		binding.set(KubernetesConstants.KUBE_METADATA, metadata);
 		
 		ObjectNode target = new ObjectMapper().createObjectNode();
 		target.put("apiVersion", "v1");

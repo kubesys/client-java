@@ -18,6 +18,10 @@ public class URLUtil {
 
 	protected static final Logger m_logger = Logger.getLogger(URLUtil.class.getName()); 
 	
+	private URLUtil() {
+		super();
+	}
+
 	/**
 	 * @param parts path
 	 * @return url
@@ -56,7 +60,9 @@ public class URLUtil {
 			
 			if (parts[i].length() == 0) {
 				continue;
-			} else if (parts[i].startsWith("?")) {
+			} 
+			
+			if (parts[i].startsWith("?")) {
 				sb.append(parts[i]);
 			} else {
 				sb.append("/").append(parts[i]);
