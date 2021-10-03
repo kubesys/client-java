@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  **/
 public abstract class KubernetesWatcher implements Runnable {
 
-	public static Logger m_logger = Logger.getLogger(KubernetesWatcher.class.getName());
+	public static final Logger m_logger = Logger.getLogger(KubernetesWatcher.class.getName());
 	/**
 	 * client
 	 */
@@ -31,7 +31,7 @@ public abstract class KubernetesWatcher implements Runnable {
 	
 	protected HttpGet request;
 	
-	public KubernetesWatcher(KubernetesClient client) {
+	protected KubernetesWatcher(KubernetesClient client) {
 		super();
 		this.client = client;
 	}

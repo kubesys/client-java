@@ -3,6 +3,7 @@
  */
 package io.github.kubesys.kubeclient;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +44,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		try {
 			client.getAnalyzer().registry.registerKinds(client.getHttpCaller(), url);
 		} catch (Exception e) {
-			m_logger.warning(e.getMessage());
+			m_logger.log(Level.SEVERE, "{0}", e);
 		}
 		
 	}
@@ -70,7 +71,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		ruleBase.removeApiPrefixBy(fullKind);
 		ruleBase.removeVerbsBy(fullKind);
 		
-		m_logger.info("unregister " + shortKind);
+		m_logger.log(Level.INFO, "unregister {0}", shortKind);
 	}
 
 	@Override
@@ -80,19 +81,20 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 
 	@Override
 	public void doClose() {
-		try {
-			client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
-					KubernetesConstants.VALUE_ALL_NAMESPACES, 
-					new KubernetesCRDWacther(client));
-		} catch (Exception e) {
-			m_logger.info("watcher apiextensions.k8s.io.CustomResourceDefinition is crash: " + e.toString());
-			m_logger.info("wait 5 seconds to restart watcher apiextensions.k8s.io.CustomResourceDefinition ");
+		while (true) {
 			try {
+				m_logger.info("watcher apiextensions.k8s.io.CustomResourceDefinition is crash");
+				m_logger.info("wait 5 seconds to restart watcher apiextensions.k8s.io.CustomResourceDefinition ");
 				Thread.sleep(5000);
-			} catch (InterruptedException e1) {
-				
+				client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", 
+						KubernetesConstants.VALUE_ALL_NAMESPACES, 
+						new KubernetesCRDWacther(client));
+				break;
+			} catch (Exception e) {
+				m_logger.info("fail to restart watcher apiextensions.k8s.io.CustomResourceDefinition: " + e.toString());
+				Thread.currentThread().interrupt();
 			}
-			doClose();
+			
 		}
 	}
 

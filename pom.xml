@@ -5,7 +5,7 @@
 
 	<groupId>io.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>2.0.5</version>
+	<version>2.0.6</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
@@ -215,6 +215,7 @@
 				<sonar.host.url>http://39.100.71.73:31014</sonar.host.url>
 				<sonar.login>admin</sonar.login>
 				<sonar.password>admin123</sonar.password>
+				<sonar.projectName>kubernetes-client-java</sonar.projectName>
 			</properties>
 		</profile>
 	</profiles>

@@ -128,70 +128,70 @@ public class ConvertorTest {
 	
 	@Test
 	public void testValidCreateURL() {
-		assertEquals(convertor.createUrl(podJson), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods");
-		assertEquals(convertor.createUrl(deployJson), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments");
-		assertEquals(convertor.createUrl(nodeJson), "https://39.100.71.73:6443/api/v1/nodes");
-		assertEquals(convertor.createUrl(igrsJson), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods", convertor.createUrl(podJson));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments", convertor.createUrl(deployJson));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes", convertor.createUrl(nodeJson));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses", convertor.createUrl(igrsJson));
 	}
 	
 	@Test
 	public void testValidDeleteURL() {
-		assertEquals(convertor.deleteUrl("Pod", "kube-system", "testPod"), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod");
-		assertEquals(convertor.deleteUrl("apps.Deployment", "kube-system", "testDeploy"), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy");
-		assertEquals(convertor.deleteUrl("Node", "", "testNode"), "https://39.100.71.73:6443/api/v1/nodes/testNode");
-		assertEquals(convertor.deleteUrl("networking.k8s.io.IngressClass", "", "testIngress"), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.deleteUrl("Pod", "kube-system", "testPod"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.deleteUrl("apps.Deployment", "kube-system", "testDeploy"));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.deleteUrl("Node", "", "testNode"));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress", convertor.deleteUrl("networking.k8s.io.IngressClass", "", "testIngress"));
 	}
 	
 	@Test
 	public void testValidUpdateURL() {
-		assertEquals(convertor.updateUrl("Pod", "kube-system", "testPod"), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod");
-		assertEquals(convertor.updateUrl("apps.Deployment", "kube-system", "testDeploy"), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy");
-		assertEquals(convertor.updateUrl("Node", "", "testNode"), "https://39.100.71.73:6443/api/v1/nodes/testNode");
-		assertEquals(convertor.updateUrl("networking.k8s.io.IngressClass", "", "testIngress"), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.updateUrl("Pod", "kube-system", "testPod"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.updateUrl("apps.Deployment", "kube-system", "testDeploy"));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.updateUrl("Node", "", "testNode"));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress", convertor.updateUrl("networking.k8s.io.IngressClass", "", "testIngress"));
 	}
 	
 	@Test
 	public void testValidGetURL() {
-		assertEquals(convertor.getUrl("Pod", "kube-system", "testPod"), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod");
-		assertEquals(convertor.getUrl("apps.Deployment", "kube-system", "testDeploy"), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy");
-		assertEquals(convertor.getUrl("Node", "", "testNode"), "https://39.100.71.73:6443/api/v1/nodes/testNode");
-		assertEquals(convertor.getUrl("networking.k8s.io.IngressClass", "", "testIngress"), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.getUrl("Pod", "kube-system", "testPod"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.getUrl("apps.Deployment", "kube-system", "testDeploy"));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.getUrl("Node", "", "testNode"));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress", convertor.getUrl("networking.k8s.io.IngressClass", "", "testIngress"));
 	}
 	
 	@Test
 	public void testValidListURL() {
-		assertEquals(convertor.listUrl("Pod", "kube-system"), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods");
-		assertEquals(convertor.listUrl("Pod", ""), "https://39.100.71.73:6443/api/v1/pods");
-		assertEquals(convertor.listUrl("apps.Deployment", "kube-system"), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments");
-		assertEquals(convertor.listUrl("apps.Deployment", ""), "https://39.100.71.73:6443/apis/apps/v1/deployments");
-		assertEquals(convertor.listUrl("Node", ""), "https://39.100.71.73:6443/api/v1/nodes");
-		assertEquals(convertor.listUrl("networking.k8s.io.IngressClass", ""), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods", convertor.listUrl("Pod", "kube-system"));
+		assertEquals("https://39.100.71.73:6443/api/v1/pods", convertor.listUrl("Pod", ""));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments", convertor.listUrl("apps.Deployment", "kube-system"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/deployments", convertor.listUrl("apps.Deployment", ""));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes", convertor.listUrl("Node", ""));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses", convertor.listUrl("networking.k8s.io.IngressClass", ""));
 	}
 	
 	@Test
 	public void testValidUpdateStatusUrlURL() {
-		assertEquals(convertor.updateStatusUrl("Pod", "kube-system", "testPod"), "https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod/status");
-		assertEquals(convertor.updateStatusUrl("apps.Deployment", "kube-system", "testDeploy"), "https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy/status");
-		assertEquals(convertor.updateStatusUrl("Node", "", "testNode"), "https://39.100.71.73:6443/api/v1/nodes/testNode/status");
-		assertEquals(convertor.updateStatusUrl("networking.k8s.io.IngressClass", "", "testIngress"), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress/status");
+		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod/status", convertor.updateStatusUrl("Pod", "kube-system", "testPod"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy/status", convertor.updateStatusUrl("apps.Deployment", "kube-system", "testDeploy"));
+		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode/status", convertor.updateStatusUrl("Node", "", "testNode"));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/ingressclasses/testIngress/status", convertor.updateStatusUrl("networking.k8s.io.IngressClass", "", "testIngress"));
 	}
 	
 	@Test
 	public void testValidWatchOneUrlURL() {
-		assertEquals(convertor.watchOneUrl("Pod", "kube-system", "testPod"), "https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods/testPod?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchOneUrl("apps.Deployment", "kube-system", "testDeploy"), "https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments/testDeploy?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchOneUrl("Node", "", "testNode"), "https://39.100.71.73:6443/api/v1/watch/nodes/testNode?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchOneUrl("networking.k8s.io.IngressClass", "", "testIngress"), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses/testIngress?watch=true&timeoutSeconds=315360000");
+		assertEquals("https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods/testPod?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("Pod", "kube-system", "testPod"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments/testDeploy?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("apps.Deployment", "kube-system", "testDeploy"));
+		assertEquals("https://39.100.71.73:6443/api/v1/watch/nodes/testNode?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("Node", "", "testNode"));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses/testIngress?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("networking.k8s.io.IngressClass", "", "testIngress"));
 	}
 	
 	@Test
 	public void testValidWatchAllUrlURL() {
-		assertEquals(convertor.watchAllUrl("Pod", "kube-system"), "https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchAllUrl("Pod", ""), "https://39.100.71.73:6443/api/v1/watch/pods?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchAllUrl("apps.Deployment", "kube-system"), "https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchAllUrl("apps.Deployment", ""), "https://39.100.71.73:6443/apis/apps/v1/watch/deployments?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchAllUrl("Node", ""), "https://39.100.71.73:6443/api/v1/watch/nodes?watch=true&timeoutSeconds=315360000");
-		assertEquals(convertor.watchAllUrl("networking.k8s.io.IngressClass", ""), "https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses?watch=true&timeoutSeconds=315360000");
+		assertEquals("https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("Pod", "kube-system"));
+		assertEquals("https://39.100.71.73:6443/api/v1/watch/pods?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("Pod", ""));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("apps.Deployment", "kube-system"));
+		assertEquals("https://39.100.71.73:6443/apis/apps/v1/watch/deployments?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("apps.Deployment", ""));
+		assertEquals("https://39.100.71.73:6443/api/v1/watch/nodes?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("Node", ""));
+		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("networking.k8s.io.IngressClass", ""));
 	}
 	
 }

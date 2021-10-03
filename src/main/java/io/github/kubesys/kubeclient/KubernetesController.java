@@ -4,6 +4,7 @@
 package io.github.kubesys.kubeclient;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  **/
 public abstract class KubernetesController<O> {
 
+	public static final Logger m_logger = Logger.getLogger(KubernetesController.class.getName());
+	
 	protected final KubernetesClient client;
 	
 	public KubernetesController(String kind, KubernetesClient client) throws Exception {
@@ -54,7 +57,7 @@ public abstract class KubernetesController<O> {
 				client.createResource(new ObjectMapper().readTree(
 						new ObjectMapper().writeValueAsString(obj)));
 			} catch (Exception e) {
-				e.printStackTrace();
+				m_logger.severe(e.toString());
 			}
 		}
 	}
@@ -65,7 +68,7 @@ public abstract class KubernetesController<O> {
 				client.updateResource(new ObjectMapper().readTree(
 						new ObjectMapper().writeValueAsString(obj)));
 			} catch (Exception e) {
-				e.printStackTrace();
+				m_logger.severe(e.toString());
 			}
 		}
 	}
@@ -76,7 +79,7 @@ public abstract class KubernetesController<O> {
 				client.deleteResource(new ObjectMapper().readTree(
 						new ObjectMapper().writeValueAsString(obj)));
 			} catch (Exception e) {
-				e.printStackTrace();
+				m_logger.severe(e.toString());
 			}
 		}
 	}
