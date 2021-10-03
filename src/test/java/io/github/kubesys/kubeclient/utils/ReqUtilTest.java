@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.MalformedURLException;
 
+import org.apache.http.client.methods.HttpPost;
 import org.junit.Test;
 
 /**
@@ -25,7 +26,7 @@ public class ReqUtilTest {
 	
 	@Test(expected = MalformedURLException.class)
 	public void testInvalidNullUrl() throws MalformedURLException {
-		assertNotNull(ReqUtil.post("abc", "abc", "abc"));
+		ReqUtil.post("abc", "abc", "abc");
 	}
 	
 	@Test

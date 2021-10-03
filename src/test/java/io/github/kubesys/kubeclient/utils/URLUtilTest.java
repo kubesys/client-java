@@ -18,26 +18,26 @@ public class URLUtilTest {
 
 	@Test
 	public void testNamespacedWithNullValue1() {
-		assertEquals(URLUtil.namespacePath(true, null), "");
+		assertEquals("", URLUtil.namespacePath(true, null));
 	}
 	
 	@Test
 	public void testNamespacedWithNullValue2() {
-		assertEquals(URLUtil.namespacePath(true, ""), "");
+		assertEquals("", URLUtil.namespacePath(true, ""));
 	}
 	
 	@Test
 	public void testNamespacedWithValue() {
-		assertEquals(URLUtil.namespacePath(true, "test"), "namespaces/test");
+		assertEquals("namespaces/test", URLUtil.namespacePath(true, "test"));
 	}
 	
 	@Test
 	public void testClusterWithValue() {
-		assertEquals(URLUtil.namespacePath(false, "test"), "");
+		assertEquals("", URLUtil.namespacePath(false, "test"));
 	}
 	
 	@Test
 	public void testClusterWithoutValue() {
-		assertEquals(URLUtil.namespacePath(false, null), "");
+		assertEquals("", URLUtil.namespacePath(false, null));
 	}
 }
