@@ -45,7 +45,7 @@ public abstract class KubernetesWatcher implements Runnable {
 		
 		BufferedReader br = null;
 		try {
-			CloseableHttpClient httpClient = client.clone().getHttpClient();
+			CloseableHttpClient httpClient = client.copy().getHttpClient();
 			CloseableHttpResponse execute = httpClient.execute(request);
 			
 			br = new BufferedReader(new InputStreamReader(
@@ -69,12 +69,12 @@ public abstract class KubernetesWatcher implements Runnable {
 		    }
 		} catch (Exception ex) {
 			m_logger.severe(ex.toString());
-			throw new RuntimeException(ex);
 		} finally {
 			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
+					m_logger.warning(e.toString());
 				}
 			}
 		}

@@ -86,6 +86,8 @@ public final class KubernetesConstants {
 	
 	public static final String KUBE_SPEC_NAMES_PLURAL       = "plural";
 	
+	public static final String KUBE_SPEC_NAMES_VERBS        = "verbs";
+	
 	public static final String KUBE_SPEC_GROUP              = "group";
 	
 	public static final String KUBE_SPEC_SCOPE              = "scope";

@@ -3,7 +3,6 @@
  */
 package io.github.kubesys.kubeclient;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +43,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		try {
 			client.getAnalyzer().registry.registerKinds(client.getHttpCaller(), url);
 		} catch (Exception e) {
-			m_logger.log(Level.SEVERE, "{0}", e);
+			m_logger.severe(e.toString());
 		}
 		
 	}
@@ -71,7 +70,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		ruleBase.removeApiPrefixBy(fullKind);
 		ruleBase.removeVerbsBy(fullKind);
 		
-		m_logger.log(Level.INFO, "unregister {0}", shortKind);
+		m_logger.info("unregister" + shortKind);
 	}
 
 	@Override

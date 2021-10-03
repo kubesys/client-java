@@ -510,18 +510,18 @@ public class KubernetesClient {
 	public JsonNode bindingResource(JsonNode pod, String host) throws Exception {
 
 		ObjectNode binding = new ObjectMapper().createObjectNode();
-		binding.put("apiVersion", "v1");
-		binding.put("kind", "Binding");
+		binding.put(KubernetesConstants.KUBE_APIVERSION, "v1");
+		binding.put(KubernetesConstants.KUBE_KIND, "Binding");
 		
 		ObjectNode metadata = new ObjectMapper().createObjectNode();
-		metadata.put("name", pod.get(KubernetesConstants.KUBE_METADATA).get("name").asText());
-		metadata.put("namespace", pod.get(KubernetesConstants.KUBE_METADATA).get("namespace").asText());
+		metadata.put(KubernetesConstants.KUBE_METADATA_NAME, pod.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAME).asText());
+		metadata.put(KubernetesConstants.KUBE_METADATA_NAMESPACE, pod.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText());
 		binding.set(KubernetesConstants.KUBE_METADATA, metadata);
 		
 		ObjectNode target = new ObjectMapper().createObjectNode();
-		target.put("apiVersion", "v1");
-		target.put("kind", "Node");
-		target.put("name", host);
+		target.put(KubernetesConstants.KUBE_APIVERSION, "v1");
+		target.put(KubernetesConstants.KUBE_KIND, "Node");
+		target.put(KubernetesConstants.KUBE_METADATA_NAME, host);
 		binding.set("target", target);
 			
 		return createResource(binding);
@@ -558,10 +558,10 @@ public class KubernetesClient {
 		
 		for (String kind : ruleBase.fullKindToNamespacedMapper.keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
-			node.put("apiVersion", ruleBase.fullKindToVersionMapper.get(kind));
-			node.put("kind", ruleBase.fullKindToKindMapper.get(kind));
-			node.put("plural", ruleBase.fullKindToNameMapper.get(kind));
-			node.set("verbs", ruleBase.fullKindToVerbsMapper.get(kind));
+			node.put(KubernetesConstants.KUBE_APIVERSION, ruleBase.fullKindToVersionMapper.get(kind));
+			node.put(KubernetesConstants.KUBE_KIND, ruleBase.fullKindToKindMapper.get(kind));
+			node.put(KubernetesConstants.KUBE_SPEC_NAMES_PLURAL, ruleBase.fullKindToNameMapper.get(kind));
+			node.set(KubernetesConstants.KUBE_SPEC_NAMES_VERBS, ruleBase.fullKindToVerbsMapper.get(kind));
 
 			map.set(kind, node);
 		}
@@ -599,7 +599,7 @@ public class KubernetesClient {
 	 * 
 	 * @return               httpCaller
 	 */
-	public HttpCaller clone() {
+	public HttpCaller copy() {
 		return new HttpCaller(httpCaller);
 	}
 	
@@ -732,6 +732,7 @@ public class KubernetesClient {
 				try {
 					httpClient.close();
 				} catch (IOException e) {
+					m_logger.warning(e.toString());
 				}
 			}
 		}
