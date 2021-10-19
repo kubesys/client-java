@@ -6,6 +6,7 @@ package io.github.kubesys.kubeclient;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,6 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
+import io.fabric8.kubernetes.client.utils.Utils;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
@@ -123,6 +125,7 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(File file) throws Exception {
 		this(file, new KubernetesAnalyzer());
+		this.analyzer.analyseServerBy(this);
 	}
 
 	/**
@@ -759,11 +762,11 @@ public class KubernetesClient {
 		protected HttpClientBuilder createDefaultHttpClientBuilder() throws Exception {
 			HttpClientBuilder builder = HttpClients.custom();
 
-			TrustManager[] trustManagers = trustManagers();
 			KeyManager[] keyManagers = keyManagers();
-			
+			TrustManager[] trustManagers = trustManagers();
+
 			builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
-						.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
+					.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
 
 			return builder;
 		}
@@ -773,7 +776,7 @@ public class KubernetesClient {
 		 * I do not known why, just copy from fabric8
 		 * 
 		 **********************************************************/
-		
+
 		public KeyManager[] keyManagers() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException,
 				CertificateException, InvalidKeySpecException, IOException {
 			if (this.clientCertData == null || this.clientKeyData == null) {
@@ -878,6 +881,7 @@ public class KubernetesClient {
 		protected KeyStore createTrustStore(InputStream pemInputStream)
 				throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
 			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			loadDefaultTrustStoreFile(trustStore, "changeit".toCharArray());
 			while (pemInputStream.available() > 0) {
 				CertificateFactory certFactory = CertificateFactory.getInstance("X509");
 				X509Certificate cert = (X509Certificate) certFactory.generateCertificate(pemInputStream);
@@ -885,6 +889,48 @@ public class KubernetesClient {
 				trustStore.setCertificateEntry(alias, cert);
 			}
 			return trustStore;
+		}
+
+		protected void loadDefaultTrustStoreFile(KeyStore keyStore, char[] trustStorePassphrase)
+				throws CertificateException, NoSuchAlgorithmException, IOException {
+
+			File trustStoreFile = getDefaultTrustStoreFile();
+
+			if (!loadDefaultStoreFile(keyStore, trustStoreFile, trustStorePassphrase)) {
+				keyStore.load(null);
+			}
+		}
+
+		protected boolean loadDefaultStoreFile(KeyStore keyStore, File fileToLoad, char[] passphrase)
+				throws CertificateException, NoSuchAlgorithmException, IOException {
+
+			if (fileToLoad.exists() && fileToLoad.isFile() && fileToLoad.length() > 0) {
+				try {
+					try (FileInputStream fis = new FileInputStream(fileToLoad)) {
+						keyStore.load(fis, passphrase);
+					}
+					return true;
+				} catch (Exception e) {
+				}
+			}
+			return false;
+		}
+
+		protected File getDefaultTrustStoreFile() {
+			String securityDirectory = System.getProperty("java.home") + File.separator + "lib" + File.separator
+					+ "security" + File.separator;
+
+			String trustStorePath = System.getProperty("javax.net.ssl.trustStore");
+			if (Utils.isNotNullOrEmpty(trustStorePath)) {
+				return new File(trustStorePath);
+			}
+
+			File jssecacertsFile = new File(securityDirectory + "jssecacerts");
+			if (jssecacertsFile.exists() && jssecacertsFile.isFile()) {
+				return jssecacertsFile;
+			}
+
+			return new File(securityDirectory + "cacerts");
 		}
 
 		protected ByteArrayInputStream createInputStreamFromBase64EncodedString(String data) {

@@ -19,7 +19,7 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient(null);
+		KubernetesClient client = createClient1(null);
 		
 		KubernetesWatcher watcher = new KubernetesWatcher(client) {
 			

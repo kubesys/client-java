@@ -49,7 +49,7 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient(null);
+		KubernetesClient client = createClient2(null);
 
 //		create(client);
 //		updateStatus(client);
