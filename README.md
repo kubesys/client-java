@@ -70,7 +70,15 @@ Add this dependency to your project's POM:
 ### Creating a client
 
 
-The easiest way to create a client is:
+Two easiest way to create a client is:
+
+CA: 
+```java
+File file = new File("/etc/kubernetes/admin.conf"); // if you installed Kuberentes, this file exist, or using the file $HOME/.kube/config
+KubernetesClient client = new KubernetesClient(file);
+```
+
+Bearer token:
 
 ```java
 String url = "https://IP:6443/";
