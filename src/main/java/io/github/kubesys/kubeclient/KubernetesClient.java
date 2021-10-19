@@ -57,7 +57,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import io.fabric8.kubernetes.client.utils.Utils;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.SSLUtil;
@@ -921,7 +920,7 @@ public class KubernetesClient {
 					+ "security" + File.separator;
 
 			String trustStorePath = System.getProperty("javax.net.ssl.trustStore");
-			if (Utils.isNotNullOrEmpty(trustStorePath)) {
+			if (trustStorePath != null) {
 				return new File(trustStorePath);
 			}
 
