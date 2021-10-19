@@ -21,7 +21,7 @@ public class UpdateCRD extends AbstractKubernetesClientTest {
 
 	
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient2(null);
+		KubernetesClient client = createClient(null);
 		JsonNode items = client.listResources("CustomResourceDefinition").get("items");
 		for (int i = 0; i < items.size(); i++) {
 			JsonNode json = items.get(i);

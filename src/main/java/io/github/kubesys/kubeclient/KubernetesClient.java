@@ -139,17 +139,6 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * invoke Kubernetes without token, which has been deprecated after Kubernetes
-	 * 1.18
-	 * 
-	 * @param url default is https://IP:6443/
-	 * @throws Exception exception
-	 */
-	public KubernetesClient(String url) throws Exception {
-		this(url, null);
-	}
-
-	/**
 	 * invoke Kubernetes using token,see
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
@@ -770,13 +759,11 @@ public class KubernetesClient {
 		protected HttpClientBuilder createDefaultHttpClientBuilder() throws Exception {
 			HttpClientBuilder builder = HttpClients.custom();
 
-			if (this.token != null) {
-				builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
-						.setSSLSocketFactory(SSLUtil.createSocketFactory());
-			} else if (this.caCertData != null) {
-				TrustManager[] trustManagers = trustManagers();
-				KeyManager[] keyManagers = keyManagers();
-			}
+			TrustManager[] trustManagers = trustManagers();
+			KeyManager[] keyManagers = keyManagers();
+			
+			builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
+						.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
 
 			return builder;
 		}
@@ -789,6 +776,9 @@ public class KubernetesClient {
 		
 		public KeyManager[] keyManagers() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException,
 				CertificateException, InvalidKeySpecException, IOException {
+			if (this.clientCertData == null || this.clientKeyData == null) {
+				return null;
+			}
 			KeyManager[] keyManagers = null;
 			char[] passphrase = "changeit".toCharArray();
 			KeyStore keyStore = createKeyStore(createInputStreamFromBase64EncodedString(this.clientCertData),
@@ -876,6 +866,9 @@ public class KubernetesClient {
 
 		protected TrustManager[] trustManagers()
 				throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+			if (this.caCertData == null) {
+				return null;
+			}
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			KeyStore trustStore = createTrustStore(createInputStreamFromBase64EncodedString(this.caCertData));
 			tmf.init(trustStore);

@@ -9,6 +9,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -35,18 +36,19 @@ public class SSLUtil {
 	/**
 	 * @return SocketFactory
 	 */
-	public static org.apache.http.conn.ssl.SSLConnectionSocketFactory createSocketFactory() {
+	public static org.apache.http.conn.ssl.SSLConnectionSocketFactory 
+				createSocketFactory(KeyManager[] km, TrustManager[] tm) {
 		return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(
-				createX509SocketFactory(), new NoopHostnameVerifier());
+				createX509SocketFactory(km, tm), new NoopHostnameVerifier());
 	}
 
 	/**
 	 * @return SocketFactory
 	 */
-	public static SSLSocketFactory createX509SocketFactory() {
+	public static SSLSocketFactory createX509SocketFactory(KeyManager[] km, TrustManager[] tm) {
 		try {
 			SSLContext sc = SSLContext.getInstance("TLS");
-			sc.init(null, createDefaultTrustManager(), new SecureRandom());
+			sc.init(km, tm == null ? createDefaultTrustManager(): tm, new SecureRandom());
 			return sc.getSocketFactory();
 		} catch (Exception ex) {
 			m_logger.severe("unable to create X509 SocketFactory, " + ex);

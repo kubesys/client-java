@@ -20,7 +20,7 @@ public class ListAllKindsTest extends AbstractKubernetesClientTest {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		KubernetesClient client = createClient2(null);
+		KubernetesClient client = createClient(null);
 		// Just kind
 		System.out.println(client.getKinds().toPrettyString());
 		// fullKind = group + kind
