@@ -48,8 +48,5 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 		// or
 //		client.watchResources("apps.Deployment", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
-		System.out.println("Start...");
-		Thread.sleep(10000);
-		System.out.println("End...");
 	}
 }

@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.MalformedURLException;
 
-import org.apache.http.client.methods.HttpPost;
 import org.junit.Test;
 
 /**

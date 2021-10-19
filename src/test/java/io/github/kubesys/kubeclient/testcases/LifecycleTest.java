@@ -56,29 +56,27 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 //		update(client);
 //		get(client);
 //		list(client);
-//		delete(client);
 		watch(client);
+//		delete(client);
 	}
 
 
 	private static void watch(KubernetesClient client) throws Exception {
-		client.watchResource("Pod", "busybox", new KubernetesWatcher(client) {
+		client.watchResource("Deployment", "kube-system", "kube-sonar", new KubernetesWatcher(client) {
 			
 			@Override
 			public void doModified(JsonNode node) {
-				// TODO Auto-generated method stub
-				
+				System.out.println(node.toPrettyString());
 			}
 			
 			@Override
 			public void doDeleted(JsonNode node) {
-				// TODO Auto-generated method stub
-				
+				System.out.println(node.toPrettyString());
 			}
 			
 			@Override
 			public void doClose() {
-				
+				System.out.println("I am close");
 			}
 			
 			@Override
