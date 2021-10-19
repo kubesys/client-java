@@ -648,7 +648,14 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public HttpCaller copy() throws Exception {
-		return new HttpCaller(httpCaller);
+		if (httpCaller.getToken() != null) {
+			return new HttpCaller(httpCaller.getMasterUrl(),
+					             httpCaller.getToken());
+		}
+		return new HttpCaller(httpCaller.getMasterUrl(),
+				             httpCaller.getCaCertData(),
+				             httpCaller.getClientCertData(),
+				             httpCaller.getClientKeyData());
 	}
 
 	/**
@@ -722,6 +729,21 @@ public class KubernetesClient {
 		}
 
 		/**
+		 * @param masterUrl masterUrl
+		 * @param caCertData caCertData
+		 * @param clientCertData clientCertData
+		 * @param clientKeyData clientKeyData
+		 * @throws Exception
+		 */
+		public HttpCaller(String masterUrl, String caCertData, String clientCertData, String clientKeyData) throws Exception {
+			this.masterUrl = masterUrl;
+			this.caCertData = caCertData;
+			this.clientCertData = clientCertData;
+			this.clientKeyData = clientKeyData;
+			this.httpClient = createDefaultHttpClient();
+		}
+		
+		/**
 		 * @param json json
 		 * @throws Exception
 		 */
@@ -768,6 +790,39 @@ public class KubernetesClient {
 					.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
 
 			return builder;
+		}
+
+		
+		public String getCaCertData() {
+			return caCertData;
+		}
+
+		public void setCaCertData(String caCertData) {
+			this.caCertData = caCertData;
+		}
+
+		public String getClientCertData() {
+			return clientCertData;
+		}
+
+		public void setClientCertData(String clientCertData) {
+			this.clientCertData = clientCertData;
+		}
+
+		public String getClientKeyData() {
+			return clientKeyData;
+		}
+
+		public void setClientKeyData(String clientKeyData) {
+			this.clientKeyData = clientKeyData;
+		}
+
+		public void setMasterUrl(String masterUrl) {
+			this.masterUrl = masterUrl;
+		}
+
+		public void setToken(String token) {
+			this.token = token;
 		}
 
 		/**********************************************************
