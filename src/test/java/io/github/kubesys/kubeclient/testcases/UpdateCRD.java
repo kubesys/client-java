@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.kubesys.kubeclient.AbstractKubernetesClientTest;
 import io.github.kubesys.kubeclient.KubernetesClient;
-import io.github.kubesys.kubeclient.KubernetesWriter;
+import io.github.kubesys.kubewriter.KubernetesWriter;
 
 
 /**
