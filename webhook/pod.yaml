@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webhook
+  labels:
+    app: webhook
+spec:
+  containers:
+  - name: hook
+    image: larryyang97/webhook:5.0
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 8000
+    volumeMounts:
+    - name: hello-tls-secret
+      mountPath: "/tls"
+      readOnly: true
+  volumes:
+  - name: hello-tls-secret
+    secret:
+      secretName: webhook-secret
