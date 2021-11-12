@@ -54,6 +54,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
@@ -432,6 +433,144 @@ public class KubernetesClient {
 		return httpCaller.getResponse(request);
 	}
 
+	public JsonNode createWebhook(String hookName, String path, String servName, String ns, Map<String, String> labels, Rule[] rules) throws Exception {
+		ObjectNode webhookConfig = createWebHookConfig(hookName, path, servName, ns, null, labels, rules);
+		return createResource(webhookConfig);
+	}
+	
+	public JsonNode createWebhook(String hookName, String path, String url, Map<String, String> labels, Rule[] rules) throws Exception {
+		ObjectNode webhookConfig = createWebHookConfig(hookName, path, null, null, url, labels, rules);
+		return createResource(webhookConfig);
+	}
+	
+	protected ObjectNode createWebHookConfig(String hookName, String path, String servName, String ns, String url, Map<String, String> labels, Rule[] rules) throws Exception {
+		ObjectNode webhookConfig = new ObjectMapper().createObjectNode();
+		webhookConfig.put("apiVersion", "admissionregistration.k8s.io/v1");
+		webhookConfig.put("kind", "MutatingWebhookConfiguration");
+		webhookConfig.set("metadata", createMetadata(hookName));
+		
+		ArrayNode webhooks = new ObjectMapper().createArrayNode();
+		
+		ObjectNode webhook = new ObjectMapper().createObjectNode();
+		webhook.put("name", hookName);
+		webhook.set("objectSelector", createExpressions(labels));
+		webhook.set("rules", new ObjectMapper().readTree(new ObjectMapper().writeValueAsBytes(rules)));
+		webhook.set("clientConfig", createClientConfig(path, servName, ns, url));
+		webhook.set("admissionReviewVersions", createReviewVersions());
+		webhook.put("sideEffects", "None");
+		webhook.put("timeoutSeconds", 10);
+		
+		webhooks.add(webhook);
+		webhookConfig.set("webhooks", webhooks);
+		return webhookConfig;
+	}
+	
+	protected ArrayNode createReviewVersions() {
+		ArrayNode versions = new ObjectMapper().createArrayNode();
+		versions.add("v1");
+		versions.add("v1beta1");
+		return versions;
+	}
+	
+	protected ObjectNode createClientConfig(String path, String serName, String ns, String url) throws Exception {
+		ObjectNode config = new ObjectMapper().createObjectNode();
+		JsonNode json = getResource("ConfigMap", "kube-system", "extension-apiserver-authentication");
+		String cert = json.get("data").get("client-ca-file").asText();
+		config.put("caBundle", Base64.getEncoder().encodeToString(cert.getBytes()));
+		if (serName != null) {
+			ObjectNode serv = new ObjectMapper().createObjectNode();
+			serv.put("namespace", ns);
+			serv.put("name", serName);
+			serv.put("path", path);
+			config.set("service", serv);
+		} else {
+			config.put("url", url + "/" + path);
+		}
+		return config;
+	}
+	
+	protected ObjectNode createMetadata(String name) {
+		ObjectNode meta = new ObjectMapper().createObjectNode();
+		meta.put("name", name);
+		return meta;
+	}
+	
+	protected ObjectNode createExpressions(Map<String, String> labels) {
+		ObjectNode match = new ObjectMapper().createObjectNode();
+		
+		ArrayNode exps = new ObjectMapper().createArrayNode();
+		for (String key: labels.keySet()) {
+			ObjectNode exp = new ObjectMapper().createObjectNode();
+			
+			exp.put("key", key);
+			exp.put("operator", "In");
+			
+			ArrayNode values = new ObjectMapper().createArrayNode();
+			values.add(labels.get(key));
+			
+			exp.set("values", values);
+			exps.add(exp);
+		}
+		match.set("matchExpressions", exps);
+		
+		return match;
+	}
+	
+	
+	public static class Rule {
+		
+		protected String[] apiGroups;
+		
+		protected String[] apiVersions;
+		
+		protected String[] operations;
+		 
+		protected String[] resources;
+		
+		protected String scope;
+
+		public String[] getApiGroups() {
+			return apiGroups;
+		}
+
+		public void setApiGroups(String[] apiGroups) {
+			this.apiGroups = apiGroups;
+		}
+
+		public String[] getApiVersions() {
+			return apiVersions;
+		}
+
+		public void setApiVersions(String[] apiVersions) {
+			this.apiVersions = apiVersions;
+		}
+
+		public String[] getOperations() {
+			return operations;
+		}
+
+		public void setOperations(String[] operations) {
+			this.operations = operations;
+		}
+
+		public String[] getResources() {
+			return resources;
+		}
+
+		public void setResources(String[] resources) {
+			this.resources = resources;
+		}
+
+		public String getScope() {
+			return scope;
+		}
+
+		public void setScope(String scope) {
+			this.scope = scope;
+		}
+		
+	}
+	
 	/**
 	 * update a Kubernetes resource status using JSON
 	 * 
