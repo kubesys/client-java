@@ -433,11 +433,34 @@ public class KubernetesClient {
 		return httpCaller.getResponse(request);
 	}
 
+	/**
+	 * see webhook-service.yaml
+	 * 
+	 * @param hookName           hookName
+	 * @param path               path
+	 * @param servName           servName
+	 * @param ns                 ns
+	 * @param labels             labels
+	 * @param rules              rules
+	 * @return      MutatingWebhookConfiguration             
+	 * @throws Exception         exception
+	 */
 	public JsonNode createWebhook(String hookName, String path, String servName, String ns, Map<String, String> labels, Rule[] rules) throws Exception {
 		ObjectNode webhookConfig = createWebHookConfig(hookName, path, servName, ns, null, labels, rules);
 		return createResource(webhookConfig);
 	}
 	
+	/**
+	 * see webhook-url.yaml
+	 * 
+	 * @param hookName           hookName
+	 * @param path               path
+	 * @param url                url
+	 * @param labels             labels
+	 * @param rules              rules
+	 * @return      MutatingWebhookConfiguration             
+	 * @throws Exception         exception
+	 */
 	public JsonNode createWebhook(String hookName, String path, String url, Map<String, String> labels, Rule[] rules) throws Exception {
 		ObjectNode webhookConfig = createWebHookConfig(hookName, path, null, null, url, labels, rules);
 		return createResource(webhookConfig);
