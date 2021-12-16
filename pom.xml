@@ -5,7 +5,7 @@
 
 	<groupId>io.github.kubesys</groupId>
 	<artifactId>kubernetes-client</artifactId>
-	<version>2.1.1</version>
+	<version>2.1.2</version>
 	<packaging>jar</packaging>
 
 	<name>kubernetes-client</name>
@@ -176,7 +176,7 @@
 			<!--javadoc -->
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>3.3.1</version>
 				<configuration>
 					<charset>UTF-8</charset>
 				</configuration>
@@ -221,7 +221,7 @@
 				<sonar.jdbc.password>onceas</sonar.jdbc.password>
 				<sonar.host.url>http://39.100.71.73:31014</sonar.host.url>
 				<sonar.login>admin</sonar.login>
-				<sonar.password>admin123</sonar.password>
+				<sonar.password>adminadmin</sonar.password>
 				<sonar.projectName>kubernetes-client-java</sonar.projectName>
 			</properties>
 		</profile>
