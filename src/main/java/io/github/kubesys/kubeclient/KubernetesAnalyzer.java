@@ -25,6 +25,8 @@ public final class KubernetesAnalyzer {
 	 */
 	protected final KubernetesRegistry registry;
 	
+	protected final KubernetesRuleBase ruleBase;
+	
 	/*******************************************
 	 * 
 	 *            Core
@@ -35,18 +37,22 @@ public final class KubernetesAnalyzer {
 	 * init KubernetesRegistry and KubernetesConvertor
 	 */
 	public KubernetesAnalyzer() {
-		KubernetesRuleBase ruleBase = new KubernetesRuleBase();
+		this.ruleBase = new KubernetesRuleBase();
 		this.registry = new KubernetesRegistry(ruleBase);
 		this.convertor = new KubernetesConvertor(ruleBase);
 	}
 	
-	public void analyseServerBy(KubernetesClient client) throws Exception {
+	public KubernetesAnalyzer initIfNeed(KubernetesClient client) throws Exception {
 		
-		KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
-		extractor.start();
+		if (ruleBase.empty()) {
+			KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
+			extractor.start();
+			
+			KubernetesListener listener = new KubernetesListener(client, registry);
+			listener.start();
+		}
 		
-		KubernetesListener listener = new KubernetesListener(client, registry);
-		listener.start();
+		return this;
 	}
 
 	/*******************************************

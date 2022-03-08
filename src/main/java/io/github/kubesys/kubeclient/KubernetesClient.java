@@ -125,7 +125,6 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(File file) throws Exception {
 		this(file, new KubernetesAnalyzer());
-		this.analyzer.analyseServerBy(this);
 	}
 
 	/**
@@ -138,7 +137,7 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws Exception {
 		this.httpCaller = new HttpCaller(new YAMLMapper().readTree(file));
-		this.analyzer = analyzer;
+		this.analyzer = analyzer.initIfNeed(this);
 	}
 
 	/**
@@ -152,7 +151,6 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token) throws Exception {
 		this(url, token, new KubernetesAnalyzer());
-		this.analyzer.analyseServerBy(this);
 	}
 
 	/**
@@ -168,7 +166,7 @@ public class KubernetesClient {
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
 		this.httpCaller = new HttpCaller(url, token);
-		this.analyzer = analyzer;
+		this.analyzer = analyzer.initIfNeed(this);
 	}
 
 	/**********************************************************

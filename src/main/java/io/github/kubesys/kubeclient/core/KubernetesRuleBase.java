@@ -91,6 +91,13 @@ public class KubernetesRuleBase {
 	
 	
 	/**
+	 * @return                    if empty
+	 */
+	public boolean empty() {
+		return kindToFullKindMapper.isEmpty();
+	}
+	
+	/**
 	 * @return                    fullKinds
 	 */
 	public Map<String, List<String>> getFullKinds() {
