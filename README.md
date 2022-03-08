@@ -91,7 +91,7 @@ you can create and get a token by the following commands:
 1. create token
 
 ```yaml
-kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client-java/master/account.yaml
+kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client-java/master/token.yaml
 ```
 2. get token
 
