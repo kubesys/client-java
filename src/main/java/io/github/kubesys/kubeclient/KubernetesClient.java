@@ -67,7 +67,6 @@ import io.github.kubesys.kubeclient.utils.SSLUtil;
  * It provides an easy-to-use way to Create, Update, Delete, Get, List and Watch all Kubernetes resources.
  * 
  * @author wuheng@iscas.ac.cn
- * @date   2022/4/1
  * @since  2.0.0
  */
 public class KubernetesClient {
