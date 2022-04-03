@@ -27,6 +27,8 @@ public class ListAllKindsTest extends AbstractKubernetesClientTest {
 		System.out.println(client.getFullKinds().toPrettyString());
 		// all supported operations for a kind
 		System.out.println(client.getKindDesc().toPrettyString());
+		// size
+		System.out.println(client.getFullKinds().size());
 		
 	}
 

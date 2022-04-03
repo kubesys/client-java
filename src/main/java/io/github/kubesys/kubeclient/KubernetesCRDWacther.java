@@ -41,7 +41,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 							.VALUE_APIS, apiGroup, version);
 		
 		try {
-			client.getAnalyzer().registry.registerKinds(client.getHttpCaller(), url);
+			client.getAnalyzer().registry.registerKinds(client.getRequester(), url);
 		} catch (Exception e) {
 			m_logger.severe(e.toString());
 		}

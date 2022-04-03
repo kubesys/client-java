@@ -10,7 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.github.kubesys.kubeclient.KubernetesClient.HttpCaller;
+import io.github.kubesys.kubeclient.KubernetesClient.HttpRequester;
 import io.github.kubesys.kubeclient.KubernetesConstants;
 import io.github.kubesys.kubeclient.utils.ReqUtil;
 import io.github.kubesys.kubeclient.utils.URLUtil;
@@ -57,7 +57,7 @@ public class KubernetesRegistry {
 	 * @param path                path
 	 * @throws Exception          exception
 	 */
-	public void registerKinds(HttpCaller caller, String path) throws Exception {
+	public void registerKinds(HttpRequester caller, String path) throws Exception {
 		
 		String uri = URLUtil.join(caller.getMasterUrl(), path);
 		
@@ -77,7 +77,8 @@ public class KubernetesRegistry {
 			String fullKind   = apiGroup == null ? shortKind : apiGroup + "." + shortKind;
 			
 			// we only support a version for each resources
-			if (ruleBase.getNameMapping().containsKey(fullKind)) {
+			if (ruleBase.getNameMapping().containsKey(fullKind) ||
+					(fullKind == shortKind && fullKind.endsWith("Options"))) {
 				continue;
 			}
 

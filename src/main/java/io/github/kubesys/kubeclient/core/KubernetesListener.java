@@ -54,7 +54,7 @@ public class KubernetesListener {
 		String path = KubernetesConstants.VALUE_APIS + "/" +  apiGroup + "/" + version;
 		
 		try {
-			registry.registerKinds(client.getHttpCaller(), path);
+			registry.registerKinds(client.getRequester(), path);
 		} catch (Exception e) {
 			m_logger.warning("fail to register: " + e);
 		}

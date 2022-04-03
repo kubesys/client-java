@@ -5,75 +5,76 @@ package io.github.kubesys.kubeclient;
 
 import io.github.kubesys.kubeclient.core.KubernetesConvertor;
 import io.github.kubesys.kubeclient.core.KubernetesExtractor;
-import io.github.kubesys.kubeclient.core.KubernetesListener;
 import io.github.kubesys.kubeclient.core.KubernetesRegistry;
 import io.github.kubesys.kubeclient.core.KubernetesRuleBase;
 
 /**
- * @author wuheng09@gmail.com
+ * KubernetesAnalyzer is used for learning all Kubernetes' resources.
+ * 
+ * @author wuheng@iscas.ac.cn
  *
  */
 public final class KubernetesAnalyzer {
 
 	/**
+	 * rulebase
+	 */
+	protected final KubernetesRuleBase ruleBase;
+
+	/**
 	 * convertor
 	 */
 	protected final KubernetesConvertor convertor;
-	
+
 	/**
 	 * registry
 	 */
 	protected final KubernetesRegistry registry;
-	
-	protected final KubernetesRuleBase ruleBase;
-	
+
 	/*******************************************
 	 * 
-	 *            Core
+	 * Init
 	 * 
 	 ********************************************/
-	
-	/**
-	 * init KubernetesRegistry and KubernetesConvertor
-	 */
 	public KubernetesAnalyzer() {
 		this.ruleBase = new KubernetesRuleBase();
 		this.registry = new KubernetesRegistry(ruleBase);
 		this.convertor = new KubernetesConvertor(ruleBase);
 	}
-	
+
+	/**
+	 * @param client client
+	 * @return KubernetesAnalyzer
+	 * @throws Exception Exception
+	 */
 	public KubernetesAnalyzer initIfNeed(KubernetesClient client) throws Exception {
-		
+
 		if (ruleBase.empty()) {
 			KubernetesExtractor extractor = new KubernetesExtractor(client, registry);
 			extractor.start();
-			
-			KubernetesListener listener = new KubernetesListener(client, registry);
-			listener.start();
 		}
-		
+
 		return this;
 	}
 
 	/*******************************************
 	 * 
-	 *            Getter
+	 * Getter
 	 * 
 	 ********************************************/
-	
+
 	/**
-	 * @return                   convertor
+	 * @return convertor
 	 */
 	public KubernetesConvertor getConvertor() {
 		return convertor;
 	}
 
 	/**
-	 * @return                   registry
+	 * @return registry
 	 */
 	public KubernetesRegistry getRegistry() {
 		return registry;
 	}
-
 
 }
