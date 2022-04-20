@@ -7,8 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import io.github.kubesys.client.utils.URLUtil;
-
 /**
  * 
  * It is used for creating various HttpRequest
@@ -27,6 +25,7 @@ public class URLUtilTest {
 	public void testNamespacedWithNullValue2() {
 		assertEquals("", URLUtil.namespacePath(true, ""));
 	}
+	
 	
 	@Test
 	public void testNamespacedWithValue() {

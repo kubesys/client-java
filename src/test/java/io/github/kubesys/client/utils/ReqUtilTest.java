@@ -1,5 +1,5 @@
 /**
- * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
+ * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
 package io.github.kubesys.client.utils;
 
@@ -9,14 +9,12 @@ import java.net.MalformedURLException;
 
 import org.junit.Test;
 
-import io.github.kubesys.client.utils.ReqUtil;
-
 /**
  * 
  * It is used for creating various HttpRequest
  * 
  * @author wuheng@iscas.ac.cn
- * @since  2.0.5 
+ * @since  2.0.0 
  **/
 public class ReqUtilTest {
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
+ * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
 package io.github.kubesys.client.core;
 
@@ -11,9 +11,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.github.kubesys.client.core.KubernetesConvertor;
-import io.github.kubesys.client.core.KubernetesRuleBase;
 
 /**
  * @author wuheng@iscas.ac.cn

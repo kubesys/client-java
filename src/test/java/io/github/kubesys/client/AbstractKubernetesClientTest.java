@@ -5,9 +5,6 @@ package io.github.kubesys.client;
 
 import java.io.File;
 
-import io.github.kubesys.client.KubernetesAnalyzer;
-import io.github.kubesys.client.KubernetesClient;
-
 /**
  * @author wuheng09@gmail.com
  *

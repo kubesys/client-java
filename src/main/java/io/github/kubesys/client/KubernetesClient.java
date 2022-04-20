@@ -1,5 +1,5 @@
 /**
- * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
+ * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
 package io.github.kubesys.client;
 
@@ -68,6 +68,7 @@ import io.github.kubesys.client.utils.SSLUtil;
  * 
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0
+ * 
  */
 public class KubernetesClient {
 
@@ -94,8 +95,14 @@ public class KubernetesClient {
 	 */
 	protected final KubernetesAnalyzer analyzer;
 
+	/******************************************************
+	 * 
+	 *  Using certificate
+	 * 
+	 ******************************************************/
+	
 	/**
-	 * for the applications running on the leader nodes
+	 * for the Pods running on the leader nodes
 	 * 
 	 * @throws Exception      exception
 	 */
@@ -104,27 +111,15 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * for the application running on all nodes
+	 * for the Pods running on all nodes
 	 * 
-	 * @param  file           see $HOME$/.kube/conf
+	 * @param  file           such as $HOME$/.kube/conf
 	 * @throws Exception      exception
 	 */
 	public KubernetesClient(File file) throws Exception {
 		this(file, new KubernetesAnalyzer());
 	}
 
-	/**
-	 * invoke Kubernetes using token,see
-	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
-	 * 
-	 * @param url   default is https://IP:6443/
-	 * @param token bearer token, you can create it using ServiceAccount and
-	 *              ClusterRoleBinding
-	 * @throws Exception exception
-	 */
-	public KubernetesClient(String url, String token) throws Exception {
-		this(url, token, new KubernetesAnalyzer());
-	}
 	
 	/**
 	 * invoke Kubernetes using x509
@@ -138,6 +133,26 @@ public class KubernetesClient {
 		this.analyzer = analyzer.initIfNeed(this);
 	}
 
+	
+	/******************************************************
+	 * 
+	 *  Using token
+	 * 
+	 ******************************************************/
+	
+	/**
+	 * invoke Kubernetes using token,see
+	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
+	 * 
+	 * @param url   default is https://IP:6443/
+	 * @param token bearer token, you can create it using ServiceAccount and
+	 *              ClusterRoleBinding
+	 * @throws Exception exception
+	 */
+	public KubernetesClient(String url, String token) throws Exception {
+		this(url, token, new KubernetesAnalyzer());
+	}
+	
 	/**
 	 * invoke Kubernetes using token, see
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
@@ -153,9 +168,10 @@ public class KubernetesClient {
 		this.analyzer = analyzer.initIfNeed(this);
 	}
 
+	 
 	/**********************************************************
 	 * 
-	 * APIs Create, Update, List, Get, Delete And Watch
+	 *  APIs Create, Update, List, Get, Delete And Watch
 	 * 
 	 **********************************************************/
 
@@ -182,9 +198,7 @@ public class KubernetesClient {
 	public JsonNode createResource(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().createUrl(json);
-
 		HttpPost request = ReqUtil.post(requester.getToken(), uri, json.toString());
-
 		return requester.getResponse(request);
 	}
 
@@ -210,8 +224,9 @@ public class KubernetesClient {
 	 */
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 
-		return deleteResource(analyzer.getConvertor().fullkind(json), analyzer.getConvertor().namespace(json),
-				analyzer.getConvertor().name(json));
+		return deleteResource(analyzer.getConvertor().fullkind(json), 
+								analyzer.getConvertor().namespace(json),
+								analyzer.getConvertor().name(json));
 	}
 
 	/**
@@ -241,9 +256,7 @@ public class KubernetesClient {
 	public JsonNode deleteResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().deleteUrl(kind, namespace, name);
-
 		HttpDelete request = ReqUtil.delete(requester.token, uri);
-
 		return requester.getResponse(request);
 	}
 
@@ -269,15 +282,16 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
-		final String uri = analyzer.getConvertor().updateUrl(analyzer.getConvertor().fullkind(json),
-				analyzer.getConvertor().namespace(json), analyzer.getConvertor().name(json));
+		final String uri = analyzer.getConvertor().updateUrl(
+								analyzer.getConvertor().fullkind(json),
+								analyzer.getConvertor().namespace(json), 
+								analyzer.getConvertor().name(json));
 
 		if (json.has(KubernetesConstants.KUBE_STATUS)) {
 			((ObjectNode) json).remove(KubernetesConstants.KUBE_STATUS);
 		}
 
 		HttpPut request = ReqUtil.put(requester.getToken(), uri, json.toString());
-
 		return requester.getResponse(request);
 	}
 
@@ -306,9 +320,7 @@ public class KubernetesClient {
 	public JsonNode getResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
-
 		HttpGet request = ReqUtil.get(requester.getToken(), uri);
-
 		return requester.getResponse(request);
 	}
 
@@ -324,7 +336,6 @@ public class KubernetesClient {
 	public boolean hasResource(String kind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
-
 		try {
 			HttpGet request = ReqUtil.get(requester.getToken(), uri);
 			requester.getResponse(request);
@@ -368,8 +379,9 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector)
-			throws Exception {
+	public JsonNode listResources(String kind, String namespace, String fieldSelector, 
+								String labelSelector) throws Exception {
+		
 		return listResources(kind, namespace, fieldSelector, labelSelector, 0, null);
 	}
 
@@ -386,12 +398,11 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	public JsonNode listResources(String kind, String namespace, String fieldSelector, String labelSelector, int limit,
-			String nextId) throws Exception {
+	public JsonNode listResources(String kind, String namespace, String fieldSelector, 
+						String labelSelector, int limit, String nextId) throws Exception {
+		
 		StringBuilder uri = new StringBuilder();
-
 		uri.append(analyzer.getConvertor().listUrl(kind, namespace));
-
 		uri.append(KubernetesConstants.HTTP_QUERY_KIND + kind);
 
 		if (limit > 0) {
@@ -411,9 +422,10 @@ public class KubernetesClient {
 		}
 
 		HttpGet request = ReqUtil.get(requester.getToken(), uri.toString());
-
 		return requester.getResponse(request);
 	}
+	
+	
 
 	/**
 	 * see webhook-service.yaml
@@ -427,6 +439,7 @@ public class KubernetesClient {
 	 * @return      MutatingWebhookConfiguration             
 	 * @throws Exception         exception
 	 */
+	@Deprecated
 	public JsonNode createWebhook(String hookName, String path, String servName, String ns, Map<String, String> labels, Rule[] rules) throws Exception {
 		ObjectNode webhookConfig = createWebHookConfig(hookName, path, servName, ns, null, labels, rules);
 		return createResource(webhookConfig);
@@ -443,11 +456,13 @@ public class KubernetesClient {
 	 * @return      MutatingWebhookConfiguration             
 	 * @throws Exception         exception
 	 */
+	@Deprecated
 	public JsonNode createWebhook(String hookName, String path, String url, Map<String, String> labels, Rule[] rules) throws Exception {
 		ObjectNode webhookConfig = createWebHookConfig(hookName, path, null, null, url, labels, rules);
 		return createResource(webhookConfig);
 	}
 	
+	@Deprecated
 	protected ObjectNode createWebHookConfig(String hookName, String path, String servName, String ns, String url, Map<String, String> labels, Rule[] rules) throws Exception {
 		ObjectNode webhookConfig = new ObjectMapper().createObjectNode();
 		webhookConfig.put("apiVersion", "admissionregistration.k8s.io/v1");
@@ -470,6 +485,7 @@ public class KubernetesClient {
 		return webhookConfig;
 	}
 	
+	@Deprecated
 	protected ArrayNode createReviewVersions() {
 		ArrayNode versions = new ObjectMapper().createArrayNode();
 		versions.add("v1");
@@ -477,6 +493,7 @@ public class KubernetesClient {
 		return versions;
 	}
 	
+	@Deprecated
 	protected ObjectNode createClientConfig(String path, String serName, String ns, String url) throws Exception {
 		ObjectNode config = new ObjectMapper().createObjectNode();
 		JsonNode json = getResource("ConfigMap", "kube-system", "extension-apiserver-authentication");
@@ -494,12 +511,14 @@ public class KubernetesClient {
 		return config;
 	}
 	
+	@Deprecated
 	protected ObjectNode createMetadata(String name) {
 		ObjectNode meta = new ObjectMapper().createObjectNode();
 		meta.put("name", name);
 		return meta;
 	}
 	
+	@Deprecated
 	protected ObjectNode createExpressions(Map<String, String> labels) {
 		ObjectNode match = new ObjectMapper().createObjectNode();
 		
@@ -805,7 +824,10 @@ public class KubernetesClient {
 	/**
 	 * Http Requester
 	 * 
+	 * TODO consider two cases (token and cert) respectively later  
+	 * 
 	 * @author wuheng@iscas.ac.cn
+	 * @since  2.0.0
 	 *
 	 */
 	public static class HttpRequester {
