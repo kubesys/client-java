@@ -22,13 +22,13 @@ public final class KubernetesConstants {
 
 	public static final String HTTP_RESPONSE_PATHS          = "paths";
 	
-	public static final String HTTP_RESPONSE_STATUS         = "status";
+	public static final String HTTP_RESPONSE_STATUS          = "status";
 
-	public static final String HTTP_RESPONSE_RESOURCES      = "resources";
+	public static final String HTTP_RESPONSE_RESOURCES       = "resources";
 	
-	public static final String HTTP_QUERY_KIND              = "?kind=";
+	public static final String HTTP_QUERY_KIND               = "?kind=";
 	
-	public static final String HTTP_QUERY_FIELDSELECTOR     = "&fieldSelector=";
+	public static final String HTTP_QUERY_FIELDSELECTOR      = "&fieldSelector=";
 	
 	public static final String HTTP_QUERY_LABELSELECTOR      = "&labelSelector=";
 	
