@@ -1,5 +1,5 @@
 /**
- * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
+ * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
 package io.github.kubesys.client;
 
@@ -8,11 +8,10 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.core.KubernetesRuleBase;
-import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * @author wuheng09@gmail.com
- * @since  2.0.3
+ * @author wuheng@iscas.ac.cn
+ * @since  2.0.0
  *
  */
 public class KubernetesCRDWacther extends KubernetesWatcher {
@@ -37,8 +36,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url = URLUtil.join(KubernetesConstants
-							.VALUE_APIS, apiGroup, version);
+		String url =  KubernetesConstants.VALUE_APIS + "/" + apiGroup + "/" + version;
 		
 		try {
 			client.getAnalyzer().registry.registerKinds(client.getRequester(), url);
