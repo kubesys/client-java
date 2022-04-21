@@ -255,16 +255,9 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 2.0.x: product ready
-  - 2.0.1: use new package name: io.github.kubesys.kubeclient
-  - 2.0.2: remove duplicate codes
-  - 2.0.3: support watch many resources
-  - 2.0.4: support default value when Kubernetes has many groups for a kind
-  - 2.0.4: using 'utf-8' charset
-  - 2.0.5: support dynamic watching CRD
-  - 2.0.6: opimal performance
-- 2.1.x: support $HOME/.kube/config
-  - 2.1.0: support $HOME/.kube/config
-  - 2.1.1: support webhook
+- 2.x: product ready
+  - 2.0: support default value when Kubernetes has many groups for a kind
+  - 2.1: support webhook
+  - 2.2: support ext-apiserver
 
 [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
