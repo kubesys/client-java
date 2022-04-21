@@ -36,10 +36,10 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		String version = spec.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
 							.iterator().next().get(KubernetesConstants
 									.KUBE_SPEC_VERSIONS_NAME).asText();
-		String url =  KubernetesConstants.VALUE_APIS + "/" + apiGroup + "/" + version;
+		String path =  KubernetesConstants.VALUE_APIS + "/" + apiGroup + "/" + version;
 		
 		try {
-			client.getAnalyzer().registry.registerKinds(client.getRequester(), url);
+			client.getAnalyzer().registry.registerKinds(client.getRequester(), path);
 		} catch (Exception e) {
 			m_logger.severe(e.toString());
 		}
