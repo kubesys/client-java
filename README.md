@@ -32,7 +32,7 @@ This project is based on the following softwares.
 To install the Java client library to your local Maven repository, simply execute:
 
 ```shell
-git clone --recursive https://github.com/kubesys/kubernetes-client-java
+git clone --recursive https://github.com/kubesys/client-java
 cd java
 mvn install
 ```
@@ -45,14 +45,14 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>kubernetes-client</artifactId>
-  <version>2.0.0</version> 
+  <version>2.1.0</version> 
 </dependency>
 
 <repositories>
    <repository>
        <id>pdos-repos</id>
        <name>PDOS Releases</name>
-       <url>http://39.100.71.73:31016/repository/maven-public/</url>
+       <url>http://120.46.180.58:31016/repository/maven-public/</url>
     </repository>
 </repositories>
 ```
@@ -91,13 +91,12 @@ you can create and get a token by the following commands:
 1. create token
 
 ```yaml
-kubectl create -f https://raw.githubusercontent.com/kubesys/kubernetes-client-java/master/token.yaml
+kubectl create -f https://raw.githubusercontent.com/kubesys/client-java/master/token.yaml
 ```
 2. get token
 
 ```kubectl
 kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
-
 ```
 ### get-all-kinds
 
