@@ -260,3 +260,6 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
   - 2.2: support ext-apiserver
 
 [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
+
+## Other
+- [kubectl command](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)

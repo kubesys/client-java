@@ -28,7 +28,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -37,20 +36,23 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.core5.http.URIScheme;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.util.Timeout;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -931,34 +933,47 @@ public class KubernetesClient {
 		 */
 		protected CloseableHttpClient createDefaultHttpClient() throws Exception {
 
-			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(0)
-					.setSoReuseAddress(true).build();
+//			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(Timeout.DISABLED)
+//					.setSoReuseAddress(true).build();
 
-			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(0).setConnectionRequestTimeout(0)
-					.setSocketTimeout(0).build();
+			RequestConfig requestConfig = RequestConfig.custom()
+					.setConnectTimeout(Timeout.DISABLED)
+					.setConnectionRequestTimeout(Timeout.DISABLED).build();
 
-			return createDefaultHttpClientBuilder().setConnectionTimeToLive(0, TimeUnit.SECONDS)
-					.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
+			return HttpClients.custom()
+					.setDefaultRequestConfig(requestConfig)
+					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+					.setConnectionManager(new PoolingHttpClientConnectionManager(
+							RegistryBuilder.<ConnectionSocketFactory>create()
+			                .register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
+			                .register(URIScheme.HTTPS.id, SSLUtil.createSocketFactory(keyManagers(), trustManagers()))
+			                .build()))
 					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
 					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
-					.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();
+					.build();
+//			return createDefaultHttpClientBuilder()
+//					.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
+//					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+//					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
+//					.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();
 		}
 
 		/**
 		 * @return builder
 		 * @throws Exception
 		 */
-		protected HttpClientBuilder createDefaultHttpClientBuilder() throws Exception {
-			HttpClientBuilder builder = HttpClients.custom();
-
-			KeyManager[] keyManagers = keyManagers();
-			TrustManager[] trustManagers = trustManagers();
-
-			builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
-					.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
-
-			return builder;
-		}
+//		protected HttpClientBuilder createDefaultHttpClientBuilder() throws Exception {
+//			HttpClientBuilder builder = HttpClients.custom();
+//
+//			KeyManager[] keyManagers = keyManagers();
+//			TrustManager[] trustManagers = trustManagers();
+//			
+//
+//			builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
+//					.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
+//
+//			return builder;
+//		}
 
 		
 		public String getCaCertData() {
@@ -1199,7 +1214,7 @@ public class KubernetesClient {
 		 * @return json json
 		 * @throws Exception exception
 		 */
-		public synchronized JsonNode getResponse(HttpRequestBase req) throws Exception {
+		public synchronized JsonNode getResponse(HttpUriRequestBase req) throws Exception {
 			return parseResponse(httpClient.execute(req));
 		}
 

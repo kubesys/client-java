@@ -11,7 +11,7 @@ import java.io.File;
  */
 public abstract class AbstractKubernetesClientTest {
 
-	static String URL = "https://39.100.71.73:6443";
+	static String URL = "";
 	
 	// kubectl -n kube-system get secret $(kubectl -n kube-system get secret | grep kuboard-user | awk '{print $1}') -o go-template='{{.data.token}}' | base64 -d
 	static String TOKEN = "";

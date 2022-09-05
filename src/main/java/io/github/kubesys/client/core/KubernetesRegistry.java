@@ -5,13 +5,13 @@ package io.github.kubesys.client.core;
 
 import java.util.logging.Logger;
 
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.github.kubesys.client.KubernetesConstants;
 import io.github.kubesys.client.KubernetesClient.HttpRequester;
+import io.github.kubesys.client.KubernetesConstants;
 import io.github.kubesys.client.utils.ReqUtil;
 import io.github.kubesys.client.utils.URLUtil;
 

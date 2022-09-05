@@ -16,7 +16,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 
 /**
  * 
@@ -36,9 +36,9 @@ public class SSLUtil {
 	/**
 	 * @return SocketFactory
 	 */
-	public static org.apache.http.conn.ssl.SSLConnectionSocketFactory 
+	public static org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory 
 				createSocketFactory(KeyManager[] km, TrustManager[] tm) {
-		return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(
+		return new org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory(
 				createX509SocketFactory(km, tm), new NoopHostnameVerifier());
 	}
 
