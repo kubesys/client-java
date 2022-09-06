@@ -88,7 +88,7 @@ public class KubernetesClient {
 	 * it is used for sending requests to Kuberenetes kube-apiserver,
 	 * and then receiving response from it.
 	 */
-	protected final HttpRequester requester;
+	protected final KubeBaseRequest requester;
 
 	/**
 	 * it is used for getting the metadata of all kinds in Kubernetes according
@@ -131,16 +131,10 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws Exception {
-		this.requester = new HttpRequester(new YAMLMapper().readTree(file));
+		this.requester = new KubeBaseRequest(new YAMLMapper().readTree(file));
 		this.analyzer = analyzer.initIfNeed(this);
 	}
 
-	
-	/******************************************************
-	 * 
-	 *  Using token
-	 * 
-	 ******************************************************/
 	
 	/**
 	 * invoke Kubernetes using token,see
@@ -166,14 +160,19 @@ public class KubernetesClient {
 	 * @throws Exception exception
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
-		this.requester = new HttpRequester(url, token);
+		this.requester = new KubeBaseRequest(url, token);
 		this.analyzer = analyzer.initIfNeed(this);
 	}
 
 	 
 	/**********************************************************
 	 * 
-	 *  APIs Create, Update, List, Get, Delete And Watch
+	 * 
+	 * 
+	 *                        Core APIs 
+	 *           Create, Update, List, Get, Delete And Watch
+	 * 
+	 * 
 	 * 
 	 **********************************************************/
 
@@ -428,175 +427,6 @@ public class KubernetesClient {
 	}
 	
 	
-
-	/**
-	 * see webhook-service.yaml
-	 * 
-	 * @param hookName           hookName
-	 * @param path               path
-	 * @param servName           servName
-	 * @param ns                 ns
-	 * @param labels             labels
-	 * @param rules              rules
-	 * @return      MutatingWebhookConfiguration             
-	 * @throws Exception         exception
-	 */
-	@Deprecated
-	public JsonNode createWebhook(String hookName, String path, String servName, String ns, Map<String, String> labels, Rule[] rules) throws Exception {
-		ObjectNode webhookConfig = createWebHookConfig(hookName, path, servName, ns, null, labels, rules);
-		return createResource(webhookConfig);
-	}
-	
-	/**
-	 * see webhook-url.yaml
-	 * 
-	 * @param hookName           hookName
-	 * @param path               path
-	 * @param url                url
-	 * @param labels             labels
-	 * @param rules              rules
-	 * @return      MutatingWebhookConfiguration             
-	 * @throws Exception         exception
-	 */
-	@Deprecated
-	public JsonNode createWebhook(String hookName, String path, String url, Map<String, String> labels, Rule[] rules) throws Exception {
-		ObjectNode webhookConfig = createWebHookConfig(hookName, path, null, null, url, labels, rules);
-		return createResource(webhookConfig);
-	}
-	
-	@Deprecated
-	protected ObjectNode createWebHookConfig(String hookName, String path, String servName, String ns, String url, Map<String, String> labels, Rule[] rules) throws Exception {
-		ObjectNode webhookConfig = new ObjectMapper().createObjectNode();
-		webhookConfig.put("apiVersion", "admissionregistration.k8s.io/v1");
-		webhookConfig.put("kind", "MutatingWebhookConfiguration");
-		webhookConfig.set("metadata", createMetadata(hookName));
-		
-		ArrayNode webhooks = new ObjectMapper().createArrayNode();
-		
-		ObjectNode webhook = new ObjectMapper().createObjectNode();
-		webhook.put("name", hookName);
-		webhook.set("objectSelector", createExpressions(labels));
-		webhook.set("rules", new ObjectMapper().readTree(new ObjectMapper().writeValueAsBytes(rules)));
-		webhook.set("clientConfig", createClientConfig(path, servName, ns, url));
-		webhook.set("admissionReviewVersions", createReviewVersions());
-		webhook.put("sideEffects", "None");
-		webhook.put("timeoutSeconds", 10);
-		
-		webhooks.add(webhook);
-		webhookConfig.set("webhooks", webhooks);
-		return webhookConfig;
-	}
-	
-	@Deprecated
-	protected ArrayNode createReviewVersions() {
-		ArrayNode versions = new ObjectMapper().createArrayNode();
-		versions.add("v1");
-		versions.add("v1beta1");
-		return versions;
-	}
-	
-	@Deprecated
-	protected ObjectNode createClientConfig(String path, String serName, String ns, String url) throws Exception {
-		ObjectNode config = new ObjectMapper().createObjectNode();
-		JsonNode json = getResource("ConfigMap", "kube-system", "extension-apiserver-authentication");
-		String cert = json.get("data").get("client-ca-file").asText();
-		config.put("caBundle", Base64.getEncoder().encodeToString(cert.getBytes()));
-		if (serName != null) {
-			ObjectNode serv = new ObjectMapper().createObjectNode();
-			serv.put("namespace", ns);
-			serv.put("name", serName);
-			serv.put("path", path);
-			config.set("service", serv);
-		} else {
-			config.put("url", url + "/" + path);
-		}
-		return config;
-	}
-	
-	@Deprecated
-	protected ObjectNode createMetadata(String name) {
-		ObjectNode meta = new ObjectMapper().createObjectNode();
-		meta.put("name", name);
-		return meta;
-	}
-	
-	@Deprecated
-	protected ObjectNode createExpressions(Map<String, String> labels) {
-		ObjectNode match = new ObjectMapper().createObjectNode();
-		
-		ArrayNode exps = new ObjectMapper().createArrayNode();
-		for (String key: labels.keySet()) {
-			ObjectNode exp = new ObjectMapper().createObjectNode();
-			
-			exp.put("key", key);
-			exp.put("operator", "In");
-			
-			ArrayNode values = new ObjectMapper().createArrayNode();
-			values.add(labels.get(key));
-			
-			exp.set("values", values);
-			exps.add(exp);
-		}
-		match.set("matchExpressions", exps);
-		
-		return match;
-	}
-	
-	
-	public static class Rule {
-		
-		protected String[] apiGroups;
-		
-		protected String[] apiVersions;
-		
-		protected String[] operations;
-		 
-		protected String[] resources;
-		
-		protected String scope;
-
-		public String[] getApiGroups() {
-			return apiGroups;
-		}
-
-		public void setApiGroups(String[] apiGroups) {
-			this.apiGroups = apiGroups;
-		}
-
-		public String[] getApiVersions() {
-			return apiVersions;
-		}
-
-		public void setApiVersions(String[] apiVersions) {
-			this.apiVersions = apiVersions;
-		}
-
-		public String[] getOperations() {
-			return operations;
-		}
-
-		public void setOperations(String[] operations) {
-			this.operations = operations;
-		}
-
-		public String[] getResources() {
-			return resources;
-		}
-
-		public void setResources(String[] resources) {
-			this.resources = resources;
-		}
-
-		public String getScope() {
-			return scope;
-		}
-
-		public void setScope(String scope) {
-			this.scope = scope;
-		}
-		
-	}
-	
 	/**
 	 * update a Kubernetes resource status using JSON
 	 * 
@@ -742,6 +572,139 @@ public class KubernetesClient {
 		return createResource(binding);
 	}
 
+	/**********************************************************
+	 * 
+	 * 
+	 * 
+	 *                     Deprecated APIs 
+	 * 
+	 * 
+	 * 
+	 **********************************************************/
+	/**
+	 * see webhook-service.yaml
+	 * 
+	 * @param hookName           hookName
+	 * @param path               path
+	 * @param servName           servName
+	 * @param ns                 ns
+	 * @param labels             labels
+	 * @param rules              rules
+	 * @return      MutatingWebhookConfiguration             
+	 * @throws Exception         exception
+	 */
+	@Deprecated
+	public JsonNode createWebhook(String hookName, String path, String servName, String ns, Map<String, String> labels, KubeRule[] rules) throws Exception {
+		ObjectNode webhookConfig = createWebHookConfig(hookName, path, servName, ns, null, labels, rules);
+		return createResource(webhookConfig);
+	}
+	
+	/**
+	 * see webhook-url.yaml
+	 * 
+	 * @param hookName           hookName
+	 * @param path               path
+	 * @param url                url
+	 * @param labels             labels
+	 * @param rules              rules
+	 * @return      MutatingWebhookConfiguration             
+	 * @throws Exception         exception
+	 */
+	@Deprecated
+	public JsonNode createWebhook(String hookName, String path, String url, Map<String, String> labels, KubeRule[] rules) throws Exception {
+		ObjectNode webhookConfig = createWebHookConfig(hookName, path, null, null, url, labels, rules);
+		return createResource(webhookConfig);
+	}
+	
+	@Deprecated
+	protected ObjectNode createWebHookConfig(String hookName, String path, String servName, String ns, String url, Map<String, String> labels, KubeRule[] rules) throws Exception {
+		ObjectNode webhookConfig = new ObjectMapper().createObjectNode();
+		webhookConfig.put("apiVersion", "admissionregistration.k8s.io/v1");
+		webhookConfig.put("kind", "MutatingWebhookConfiguration");
+		webhookConfig.set("metadata", createMetadata(hookName));
+		
+		ArrayNode webhooks = new ObjectMapper().createArrayNode();
+		
+		ObjectNode webhook = new ObjectMapper().createObjectNode();
+		webhook.put("name", hookName);
+		webhook.set("objectSelector", createExpressions(labels));
+		webhook.set("rules", new ObjectMapper().readTree(new ObjectMapper().writeValueAsBytes(rules)));
+		webhook.set("clientConfig", createClientConfig(path, servName, ns, url));
+		webhook.set("admissionReviewVersions", createReviewVersions());
+		webhook.put("sideEffects", "None");
+		webhook.put("timeoutSeconds", 10);
+		
+		webhooks.add(webhook);
+		webhookConfig.set("webhooks", webhooks);
+		return webhookConfig;
+	}
+	
+	@Deprecated
+	protected ArrayNode createReviewVersions() {
+		ArrayNode versions = new ObjectMapper().createArrayNode();
+		versions.add("v1");
+		versions.add("v1beta1");
+		return versions;
+	}
+	
+	@Deprecated
+	protected ObjectNode createClientConfig(String path, String serName, String ns, String url) throws Exception {
+		ObjectNode config = new ObjectMapper().createObjectNode();
+		JsonNode json = getResource("ConfigMap", "kube-system", "extension-apiserver-authentication");
+		String cert = json.get("data").get("client-ca-file").asText();
+		config.put("caBundle", Base64.getEncoder().encodeToString(cert.getBytes()));
+		if (serName != null) {
+			ObjectNode serv = new ObjectMapper().createObjectNode();
+			serv.put("namespace", ns);
+			serv.put("name", serName);
+			serv.put("path", path);
+			config.set("service", serv);
+		} else {
+			config.put("url", url + "/" + path);
+		}
+		return config;
+	}
+	
+	@Deprecated
+	protected ObjectNode createMetadata(String name) {
+		ObjectNode meta = new ObjectMapper().createObjectNode();
+		meta.put("name", name);
+		return meta;
+	}
+	
+	@Deprecated
+	protected ObjectNode createExpressions(Map<String, String> labels) {
+		ObjectNode match = new ObjectMapper().createObjectNode();
+		
+		ArrayNode exps = new ObjectMapper().createArrayNode();
+		for (String key: labels.keySet()) {
+			ObjectNode exp = new ObjectMapper().createObjectNode();
+			
+			exp.put("key", key);
+			exp.put("operator", "In");
+			
+			ArrayNode values = new ObjectMapper().createArrayNode();
+			values.add(labels.get(key));
+			
+			exp.set("values", values);
+			exps.add(exp);
+		}
+		match.set("matchExpressions", exps);
+		
+		return match;
+	}
+	
+	
+	/**********************************************************
+	 * 
+	 * 
+	 * 
+	 *                    Get  
+	 * 
+	 * 
+	 * 
+	 **********************************************************/
+	
 	/**
 	 * @return kinds kind, see Kubernetes kind
 	 * @throws Exception Kubernetes unavailability
@@ -781,11 +744,6 @@ public class KubernetesClient {
 		return map;
 	}
 
-	/**********************************************************
-	 * 
-	 * Getter
-	 * 
-	 **********************************************************/
 
 	/**
 	 * 
@@ -802,7 +760,7 @@ public class KubernetesClient {
 	 * @return httpCaller, it is used for sending request to Kuberenetes and
 	 *         receiving response from Kubernetes.
 	 */
-	public HttpRequester getRequester() {
+	public KubeBaseRequest getRequester() {
 		return requester;
 	}
 
@@ -812,16 +770,83 @@ public class KubernetesClient {
 	 * @return httpCaller
 	 * @throws Exception exception
 	 */
-	public HttpRequester copy() throws Exception {
+	public KubeBaseRequest copy() throws Exception {
 		if (requester.getToken() != null) {
-			return new HttpRequester(requester.getMasterUrl(),
+			return new KubeBaseRequest(requester.getMasterUrl(),
 					             requester.getToken());
 		}
-		return new HttpRequester(requester.getMasterUrl(),
+		return new KubeBaseRequest(requester.getMasterUrl(),
 				             requester.getCaCertData(),
 				             requester.getClientCertData(),
 				             requester.getClientKeyData());
 	}
+	
+	
+	/**********************************************************
+	 * 
+	 * 
+	 * 
+	 *                    Models  
+	 * 
+	 * 
+	 * 
+	 **********************************************************/
+	
+	public static class KubeRule {
+		
+		protected String[] apiGroups;
+		
+		protected String[] apiVersions;
+		
+		protected String[] operations;
+		 
+		protected String[] resources;
+		
+		protected String scope;
+
+		public String[] getApiGroups() {
+			return apiGroups;
+		}
+
+		public void setApiGroups(String[] apiGroups) {
+			this.apiGroups = apiGroups;
+		}
+
+		public String[] getApiVersions() {
+			return apiVersions;
+		}
+
+		public void setApiVersions(String[] apiVersions) {
+			this.apiVersions = apiVersions;
+		}
+
+		public String[] getOperations() {
+			return operations;
+		}
+
+		public void setOperations(String[] operations) {
+			this.operations = operations;
+		}
+
+		public String[] getResources() {
+			return resources;
+		}
+
+		public void setResources(String[] resources) {
+			this.resources = resources;
+		}
+
+		public String getScope() {
+			return scope;
+		}
+
+		public void setScope(String scope) {
+			this.scope = scope;
+		}
+		
+	}
+	
+	
 
 	/**
 	 * Http Requester
@@ -832,7 +857,7 @@ public class KubernetesClient {
 	 * @since  2.0.0
 	 *
 	 */
-	public static class HttpRequester {
+	public static class KubeBaseRequest {
 
 		// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
 		static Map<Integer, String> statusDesc = new HashMap<>();
@@ -882,7 +907,7 @@ public class KubernetesClient {
 		 * @param requester requester
 		 * @throws Exception exception
 		 */
-		public HttpRequester(HttpRequester requester) throws Exception {
+		public KubeBaseRequest(KubeBaseRequest requester) throws Exception {
 			this(requester.getMasterUrl(), requester.getToken());
 		}
 
@@ -891,7 +916,7 @@ public class KubernetesClient {
 		 * @param token     token
 		 * @throws Exception exception
 		 */
-		public HttpRequester(String masterUrl, String token) throws Exception {
+		public KubeBaseRequest(String masterUrl, String token) throws Exception {
 			super();
 			this.masterUrl = masterUrl;
 			this.token = token;
@@ -905,7 +930,7 @@ public class KubernetesClient {
 		 * @param clientKeyData clientKeyData
 		 * @throws Exception
 		 */
-		public HttpRequester(String masterUrl, String caCertData, String clientCertData, String clientKeyData) throws Exception {
+		public KubeBaseRequest(String masterUrl, String caCertData, String clientCertData, String clientKeyData) throws Exception {
 			this.masterUrl = masterUrl;
 			this.caCertData = caCertData;
 			this.clientCertData = clientCertData;
@@ -917,7 +942,7 @@ public class KubernetesClient {
 		 * @param json json
 		 * @throws Exception
 		 */
-		public HttpRequester(JsonNode json) throws Exception {
+		public KubeBaseRequest(JsonNode json) throws Exception {
 			JsonNode cluster = json.get("clusters").get(0).get("cluster");
 			this.masterUrl = cluster.get("server").asText();
 			this.caCertData = cluster.get("certificate-authority-data").asText();
@@ -933,12 +958,12 @@ public class KubernetesClient {
 		 */
 		protected CloseableHttpClient createDefaultHttpClient() throws Exception {
 
-//			SocketConfig socketConfig = SocketConfig.custom().setSoKeepAlive(true).setSoTimeout(Timeout.DISABLED)
-//					.setSoReuseAddress(true).build();
-
 			RequestConfig requestConfig = RequestConfig.custom()
 					.setConnectTimeout(Timeout.DISABLED)
-					.setConnectionRequestTimeout(Timeout.DISABLED).build();
+					.setConnectionKeepAlive(Timeout.DISABLED)
+					.setConnectionRequestTimeout(Timeout.DISABLED)
+					.setResponseTimeout(Timeout.DISABLED)
+					.build();
 
 			return HttpClients.custom()
 					.setDefaultRequestConfig(requestConfig)
@@ -948,32 +973,10 @@ public class KubernetesClient {
 			                .register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
 			                .register(URIScheme.HTTPS.id, SSLUtil.createSocketFactory(keyManagers(), trustManagers()))
 			                .build()))
-					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
 					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
 					.build();
-//			return createDefaultHttpClientBuilder()
-//					.setDefaultSocketConfig(socketConfig).setDefaultRequestConfig(requestConfig)
-//					.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-//					.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy())
-//					.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy()).build();
 		}
 
-		/**
-		 * @return builder
-		 * @throws Exception
-		 */
-//		protected HttpClientBuilder createDefaultHttpClientBuilder() throws Exception {
-//			HttpClientBuilder builder = HttpClients.custom();
-//
-//			KeyManager[] keyManagers = keyManagers();
-//			TrustManager[] trustManagers = trustManagers();
-//			
-//
-//			builder.setSSLHostnameVerifier(SSLUtil.createDefaultHostnameVerifier())
-//					.setSSLSocketFactory(SSLUtil.createSocketFactory(keyManagers, trustManagers));
-//
-//			return builder;
-//		}
 
 		
 		public String getCaCertData() {
@@ -1251,88 +1254,88 @@ public class KubernetesClient {
 		public CloseableHttpClient getHttpClient() {
 			return httpClient;
 		}
+		
+		static class DerParser {
+
+			private InputStream in;
+
+			DerParser(byte[] bytes) throws IOException {
+				this.in = new ByteArrayInputStream(bytes);
+			}
+
+			Asn1Object read() throws IOException {
+				int tag = in.read();
+
+				if (tag == -1) {
+					throw new IOException("Invalid DER: stream too short, missing tag");
+				}
+
+				int length = getLength();
+				byte[] value = new byte[length];
+				if (in.read(value) < length) {
+					throw new IOException("Invalid DER: stream too short, missing value");
+				}
+
+				return new Asn1Object(tag, value);
+			}
+
+			private int getLength() throws IOException {
+				int i = in.read();
+				if (i == -1) {
+					throw new IOException("Invalid DER: length missing");
+				}
+
+				if ((i & ~0x7F) == 0) {
+					return i;
+				}
+
+				int num = i & 0x7F;
+				if (i >= 0xFF || num > 4) {
+					throw new IOException("Invalid DER: length field too big (" + i + ")");
+				}
+
+				byte[] bytes = new byte[num];
+				if (in.read(bytes) < num) {
+					throw new IOException("Invalid DER: length too short");
+				}
+
+				return new BigInteger(1, bytes).intValue();
+			}
+		}
+
+		static class Asn1Object {
+
+			private final int type;
+			private final byte[] value;
+			private final int tag;
+
+			public Asn1Object(int tag, byte[] value) {
+				this.tag = tag;
+				this.type = tag & 0x1F;
+				this.value = value;
+			}
+
+			public byte[] getValue() {
+				return value;
+			}
+
+			BigInteger getInteger() throws IOException {
+				if (type != 0x02) {
+					throw new IOException("Invalid DER: object is not integer"); //$NON-NLS-1$
+				}
+				return new BigInteger(value);
+			}
+
+			void validateSequence() throws IOException {
+				if (type != 0x10) {
+					throw new IOException("Invalid DER: not a sequence");
+				}
+				if ((tag & 0x20) != 0x20) {
+					throw new IOException("Invalid DER: can't parse primitive entity");
+				}
+			}
+		}
 
 	}
-
-	static class DerParser {
-
-		private InputStream in;
-
-		DerParser(byte[] bytes) throws IOException {
-			this.in = new ByteArrayInputStream(bytes);
-		}
-
-		Asn1Object read() throws IOException {
-			int tag = in.read();
-
-			if (tag == -1) {
-				throw new IOException("Invalid DER: stream too short, missing tag");
-			}
-
-			int length = getLength();
-			byte[] value = new byte[length];
-			if (in.read(value) < length) {
-				throw new IOException("Invalid DER: stream too short, missing value");
-			}
-
-			return new Asn1Object(tag, value);
-		}
-
-		private int getLength() throws IOException {
-			int i = in.read();
-			if (i == -1) {
-				throw new IOException("Invalid DER: length missing");
-			}
-
-			if ((i & ~0x7F) == 0) {
-				return i;
-			}
-
-			int num = i & 0x7F;
-			if (i >= 0xFF || num > 4) {
-				throw new IOException("Invalid DER: length field too big (" + i + ")");
-			}
-
-			byte[] bytes = new byte[num];
-			if (in.read(bytes) < num) {
-				throw new IOException("Invalid DER: length too short");
-			}
-
-			return new BigInteger(1, bytes).intValue();
-		}
-	}
-
-	static class Asn1Object {
-
-		private final int type;
-		private final byte[] value;
-		private final int tag;
-
-		public Asn1Object(int tag, byte[] value) {
-			this.tag = tag;
-			this.type = tag & 0x1F;
-			this.value = value;
-		}
-
-		public byte[] getValue() {
-			return value;
-		}
-
-		BigInteger getInteger() throws IOException {
-			if (type != 0x02) {
-				throw new IOException("Invalid DER: object is not integer"); //$NON-NLS-1$
-			}
-			return new BigInteger(value);
-		}
-
-		void validateSequence() throws IOException {
-			if (type != 0x10) {
-				throw new IOException("Invalid DER: not a sequence");
-			}
-			if ((tag & 0x20) != 0x20) {
-				throw new IOException("Invalid DER: can't parse primitive entity");
-			}
-		}
-	}
-
+	
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.github.kubesys.client.AbstractKubernetesClientTest;
 import io.github.kubesys.client.KubernetesClient;
-import io.github.kubesys.client.KubernetesClient.Rule;
+import io.github.kubesys.client.KubernetesClient.KubeRule;
 
 
 /**
@@ -25,14 +25,14 @@ public class CreateWebHookTest extends AbstractKubernetesClientTest {
 		Map<String, String> labels = new HashMap<>();
 		labels.put("app", "webhook");
 		
-		Rule[] rules = new Rule[1];
-		Rule rule = new Rule();
-		rule.setApiGroups(new String[] {""});
-		rule.setApiVersions(new String[] {"v1"});
-		rule.setOperations(new String[] {"CREATE"});
-		rule.setResources(new String[] {"pods"});
-		rule.setScope("Namespaced");
-		rules[0] = rule;
+		KubeRule[] rules = new KubeRule[1];
+		KubeRule kubeRule = new KubeRule();
+		kubeRule.setApiGroups(new String[] {""});
+		kubeRule.setApiVersions(new String[] {"v1"});
+		kubeRule.setOperations(new String[] {"CREATE"});
+		kubeRule.setResources(new String[] {"pods"});
+		kubeRule.setScope("Namespaced");
+		rules[0] = kubeRule;
  		
 //		System.out.println(client.createWebhook("hello-webhook.leclouddev.com", "/mutate", "hello-webhook-service", "default", labels, rules).toPrettyString());
 		System.out.println(client.createWebhook("hello-webhook.leclouddev.com", "/mutate", "https://133.133.134.22:90", labels, rules).toPrettyString());
