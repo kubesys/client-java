@@ -63,6 +63,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.github.kubesys.client.core.KubernetesRuleBase;
 import io.github.kubesys.client.utils.ReqUtil;
 import io.github.kubesys.client.utils.SSLUtil;
+import io.github.kubesys.client.utils.URLUtil;
 
 /**
  * This class is used for creating a connection between users' application and Kubernetes server.
@@ -356,6 +357,28 @@ public class KubernetesClient {
 	public JsonNode listResources(String kind) throws Exception {
 		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null);
 	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode listResourcesWithField(String kind, Map<String, String> fields) throws Exception {
+		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, URLUtil.fromMap(fields), null, 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode listResourcesWithLabel(String kind, Map<String, String> labels) throws Exception {
+		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, URLUtil.fromMap(labels), 0, null);
+	}
 
 	/**
 	 * list all Kubernetes resources using kind and namespace
@@ -367,6 +390,29 @@ public class KubernetesClient {
 	 */
 	public JsonNode listResources(String kind, String namespace) throws Exception {
 		return listResources(kind, namespace, null, null, 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode listResourcesWithField(String kind, String namespace,  Map<String, String> fields) throws Exception {
+		return listResources(kind, namespace, URLUtil.fromMap(fields), null, 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind and namespace
+	 * 
+	 * @param kind      kind
+	 * @param namespace namespace
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode listResourcesWithLabel(String kind, String namespace, Map<String, String> labels) throws Exception {
+		return listResources(kind, namespace, null, URLUtil.fromMap(labels), 0, null);
 	}
 
 	/**

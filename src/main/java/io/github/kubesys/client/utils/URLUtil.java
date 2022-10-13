@@ -5,6 +5,7 @@ package io.github.kubesys.client.utils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import io.github.kubesys.client.KubernetesConstants;
@@ -76,5 +77,20 @@ public class URLUtil {
 		return (namespaced && namespace != null && namespace.length() != 0)
 				? KubernetesConstants.KUBEAPI_NAMESPACES_PATTERN + namespace
 				: KubernetesConstants.VALUE_ALL_NAMESPACES;
+	}
+	
+	public static String fromMap(Map<String, String> map) {
+		//%3D
+		if (map == null || map.size() == 0) {
+			return null;
+		}
+		
+		
+		StringBuilder sb = new StringBuilder();
+		for (String key : map.keySet()) {
+			sb.append(key + "%3D" + map.get(key) + ",");
+		}
+		
+		return sb.substring(0, sb.length() - 1);
 	}
 }

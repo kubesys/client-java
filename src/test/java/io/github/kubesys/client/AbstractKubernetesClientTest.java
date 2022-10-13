@@ -11,13 +11,8 @@ import java.io.File;
  */
 public abstract class AbstractKubernetesClientTest {
 
-	static String URL = "https://120.46.180.58:6443/";
-	
-	// kubectl -n kube-system get secret $(kubectl -n kube-system get secret | grep kuboard-user | awk '{print $1}') -o go-template='{{.data.token}}' | base64 -d
-	static String TOKEN = "";
-
 	public static KubernetesClient createClient1(KubernetesAnalyzer ana) throws Exception {
-		return (ana == null) ? new KubernetesClient(URL, TOKEN) : new KubernetesClient(URL, TOKEN, ana);
+		return (ana == null) ? new KubernetesClient(new File(".token")) : new KubernetesClient(new File(".token"), ana);
 	}
 	
 	public static KubernetesClient createClient2(KubernetesAnalyzer ana) throws Exception {
