@@ -197,6 +197,30 @@ public class KubernetesClient {
 	 * @return json Kubernetes may add come fields according to Kubernetes' context
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
+	public JsonNode createResource(String json) throws Exception {
+		return createResource(new ObjectMapper().readTree(json));
+	}
+	
+	/**
+	 * create a Kubernetes resource using JSON. <br>
+	 * 
+	 * for example, a json can be <br>
+	 * { <br>
+	 * "apiVersion": "v1", <br>
+	 * "kind": "Pod", <br>
+	 * "metadata": { <br>
+	 * "name": "busybox", <br>
+	 * "namespace": "default", <br>
+	 * "labels": { <br>
+	 * "test": "test" <br>
+	 * } <br>
+	 * } <br>
+	 * } <br>
+	 * 
+	 * @param json json object, which must meet the Kubernetes' specification
+	 * @return json Kubernetes may add come fields according to Kubernetes' context
+	 * @throws Exception see link HttpCaller.getResponse
+	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().createUrl(json);
@@ -204,6 +228,30 @@ public class KubernetesClient {
 		return requester.getResponse(request);
 	}
 
+	/**
+	 * delete a Kubernetes resource using JSON <br>
+	 * 
+	 * for example, a json can be <br>
+	 * { <br>
+	 * "apiVersion": "v1", <br>
+	 * "kind": "Pod", <br>
+	 * "metadata": { <br>
+	 * "name": "busybox", <br>
+	 * "namespace": "default", <br>
+	 * "labels": { <br>
+	 * "test": "test" <br>
+	 * } <br>
+	 * } <br>
+	 * } <br>
+	 * 
+	 * @param json json object, which must meet the Kubernetes' specification
+	 * @return json the deleted object with json style
+	 * @throws Exception see HttpCaller.getResponse
+	 */
+	public JsonNode deleteResource(String json) throws Exception {
+		return deleteResource(new ObjectMapper().readTree(json));
+	}
+	
 	/**
 	 * delete a Kubernetes resource using JSON <br>
 	 * 
@@ -262,6 +310,30 @@ public class KubernetesClient {
 		return requester.getResponse(request);
 	}
 
+	/**
+	 * update a Kubernetes resource using JSON
+	 * 
+	 * for example, a json can be <br>
+	 * { <br>
+	 * "apiVersion": "v1", <br>
+	 * "kind": "Pod", <br>
+	 * "metadata": { <br>
+	 * "name": "busybox", <br>
+	 * "namespace": "default", <br>
+	 * "labels": { <br>
+	 * "test": "test" <br>
+	 * } <br>
+	 * } <br>
+	 * } <br>
+	 * 
+	 * @param json json object, which must meet the Kubernetes' specification
+	 * @return json updated object with json style
+	 * @throws Exception see HttpCaller.getResponse
+	 */
+	public JsonNode updateResource(String json) throws Exception {
+		return updateResource(new ObjectMapper().readTree(json));
+	}
+	
 	/**
 	 * update a Kubernetes resource using JSON
 	 * 
@@ -472,6 +544,17 @@ public class KubernetesClient {
 		return requester.getResponse(request);
 	}
 	
+	
+	/**
+	 * update a Kubernetes resource status using JSON
+	 * 
+	 * @param json json
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode updateResourceStatus(String json) throws Exception {
+		return updateResourceStatus(new ObjectMapper().readTree(json));
+	}
 	
 	/**
 	 * update a Kubernetes resource status using JSON

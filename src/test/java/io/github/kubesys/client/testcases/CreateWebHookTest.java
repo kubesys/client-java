@@ -20,6 +20,7 @@ import io.github.kubesys.client.KubernetesClient.KubeRule;
 public class CreateWebHookTest extends AbstractKubernetesClientTest {
 
 	
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient1(null);
 		Map<String, String> labels = new HashMap<>();
