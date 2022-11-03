@@ -1,5 +1,5 @@
-/**
- * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
+/*
+  Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
 package io.github.kubesys.client;
 
@@ -81,11 +81,6 @@ public class KubernetesClient {
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 
 	/**
-	 * all-namespaces
-	 */
-	public static final String ALL_NAMESPACES = "";
-
-	/**
 	 * it is used for sending requests to Kuberenetes kube-apiserver,
 	 * and then receiving response from it.
 	 */
@@ -97,12 +92,6 @@ public class KubernetesClient {
 	 * (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/)
 	 */
 	protected final KubernetesAnalyzer analyzer;
-
-	/******************************************************
-	 * 
-	 *  Using certificate
-	 * 
-	 ******************************************************/
 	
 	/**
 	 * for the Pods running on the leader nodes
