@@ -61,6 +61,8 @@ public final class KubernetesConstants {
 	 * Kubernetes json structure
 	 * 
 	 *************************************/
+
+	public static final String KUBE_CONFIG                    = "/etc/kubernetes/admin.conf";
 	
 	public static final String KUBE_KIND                    = "kind";
 	

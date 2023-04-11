@@ -99,7 +99,7 @@ public class KubernetesClient {
 	 * @throws Exception      exception
 	 */
 	public KubernetesClient() throws Exception {
-		this(new File("/etc/kubernetes/admin.conf"));
+		this(new File(KubernetesConstants.KUBE_CONFIG));
 	}
 
 	/**
@@ -1076,6 +1076,7 @@ public class KubernetesClient {
 		 */
 		protected CloseableHttpClient createDefaultHttpClient() throws Exception {
 
+			@SuppressWarnings("deprecation")
 			RequestConfig requestConfig = RequestConfig.custom()
 					.setConnectTimeout(Timeout.DISABLED)
 					.setConnectionKeepAlive(Timeout.DISABLED)
@@ -1335,6 +1336,7 @@ public class KubernetesClient {
 		 * @return json json
 		 * @throws Exception exception
 		 */
+		@SuppressWarnings("deprecation")
 		public synchronized JsonNode getResponse(HttpUriRequestBase req) throws Exception {
 			return parseResponse(httpClient.execute(req));
 		}
