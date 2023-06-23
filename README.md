@@ -44,7 +44,7 @@ Add this dependency to your project's POM:
 ```xml
 <dependency>
   <groupId>io.github.kubesys</groupId>
-  <artifactId>kubernetes-client</artifactId>
+  <artifactId>client-java</artifactId>
   <version>0.9.0</version> 
 </dependency>
 
