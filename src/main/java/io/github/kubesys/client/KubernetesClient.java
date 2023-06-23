@@ -84,21 +84,21 @@ public class KubernetesClient {
 	 * it is used for sending requests to Kuberenetes kube-apiserver,
 	 * and then receiving response from it.
 	 */
-	protected final KubeBaseRequest requester;
+	protected KubeBaseRequest requester;
 
 	/**
 	 * it is used for getting the metadata of all kinds in Kubernetes according
 	 * to [Kubernetes API pattern]
 	 * (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/)
 	 */
-	protected final KubernetesAnalyzer analyzer;
+	protected KubernetesAnalyzer analyzer;
 	
 	/**
 	 * for the Pods running on the leader nodes
 	 * 
 	 * @throws Exception      exception
 	 */
-	public KubernetesClient() throws Exception {
+	public KubernetesClient() {
 		this(new File(KubernetesConstants.KUBE_CONFIG));
 	}
 
@@ -108,7 +108,7 @@ public class KubernetesClient {
 	 * @param  file           such as $HOME$/.kube/conf
 	 * @throws Exception      exception
 	 */
-	public KubernetesClient(File file) throws Exception {
+	public KubernetesClient(File file) {
 		this(file, new KubernetesAnalyzer());
 	}
 
@@ -120,11 +120,15 @@ public class KubernetesClient {
 	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
 	 * @throws Exception exception
 	 */
-	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws Exception {
-		this.requester = new KubeBaseRequest(new YAMLMapper().readTree(file));
-		this.analyzer = analyzer.initIfNeed(this);
+	public KubernetesClient(File file, KubernetesAnalyzer analyzer)  {
+		try {
+			this.requester = new KubeBaseRequest(new YAMLMapper().readTree(file));
+			this.analyzer = analyzer.initIfNeed(this);
+		} catch (Exception e) {
+			m_logger.severe("无法连接到Kubernetes，退出");
+			System.exit(1);
+		}
 	}
-
 	
 	/**
 	 * invoke Kubernetes using token,see
@@ -135,7 +139,7 @@ public class KubernetesClient {
 	 *              ClusterRoleBinding
 	 * @throws Exception exception
 	 */
-	public KubernetesClient(String url, String token) throws Exception {
+	public KubernetesClient(String url, String token) {
 		this(url, token, new KubernetesAnalyzer());
 	}
 	
@@ -149,9 +153,14 @@ public class KubernetesClient {
 	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
 	 * @throws Exception exception
 	 */
-	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
-		this.requester = new KubeBaseRequest(url, token);
-		this.analyzer = analyzer.initIfNeed(this);
+	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) {
+		try {
+			this.requester = new KubeBaseRequest(url, token);
+			this.analyzer = analyzer.initIfNeed(this);
+		} catch (Exception e) {
+			m_logger.severe("无法连接到Kubernetes，退出");
+			System.exit(1);
+		}
 	}
 
 	 
