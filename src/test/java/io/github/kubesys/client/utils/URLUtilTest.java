@@ -3,9 +3,9 @@
  */
 package io.github.kubesys.client.utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -17,28 +17,28 @@ import org.junit.Test;
 public class URLUtilTest {
 
 	@Test
-	public void testNamespacedWithNullValue1() {
+	void testNamespacedWithNullValue1() {
 		assertEquals("", URLUtil.namespacePath(true, null));
 	}
 	
 	@Test
-	public void testNamespacedWithNullValue2() {
+	void testNamespacedWithNullValue2() {
 		assertEquals("", URLUtil.namespacePath(true, ""));
 	}
 	
 	
 	@Test
-	public void testNamespacedWithValue() {
+	void testNamespacedWithValue() {
 		assertEquals("namespaces/test", URLUtil.namespacePath(true, "test"));
 	}
 	
 	@Test
-	public void testClusterWithValue() {
+	void testClusterWithValue() {
 		assertEquals("", URLUtil.namespacePath(false, "test"));
 	}
 	
 	@Test
-	public void testClusterWithoutValue() {
+	void testClusterWithoutValue() {
 		assertEquals("", URLUtil.namespacePath(false, null));
 	}
 }

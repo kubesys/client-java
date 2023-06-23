@@ -46,6 +46,7 @@ public abstract class KubernetesWatcher implements Runnable {
 		BufferedReader br = null;
 		try {
 			CloseableHttpClient httpClient = client.copy().getHttpClient();
+			@SuppressWarnings("deprecation")
 			CloseableHttpResponse execute = httpClient.execute(request);
 			
 			br = new BufferedReader(new InputStreamReader(

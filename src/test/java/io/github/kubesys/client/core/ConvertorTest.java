@@ -3,11 +3,12 @@
  */
 package io.github.kubesys.client.core;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -86,48 +87,67 @@ public class ConvertorTest {
 		System.out.println(convertor.createUrl(podJson));
 	}
 	
-	@Test(expected = NullPointerException.class)
-	public void testNullCreateURL() {
-		convertor.createUrl(null);
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testInvalidJsonCreateURL() {
-		convertor.createUrl(new ObjectMapper().createObjectNode());
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testNullBindingURL() {
-		convertor.bindingUrl(null);
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testInvalidJsonBindingURL() {
-		convertor.bindingUrl(new ObjectMapper().createObjectNode());
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testNullDeleteKindURL() {
-		convertor.deleteUrl(null, "abc", "abc");
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testNullDeleteNameURL1() {
-		convertor.deleteUrl("abc", "abc", null);
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testNullDeleteNameURL2() {
-		convertor.deleteUrl("abc", "abc", "");
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testNullListKindURL() {
-		convertor.listUrl(null, "abc");
+	@Test
+	void testNullCreateURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.createUrl(null);
+        });
+		
 	}
 	
 	@Test
-	public void testValidCreateURL() {
+	void testInvalidJsonCreateURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.createUrl(new ObjectMapper().createObjectNode());
+        });
+	}
+	
+	@Test
+	void testNullBindingURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.bindingUrl(null);
+        });
+	}
+	
+	@Test
+	void testInvalidJsonBindingURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.bindingUrl(new ObjectMapper().createObjectNode());
+        });
+	}
+	
+	@Test
+	void testNullDeleteKindURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.deleteUrl(null, "abc", "abc");
+        });
+	}
+	
+	@Test
+	void testNullDeleteNameURL1() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.deleteUrl("abc", "abc", null);
+        });
+	}
+	
+	@Test
+	void testNullDeleteNameURL2() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.deleteUrl("abc", "abc", "");
+        });
+		
+	}
+	
+	@Test
+	void testNullListKindURL() {
+		assertThrows(NullPointerException.class, () -> {
+			convertor.listUrl(null, "abc");
+        });
+		
+	}
+	
+	@Test
+	void testValidCreateURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods", convertor.createUrl(podJson));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments", convertor.createUrl(deployJson));
 		assertEquals("https://39.100.71.73:6443/api/v1/nodes", convertor.createUrl(nodeJson));
@@ -135,7 +155,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidDeleteURL() {
+	void testValidDeleteURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.deleteUrl("Pod", "kube-system", "testPod"));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.deleteUrl("apps.Deployment", "kube-system", "testDeploy"));
 		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.deleteUrl("Node", "", "testNode"));
@@ -143,7 +163,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidUpdateURL() {
+	void testValidUpdateURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.updateUrl("Pod", "kube-system", "testPod"));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.updateUrl("apps.Deployment", "kube-system", "testDeploy"));
 		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.updateUrl("Node", "", "testNode"));
@@ -151,7 +171,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidGetURL() {
+	void testValidGetURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod", convertor.getUrl("Pod", "kube-system", "testPod"));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy", convertor.getUrl("apps.Deployment", "kube-system", "testDeploy"));
 		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode", convertor.getUrl("Node", "", "testNode"));
@@ -159,7 +179,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidListURL() {
+	void testValidListURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods", convertor.listUrl("Pod", "kube-system"));
 		assertEquals("https://39.100.71.73:6443/api/v1/pods", convertor.listUrl("Pod", ""));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments", convertor.listUrl("apps.Deployment", "kube-system"));
@@ -169,7 +189,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidUpdateStatusUrlURL() {
+	void testValidUpdateStatusUrlURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/namespaces/kube-system/pods/testPod/status", convertor.updateStatusUrl("Pod", "kube-system", "testPod"));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/namespaces/kube-system/deployments/testDeploy/status", convertor.updateStatusUrl("apps.Deployment", "kube-system", "testDeploy"));
 		assertEquals("https://39.100.71.73:6443/api/v1/nodes/testNode/status", convertor.updateStatusUrl("Node", "", "testNode"));
@@ -177,7 +197,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidWatchOneUrlURL() {
+	void testValidWatchOneUrlURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods/testPod?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("Pod", "kube-system", "testPod"));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments/testDeploy?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("apps.Deployment", "kube-system", "testDeploy"));
 		assertEquals("https://39.100.71.73:6443/api/v1/watch/nodes/testNode?watch=true&timeoutSeconds=315360000", convertor.watchOneUrl("Node", "", "testNode"));
@@ -185,7 +205,7 @@ public class ConvertorTest {
 	}
 	
 	@Test
-	public void testValidWatchAllUrlURL() {
+	void testValidWatchAllUrlURL() {
 		assertEquals("https://39.100.71.73:6443/api/v1/watch/namespaces/kube-system/pods?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("Pod", "kube-system"));
 		assertEquals("https://39.100.71.73:6443/api/v1/watch/pods?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("Pod", ""));
 		assertEquals("https://39.100.71.73:6443/apis/apps/v1/watch/namespaces/kube-system/deployments?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("apps.Deployment", "kube-system"));
