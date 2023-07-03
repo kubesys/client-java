@@ -11,7 +11,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.KubernetesClient;
-import io.github.kubesys.client.KubernetesClient.KubeBaseRequest;
+import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
 import io.github.kubesys.client.KubernetesConstants;
 import io.github.kubesys.client.utils.ReqUtil;
 
@@ -34,7 +34,7 @@ public class KubernetesExtractor {
 	/**
 	 * httpCaller
 	 */
-	protected final KubeBaseRequest caller;
+	protected final BaseRequestConfig caller;
 	
 	/**
 	 * kubeRegistry
@@ -60,7 +60,7 @@ public class KubernetesExtractor {
 	
 	public void start() throws Exception {
 
-		HttpGet request = ReqUtil.get(caller.getToken(), caller.getMasterUrl());
+		HttpGet request = ReqUtil.get(caller, caller.getMasterUrl());
 		
 		JsonNode resp = caller.getResponse(request);
 		

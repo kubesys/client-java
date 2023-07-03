@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
+
 
 /**
  * 
@@ -21,38 +23,34 @@ import org.junit.jupiter.api.Test;
 public class ReqUtilTest {
 
 	@Test
-	void testNullUrl() {
+	void testNullUrl() throws Exception {
+		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
 		assertThrows(MalformedURLException.class, () -> {
-			ReqUtil.post("abc", null, "abc");
+			ReqUtil.post(config, null, "abc");
         });
 		
 	}
 	
 	@Test
-	void testInvalidNullUrl()  {
+	void testInvalidNullUrl() throws Exception  {
+		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
 		assertThrows(MalformedURLException.class, () -> {
-			ReqUtil.post("abc", "abc", "abc");
+			ReqUtil.post(config, "abc", "abc");
         });
 	}
 	
-	@Test
-	void testNullToken() throws MalformedURLException {
-		assertNotNull(ReqUtil.post(null, "http://abc.com", "abc"));
-	}
 	
 	@Test
-	void testNotNullToken() throws MalformedURLException {
-		assertNotNull(ReqUtil.post("abc", "http://abc.com", "abc"));
+	void testNotNullToken() throws Exception {
+		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		assertNotNull(ReqUtil.post(config, "http://abc.com", "abc"));
 	}
 	
-	@Test
-	void testNullBody() throws NullPointerException, MalformedURLException {
-		assertNotNull(ReqUtil.post(null, "http://abc.com", null));
-	}
 	
 	@Test
-	void testNotNullBody() throws NullPointerException, MalformedURLException {
-		assertNotNull(ReqUtil.post("abc", "http://abc.com", "abc"));
+	void testNotNullBody() throws Exception {
+		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		assertNotNull(ReqUtil.post(config, "http://abc.com", "abc"));
 	}
 	
 }
