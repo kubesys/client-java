@@ -45,7 +45,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>client-java</artifactId>
-  <version>0.9.0</version> 
+  <version>0.9.3</version> 
 </dependency>
 
 <repositories>
