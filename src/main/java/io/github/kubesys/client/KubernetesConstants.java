@@ -4,7 +4,7 @@
 package io.github.kubesys.client;
 
 /**
- * @author wuheng09@wuheng@iscas.ac.cn
+ * @author wuheng@iscas.ac.cn
  *
  */
 public final class KubernetesConstants {

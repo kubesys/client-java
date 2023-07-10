@@ -21,7 +21,7 @@ public class GetAllKindDesc extends AbstractKubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		System.out.println(Base64.getEncoder().encodeToString("admin".getBytes()));
 		System.out.println(Base64.getEncoder().encodeToString("admin:admin".getBytes()));
-		KubernetesClient client = createClient2(null);
+		KubernetesClient client = createClient1(null);
 		System.out.println(client.getKinds().toPrettyString());
 		System.out.println(client.getKindDesc().toPrettyString());
 	}
