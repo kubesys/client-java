@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -66,8 +67,10 @@ import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * This class is used for creating a connection between users' application and Kubernetes server.
- * It provides an easy-to-use way to Create, Update, Delete, Get, List and Watch all Kubernetes resources.
+ * Kubernetes的客户端，根据https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
+ * URL规则生产URL
+ * 
+ * 对于JSON参数，可参见https://kubernetes.io/docs/reference/kubernetes-api/
  * 
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0
@@ -676,6 +679,7 @@ public class KubernetesClient {
 				+ (namespace == null || "".equals(namespace) ? "all-namespaces" : namespace);
 		return watchResources(watchName, kind, namespace, watcher);
 	}
+	
 
 	/**
 	 * watch a Kubernetes resources using kind, namespace, and WebSocketListener
@@ -691,6 +695,23 @@ public class KubernetesClient {
 			throws Exception {
 		watcher.setRequest(ReqUtil.get(requester, analyzer.getConvertor().watchAllUrl(kind, namespace)));
 		Thread thread = new Thread(watcher, watchName);
+		thread.start();
+		return thread;
+	}
+	
+	/**
+	 * watch a Kubernetes resources using kind, namespace, and WebSocketListener
+	 * 
+	 * @param watcher   watcher
+	 * @return thread thread
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public Thread watchPodsOnLocalNode(KubernetesWatcher watcher)
+			throws Exception {
+		String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
+		watcher.setRequest(ReqUtil.get(requester, analyzer.getConvertor()
+					.watchAllUrlWithFieldSelector("Pod", "", "spec.nodeName=" + hostname)));
+		Thread thread = new Thread(watcher, "watch-pods-by-hostname");
 		thread.start();
 		return thread;
 	}

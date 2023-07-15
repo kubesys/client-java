@@ -162,6 +162,19 @@ public class KubernetesConvertor {
 				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE);
 	}
 	
+	/**
+	 * @param kind kind
+	 * @param ns   ns
+	 * @return Url
+	 * @throws NullPointerException exception
+	 */
+	public String watchAllUrlWithFieldSelector(String kind, String ns, String fieldSelector) throws NullPointerException {
+		String fullKind = fullkind(kind);
+		return URLUtil.join(baseUrl(fullKind, ns, true),
+				KubernetesConstants.HTTP_QUERY_WATCHER_ENABLE)
+					+ "&fieldSelector=" + fieldSelector;
+	}
+	
 	
 	/*******************************************
 	 * 

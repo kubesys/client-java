@@ -214,4 +214,7 @@ public class ConvertorTest {
 		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("networking.k8s.io.IngressClass", ""));
 	}
 	
+	public static void main() {
+		
+	}
 }
