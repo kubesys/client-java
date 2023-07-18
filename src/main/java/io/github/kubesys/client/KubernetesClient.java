@@ -84,6 +84,11 @@ public class KubernetesClient {
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 
 	/**
+	 * exceptions
+	 */
+	public static final String KUBE_CONNECTION_ERROR = "unable to connect to Kubernetes, ";
+	
+	/**
 	 * it is used for sending requests to Kuberenetes kube-apiserver,
 	 * and then receiving response from it.
 	 */
@@ -125,7 +130,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(new YAMLMapper().readTree(file));
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("unable to connect to Kubernetes, " + e);
+			m_logger.severe(KUBE_CONNECTION_ERROR + e);
 			System.exit(1);
 		}
 	}
@@ -168,7 +173,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(url, token);
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("unable to connect to Kubernetes, " + e);
+			m_logger.severe(KUBE_CONNECTION_ERROR + e);
 			System.exit(1);
 		}
 	}
@@ -187,7 +192,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(url, username, password);
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("unable to connect to Kubernetes, " + e);
+			m_logger.severe(KUBE_CONNECTION_ERROR + e);
 			System.exit(1);
 		}
 	}
