@@ -125,7 +125,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(new YAMLMapper().readTree(file));
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("无法连接到Kubernetes，退出");
+			m_logger.severe("unable to connect to Kubernetes, " + e);
 			System.exit(1);
 		}
 	}
@@ -168,7 +168,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(url, token);
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("无法连接到Kubernetes，退出");
+			m_logger.severe("unable to connect to Kubernetes, " + e);
 			System.exit(1);
 		}
 	}
@@ -187,7 +187,7 @@ public class KubernetesClient {
 			this.requester = new BaseRequestConfig(url, username, password);
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception e) {
-			m_logger.severe("无法连接到Kubernetes，退出" + e);
+			m_logger.severe("unable to connect to Kubernetes, " + e);
 			System.exit(1);
 		}
 	}

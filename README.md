@@ -1,6 +1,6 @@
 # Kubernetes-client-java
 
-We expect to provide a Java client (Please using JDK 8):
+We expect to provide a Java client (Please using JDK 17):
 
 - **Flexibility**. It can support all Kubernetes-based systems with minimized extra development, such as [Openshift](https://www.redhat.com/en/technologies/cloud-computing/openshift), [istio](https://istio.io/), etc.
 - **Usability**. Developers just need to learn to write json/yaml(kubernetes native style) from [Kubernetes documentation](https://kubernetes.io/docs/home/).
@@ -45,7 +45,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>client-java</artifactId>
-  <version>0.9.3</version> 
+  <version>0.9.5</version> 
 </dependency>
 
 <repositories>

@@ -22,7 +22,7 @@ public class KubernetesWriter {
 	/**
 	 * m_logger
 	 */
-	public final static Logger m_logger = Logger.getLogger(KubernetesWriter.class.getName());
+	public static final Logger m_logger = Logger.getLogger(KubernetesWriter.class.getName());
 	
 	/**
 	 * @param path           path
