@@ -59,6 +59,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import io.github.kubesys.client.core.KubernetesRuleBase;
@@ -210,6 +211,16 @@ public class KubernetesClient {
 	 **********************************************************/
 
 	/**
+	 * @param yaml     yaml
+	 * @return         String
+	 * @throws Exception Exception
+	 */
+	public String createResourceUsingYaml(String yaml) throws Exception {
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		JsonNode jsonNode = mapper.readTree(yaml);
+		return new YAMLMapper().writeValueAsString(createResource(jsonNode));
+	}
+	/**
 	 * create a Kubernetes resource using JSON. <br>
 	 * 
 	 * for example, a json can be <br>
@@ -285,6 +296,17 @@ public class KubernetesClient {
 	}
 	
 	/**
+	 * @param yaml     yaml
+	 * @return         string 
+	 * @throws Exception Exception
+	 */
+	public String deleteResourceUsingYaml(String yaml) throws Exception {
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		JsonNode jsonNode = mapper.readTree(yaml);
+		return new YAMLMapper().writeValueAsString(deleteResource(jsonNode));
+	}
+	
+	/**
 	 * delete a Kubernetes resource using JSON <br>
 	 * 
 	 * for example, a json can be <br>
@@ -341,6 +363,20 @@ public class KubernetesClient {
 		HttpDelete request = ReqUtil.delete(requester, uri);
 		return requester.getResponse(request);
 	}
+	
+	/**
+	 * delete a Kubernetes resource using kind, namespace and name see
+	 * https://kubernetes.io/docs/reference/kubectl/overview/
+	 * 
+	 * @param kind      kind or fullKind
+	 * @param namespace resource namespace, and "" means all-namespaces
+	 * @param name      resource name
+	 * @return json the deleted object with json style
+	 * @throws Exception see HttpCaller.getResponse
+	 */
+	public String deleteResourceUsingYaml(String kind, String namespace, String name) throws Exception {
+		return new YAMLMapper().writeValueAsString(deleteResource(kind, namespace, name));
+	}
 
 	/**
 	 * update a Kubernetes resource using JSON
@@ -364,6 +400,17 @@ public class KubernetesClient {
 	 */
 	public JsonNode updateResource(String json) throws Exception {
 		return updateResource(new ObjectMapper().readTree(json));
+	}
+	
+	/**
+	 * @param yaml     yaml
+	 * @return         string
+	 * @throws Exception Exception
+	 */
+	public String updateResourceUsingYaml(String yaml) throws Exception {
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		JsonNode jsonNode = mapper.readTree(yaml);
+		return new YAMLMapper().writeValueAsString(updateResource(jsonNode));
 	}
 	
 	/**
@@ -418,6 +465,18 @@ public class KubernetesClient {
 	 * get a Kubernetes resource using kind, namespace and name
 	 * 
 	 * @param kind      kind or fullkind
+	 * @param name      name
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String getResourceUsingYaml(String kind, String name) throws Exception {
+		return new YAMLMapper().writeValueAsString(getResource(kind, name));
+	}
+	
+	/**
+	 * get a Kubernetes resource using kind, namespace and name
+	 * 
+	 * @param kind      kind or fullkind
 	 * @param namespace namespace, if this kind unsupports namespace, it is ""
 	 * @param name      name
 	 * @return json json
@@ -428,6 +487,19 @@ public class KubernetesClient {
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 		HttpGet request = ReqUtil.get(requester, uri);
 		return requester.getResponse(request);
+	}
+	
+	/**
+	 * get a Kubernetes resource using kind, namespace and name
+	 * 
+	 * @param kind      kind or fullkind
+	 * @param namespace namespace, if this kind unsupports namespace, it is ""
+	 * @param name      name
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String getResourceUsingYaml(String kind, String namespace, String name) throws Exception {
+		return new YAMLMapper().writeValueAsString(getResource(kind, namespace, name));
 	}
 
 	/**
@@ -466,12 +538,37 @@ public class KubernetesClient {
 	 * list all Kubernetes resources using kind
 	 * 
 	 * @param kind kind
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesUsingYamml(String kind) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null));
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
 	 * @param fields fields
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode listResourcesWithField(String kind, Map<String, String> fields) throws Exception {
 		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, URLUtil.fromMap(fields), null, 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @param fields fields
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesWithFieldUsingYaml(String kind, Map<String, String> fields) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, KubernetesConstants.VALUE_ALL_NAMESPACES, URLUtil.fromMap(fields), null, 0, null));
 	}
 	
 	/**
@@ -486,6 +583,18 @@ public class KubernetesClient {
 		return listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, URLUtil.fromMap(labels), 0, null);
 	}
 
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @param labels labels
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesWithLabelUsingYaml(String kind, Map<String, String> labels) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, URLUtil.fromMap(labels), 0, null));
+	}
 	/**
 	 * list all Kubernetes resources using kind and namespace
 	 * 
@@ -503,11 +612,38 @@ public class KubernetesClient {
 	 * 
 	 * @param kind kind
 	 * @param namespace namespace
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesUsingYaml(String kind, String namespace) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, namespace, null, null, 0, null));
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @param namespace namespace
 	 * @return fields fields
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
 	public JsonNode listResourcesWithField(String kind, String namespace,  Map<String, String> fields) throws Exception {
 		return listResources(kind, namespace, URLUtil.fromMap(fields), null, 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @param namespace namespace
+	 * @param fields fields
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesWithFieldUsingYaml(String kind, String namespace, Map<String, String> fields) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, namespace, URLUtil.fromMap(fields), null, 0, null));
 	}
 	
 	/**
@@ -520,6 +656,20 @@ public class KubernetesClient {
 	 */
 	public JsonNode listResourcesWithLabel(String kind, String namespace, Map<String, String> labels) throws Exception {
 		return listResources(kind, namespace, null, URLUtil.fromMap(labels), 0, null);
+	}
+	
+	/**
+	 * list all Kubernetes resources using kind
+	 * 
+	 * @param kind kind
+	 * @param namespace namespace
+	 * @param labels labels
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesWithLabelUsingYaml(String kind, String namespace, Map<String, String> labels) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, namespace, null, URLUtil.fromMap(labels), 0, null));
 	}
 
 	/**
@@ -579,6 +729,24 @@ public class KubernetesClient {
 		return requester.getResponse(request);
 	}
 	
+	/**
+	 * list all Kubernetes resources using kind, namespace, fieldSelector,
+	 * labelSelector, limit and nextId
+	 * 
+	 * @param kind          kind
+	 * @param namespace     namespace
+	 * @param fieldSelector fieldSelector
+	 * @param labelSelector labelSelector
+	 * @param limit         limit
+	 * @param nextId        nextId
+	 * @return json json
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public String listResourcesUsingYaml(String kind, String namespace, String fieldSelector, 
+						String labelSelector, int limit, String nextId) throws Exception {
+		return new YAMLMapper().writeValueAsString(listResources(
+				kind, namespace, fieldSelector, labelSelector, limit, nextId));
+	}
 	
 	/**
 	 * update a Kubernetes resource status using JSON
