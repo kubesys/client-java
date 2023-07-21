@@ -19,6 +19,26 @@ import io.github.kubesys.client.KubernetesWatcher;
  */
 public class LifecycleTest extends AbstractKubernetesClientTest {
 
+	static String CreateYaml = "apiVersion: v1\r\n"
+			+ "kind: Pod\r\n"
+			+ "metadata:\r\n"
+			+ "  name: busybox\r\n"
+			+ "  namespace: default\r\n"
+			+ "  labels:\r\n"
+			+ "    test: test\r\n"
+			+ "spec:\r\n"
+			+ "  containers:\r\n"
+			+ "    - image: busybox\r\n"
+			+ "      env:\r\n"
+			+ "        - name: abc\r\n"
+			+ "          value: abc\r\n"
+			+ "      command:\r\n"
+			+ "        - sleep\r\n"
+			+ "        - '3600'\r\n"
+			+ "      imagePullPolicy: IfNotPresent\r\n"
+			+ "      name: busybox\r\n"
+			+ "  restartPolicy: Always";
+	
 	static String CreateJSON = "{\r\n"
 			+ "	\"apiVersion\": \"v1\",\r\n"
 			+ "	\"kind\": \"Pod\",\r\n"
@@ -49,14 +69,15 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
+//		System.out.println(CreateJSON);
 		KubernetesClient client = createClient1(null);
 
-//		create(client);
+		create(client);
 //		updateStatus(client);
 //		update(client);
 //		get(client);
-		list(client);
-		watch(client);
+//		list(client);
+//		watch(client);
 //		delete(client);
 	}
 
@@ -125,7 +146,8 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 
 
 	protected static void create(KubernetesClient client) throws Exception {
-		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
+//		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
+		System.out.println(client.createResourceUsingYaml(CreateYaml));
 	}
 	
 	protected static void create(KubernetesClient client, JsonNode json) throws Exception {
