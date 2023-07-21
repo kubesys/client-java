@@ -22,14 +22,13 @@ public class ListAllKindsTest extends AbstractKubernetesClientTest {
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient1(null);
 		// Just kind
-		System.out.println(client.getKinds().toPrettyString());
-		// fullKind = group + kind
-		System.out.println(client.getFullKinds().toPrettyString());
+//		System.out.println(client.getKinds().toPrettyString());
+//		// fullKind = group + kind
+//		System.out.println(client.getFullKinds().toPrettyString());
 		// all supported operations for a kind
 		System.out.println(client.getKindDesc().toPrettyString());
 		// size
-		System.out.println(client.getFullKinds().size());
-		
+//		System.out.println(client.getFullKinds().size());
 	}
 
 }
