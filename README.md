@@ -45,7 +45,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>client-java</artifactId>
-  <version>0.9.5</version> 
+  <version>1.0.0</version> 
 </dependency>
 
 <repositories>
@@ -254,10 +254,7 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 2.x: product ready
-  - 2.0: support default value when Kubernetes has many groups for a kind
-  - 2.1: support webhook
-  - 2.2: support ext-apiserver
+- 1.0.0: product ready
 
 [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
 

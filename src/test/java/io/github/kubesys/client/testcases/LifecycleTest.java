@@ -82,7 +82,7 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	}
 
 
-	private static void watch(KubernetesClient client) throws Exception {
+	static void watch(KubernetesClient client) throws Exception {
 		client.watchResources("Namespace", new KubernetesWatcher(client) {
 			
 			@Override
