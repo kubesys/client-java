@@ -29,7 +29,8 @@ public class KubeUtil {
 	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
 	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
 	 * 
-	 * @param pod  pod json
+	 * @param podName  name
+	 * @param podNamespace namespace
 	 * @param hostName hostname
 	 * @return json json from Kubernetes
 	 */
