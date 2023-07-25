@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.addon;
+package io.github.kubesys.client.addons;
 
 import java.io.File;
 import java.io.FileWriter;

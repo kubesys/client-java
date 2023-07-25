@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.kubesys.client.AbstractKubernetesClientTest;
-import io.github.kubesys.client.addon.KubernetesWriter;
+import io.github.kubesys.client.addons.KubernetesWriter;
 
 
 /**

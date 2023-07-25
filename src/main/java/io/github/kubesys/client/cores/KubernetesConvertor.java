@@ -1,12 +1,13 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.core;
+package io.github.kubesys.client.cores;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.KubernetesConstants;
+import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
 import io.github.kubesys.client.utils.URLUtil;
 
 
@@ -49,10 +50,14 @@ public class KubernetesConvertor {
 	 */
 	protected String baseUrl(String fullKind, String namespace, boolean isWatch) {
 
-		return URLUtil.join(ruleBase.getApiPrefix(fullKind),
+		try {
+			return URLUtil.join(ruleBase.getApiPrefix(fullKind),
 							isWatch ? KubernetesConstants.KUBEAPI_WATCHER_PATTERN : "",
 							URLUtil.namespacePath(ruleBase.isNamespaced(fullKind), namespace),
 							ruleBase.getName(fullKind));
+		} catch (Exception ex) {
+			throw new KubernetesResourceNotFoundException(fullKind + " is not registered" );
+		}
 	}
 	
 	/**

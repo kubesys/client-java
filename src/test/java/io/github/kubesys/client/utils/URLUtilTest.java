@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author wuheng@iscas.ac.cn
  * @since  2.0.5 
  **/
-public class URLUtilTest {
+class URLUtilTest {
 
 	@Test
 	void testNamespacedWithNullValue1() {

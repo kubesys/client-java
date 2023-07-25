@@ -20,7 +20,7 @@ import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0 
  **/
-public class ReqUtilTest {
+class ReqUtilTest {
 
 	@Test
 	void testNullUrl() throws Exception {

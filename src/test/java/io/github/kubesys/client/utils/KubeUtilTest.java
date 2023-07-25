@@ -4,13 +4,9 @@
 package io.github.kubesys.client.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.net.MalformedURLException;
 
 import org.junit.jupiter.api.Test;
-
-import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
 
 /**
  * @author  wuheng@iscas.ac.cn
@@ -20,7 +16,7 @@ import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
  * it is used for generating Pods and related resources
  * 
  **/
-public class KubeUtilTest {
+class KubeUtilTest {
 
 	static String EXPECTED_BINDING = "{\r\n"
 			+ "  \"apiVersion\" : \"v1\",\r\n"

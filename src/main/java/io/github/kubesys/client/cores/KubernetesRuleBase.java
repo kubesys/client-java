@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.core;
+package io.github.kubesys.client.cores;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.github.kubesys.client.core.KubernetesRuleBase;
+import io.github.kubesys.client.cores.KubernetesRuleBase;
 
 /**
  * @author wuheng@iscas.ac.cn

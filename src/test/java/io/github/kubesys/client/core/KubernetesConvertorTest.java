@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.github.kubesys.client.cores.KubernetesConvertor;
+import io.github.kubesys.client.cores.KubernetesRuleBase;
+
 /**
  * @author wuheng@iscas.ac.cn
  * @since  2.0.0
@@ -20,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * get real Url from <code>KubernetesRuleBase</code>
  * 
  */
-public class ConvertorTest {
+public class KubernetesConvertorTest {
 	
 	protected final static KubernetesRuleBase ruleBase  = new KubernetesRuleBase();
 	

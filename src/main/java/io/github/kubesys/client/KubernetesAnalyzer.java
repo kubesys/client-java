@@ -3,10 +3,10 @@
  */
 package io.github.kubesys.client;
 
-import io.github.kubesys.client.core.KubernetesConvertor;
-import io.github.kubesys.client.core.KubernetesExtractor;
-import io.github.kubesys.client.core.KubernetesRegistry;
-import io.github.kubesys.client.core.KubernetesRuleBase;
+import io.github.kubesys.client.cores.KubernetesConvertor;
+import io.github.kubesys.client.cores.KubernetesExtractor;
+import io.github.kubesys.client.cores.KubernetesRegistry;
+import io.github.kubesys.client.cores.KubernetesRuleBase;
 
 /**
  * KubernetesAnalyzer is used for learning all Kubernetes' resources.
