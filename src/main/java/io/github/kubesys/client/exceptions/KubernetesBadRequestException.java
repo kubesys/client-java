@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 400, exception = "请求无效，服务器无法理解请求")
+@Catch(code = 400, description = "请求无效，服务器无法理解请求")
 public class KubernetesBadRequestException extends RuntimeException {
 
 	/**

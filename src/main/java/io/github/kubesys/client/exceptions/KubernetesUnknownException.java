@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 402, exception = "错误的Kubernetes地址")
+@Catch(code = 402, description = "错误的Kubernetes地址")
 public class KubernetesUnknownException extends RuntimeException {
 
 	/**

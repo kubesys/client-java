@@ -16,17 +16,16 @@ import java.lang.annotation.Target;
  * @version 1.0.0
  *
  */
-@Target({ElementType.METHOD, ElementType.TYPE}) 
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR}) 
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Api {
 
-	String desc() default "";
+	String description() default "";
 	
-	String author() default "";
+	String[] author() default {};
 	
 	String date() default "";
 
-	String exceptions() default "";
-	
+	Class<?>[] exceptions() default {};
 }

@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 403, exception = "请求被拒绝，客户端没有访问资源的权限")
+@Catch(code = 403, description = "请求被拒绝，客户端没有访问资源的权限")
 public class KubernetesForbiddenAccessException extends RuntimeException {
 
 	/**

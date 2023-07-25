@@ -23,5 +23,5 @@ public @interface Catch {
 
 	int code() default -1;
 	
-	String exception() default "";
+	String description() default "";
 }

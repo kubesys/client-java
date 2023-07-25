@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 409, exception = "请求冲突，通常用于表示资源的当前状态与请求的条件不匹配")
+@Catch(code = 409, description = "请求冲突，通常用于表示资源的当前状态与请求的条件不匹配")
 public class KubernetesConflictResourceException extends RuntimeException {
 
 	/**

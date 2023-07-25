@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 401, exception = "未授权，需要进行身份验证或令牌无效")
+@Catch(code = 401, description = "未授权，需要进行身份验证或令牌无效")
 public class KubernetesUnauthorizedTokenException extends RuntimeException {
 
 	/**

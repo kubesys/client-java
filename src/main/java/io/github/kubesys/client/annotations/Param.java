@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Param {
 
-	String desc() default "";
+	String description() default "";
 	
 	String regexp() default "";
 	

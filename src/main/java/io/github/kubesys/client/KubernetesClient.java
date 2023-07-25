@@ -229,7 +229,7 @@ public class KubernetesClient {
 	 * @return String
 	 * @throws Exception Exception
 	 */
-	@Api(desc = "通过YAML文件创建Kubernetes资源")
+	@Api(description = "通过YAML文件创建Kubernetes资源", date = "2023/07/25", exceptions = {})
 	public String createResourceUsingYaml(String yaml) throws Exception {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		JsonNode jsonNode = mapper.readTree(yaml);
