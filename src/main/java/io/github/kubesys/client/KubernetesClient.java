@@ -889,38 +889,6 @@ public class KubernetesClient {
 		return thread;
 	}
 
-	/**
-	 * for Scheduler
-	 * 
-	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
-	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
-	 * 
-	 * @param pod  pod json
-	 * @param host hostname
-	 * @return json json from Kubernetes
-	 * @throws Exception Kubernetes cannot parsing this jsonStr
-	 */
-	public JsonNode bindingResource(JsonNode pod, String host) throws Exception {
-
-		ObjectNode binding = new ObjectMapper().createObjectNode();
-		binding.put(KubernetesConstants.KUBE_APIVERSION, "v1");
-		binding.put(KubernetesConstants.KUBE_KIND, "Binding");
-
-		ObjectNode metadata = new ObjectMapper().createObjectNode();
-		metadata.put(KubernetesConstants.KUBE_METADATA_NAME,
-				pod.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAME).asText());
-		metadata.put(KubernetesConstants.KUBE_METADATA_NAMESPACE,
-				pod.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAMESPACE).asText());
-		binding.set(KubernetesConstants.KUBE_METADATA, metadata);
-
-		ObjectNode target = new ObjectMapper().createObjectNode();
-		target.put(KubernetesConstants.KUBE_APIVERSION, "v1");
-		target.put(KubernetesConstants.KUBE_KIND, "Node");
-		target.put(KubernetesConstants.KUBE_METADATA_NAME, host);
-		binding.set("target", target);
-
-		return createResource(binding);
-	}
 
 	/**********************************************************
 	 * 

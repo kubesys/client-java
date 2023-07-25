@@ -260,3 +260,6 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Other
 - [kubectl command](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+- [webhook](https://medium.com/ovni/writing-a-very-basic-kubernetes-mutating-admission-webhook-398dbbcb63ec)
+  - [example](https://github.com/alex-leonhardt/k8s-mutate-webhook/blob/master/deploy/webhook.yaml)
+  - [cert](https://github.com/alex-leonhardt/k8s-mutate-webhook/blob/master/ssl/ssl.sh)

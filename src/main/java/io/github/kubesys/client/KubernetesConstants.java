@@ -63,15 +63,17 @@ public final class KubernetesConstants {
 	 * 
 	 *************************************/
 
-	public static final String KUBE_CONFIG                    = "/etc/kubernetes/admin.conf";
+	public static final String KUBE_CONFIG                  = "/etc/kubernetes/admin.conf";
 	
-	public static final String KUBE_KIND                    = "kind";
+	public static final String NODE_KIND                    = "Node";
 	
 	public static final String KUBE_METADATA                = "metadata";
 	
 	public static final String KUBE_METADATA_NAMESPACE      = "namespace";
 	
 	public static final String KUBE_METADATA_NAME           = "name";
+	
+	public static final String KUBE_TARGET                  = "target";
 	
 	public static final String KUBE_STATUS                  = "status";
 
@@ -104,6 +106,11 @@ public final class KubernetesConstants {
 	public static final String KUBE_OBJECT                  = "object";
 	
 	
+	public static final String DEFAULT_APIVERSION           = "v1";
+	
+	public static final String KUBE_KIND                    = "kind";
+	
+	public static final String BINDING_KIND                 = "Binding";
 	
 	/*************************************
 	 * 
