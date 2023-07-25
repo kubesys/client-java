@@ -66,6 +66,11 @@ Add this dependency to your project's POM:
 - [Work with other SDKs](#work-with-other-sdks)
     
 
+### Build from source
+
+```
+docker run -it --net host --rm -v /root/.m2:/root/.m2 -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.8.5-openjdk-17-slim mvn clean install -Dmaven.test.skip
+```
 
 ### Creating a client
 
