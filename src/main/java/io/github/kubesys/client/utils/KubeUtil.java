@@ -38,7 +38,7 @@ public class KubeUtil {
 
 		ObjectNode binding = new ObjectMapper().createObjectNode();
 		binding.put(KubernetesConstants.KUBE_APIVERSION, KubernetesConstants.DEFAULT_APIVERSION);
-		binding.put(KubernetesConstants.KUBE_KIND, KubernetesConstants.BINDING_KIND);
+		binding.put(KubernetesConstants.KUBE_KIND, KubernetesConstants.KUBD_KIND_BINDING);
 
 		ObjectNode metadata = new ObjectMapper().createObjectNode();
 		metadata.put(KubernetesConstants.KUBE_METADATA_NAME, podName);
@@ -52,6 +52,68 @@ public class KubeUtil {
 		binding.set(KubernetesConstants.KUBE_TARGET, target);
 
 		return binding;
+	}
+	
+	/**
+	 * json必须符合Kubernetes的CRD规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param crd Kubernetes的CRD
+	 * @return 其中一个APIVERSION
+	 */
+	public static String getCrdApiversion(JsonNode crd) {
+		String group = crd.get(KubernetesConstants.KUBE_SPEC)
+						.get(KubernetesConstants.KUBE_SPEC_GROUP)
+						.asText();
+		String version = crd.get(KubernetesConstants.KUBE_SPEC)
+						.get(KubernetesConstants.KUBE_SPEC_VERSIONS)
+						.get(0)
+						.get(KubernetesConstants.KUBE_SPEC_VERSIONS_NAME)
+						.asText();
+		
+		return group + KubernetesConstants.KUBE_VALUE_SPLIT + version;
+	}
+	
+	/**
+	 * json必须符合Kubernetes的CRD规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param crd Kubernetes的CRD
+	 * @return kind
+	 */
+	public static String getCrdKind(JsonNode crd) {
+		return crd.get(KubernetesConstants.KUBE_SPEC)
+						.get(KubernetesConstants.KUBE_SPEC_NAMES)
+						.get(KubernetesConstants.KUBE_SPEC_NAMES_KIND)
+						.asText();
+	}
+	
+	/**
+	 * json必须符合Kubernetes的CRD规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param crd Kubernetes的CRD
+	 * @return kind
+	 */
+	public static String getCrdPlural(JsonNode crd) {
+		return crd.get(KubernetesConstants.KUBE_SPEC)
+						.get(KubernetesConstants.KUBE_SPEC_NAMES)
+						.get(KubernetesConstants.KUBE_SPEC_NAMES_PLURAL)
+						.asText();
+	}
+	
+	/**
+	 * json必须符合Kubernetes规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param json Kubernetes对应kind的apiVersion
+	 * @return fullkind
+	 */
+	public static String getFullkind(JsonNode json) {
+		String group = getGroup(json);
+		String kind  = getKind(json);
+		return group.length() == 0 ? kind : group + 
+				KubernetesConstants.KUBE_VALUE_SPLIT + kind;
 	}
 	
 	/**
@@ -78,6 +140,19 @@ public class KubeUtil {
 	 */
 	public static String getName(JsonNode json) {
 		return json.get(KubernetesConstants.KUBE_METADATA).get(KubernetesConstants.KUBE_METADATA_NAME).asText();
+	}
+	
+	
+	/**
+	 * 不考虑json为空或者不符合Kuberneres资源定义的的情况
+	 * 否则抛出异常
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param json   json
+	 * @return      获得kubernetes的kind
+	 */
+	public static String getKind(JsonNode json) {
+		return json.get(KubernetesConstants.KUBE_KIND).asText();
 	}
 	
 	/**

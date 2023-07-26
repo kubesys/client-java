@@ -109,7 +109,18 @@ public final class KubernetesConstants {
 	
 	public static final String KUBE_KIND                    = "kind";
 	
-	public static final String BINDING_KIND                 = "Binding";
+	
+	/*************************************
+	 * 
+	 * Kubernetes json structure
+	 * 
+	 *************************************/
+	
+	public static final String KUBD_KIND_BINDING                       = "Binding";
+	
+	public static final String KUBD_FULLKIND_CUSTOMRESOURCEDEFINITION  = "apiextensions.k8s.io.CustomResourceDefinition";
+	
+	public static final String KUBE_DEFAULT_KIND_VERBS                 = "[\"create\", \"delete\", \"deletecollection\", \"get\", \"list\", \"patch\", \"update\", \"watch\"]";
 	
 	public static final String KUBE_APIVERSION_SPLIT        = "/";
 	
