@@ -105,12 +105,38 @@ public final class KubernetesConstants {
 	
 	public static final String KUBE_OBJECT                  = "object";
 	
-	
 	public static final String DEFAULT_APIVERSION           = "v1";
 	
 	public static final String KUBE_KIND                    = "kind";
 	
 	public static final String BINDING_KIND                 = "Binding";
+	
+	public static final String KUBE_APIVERSION_SPLIT        = "/";
+	
+	/**
+	 * 取值为default
+	 */
+	public static final String KUBE_DEFAULT_NAMESPACE        = "default";
+
+	/**
+	 * 取值为""
+	 */
+	public static final String KUBE_DEFAULT_GROUP            = "";
+	
+	/**
+	 * 取值为.
+	 */
+	public static final String KUBE_VALUE_SPLIT              = ".";
+	
+	/**
+	 * 取值为creationTimestamp
+	 */
+	public static final String KUBE_METADATA_CREATED         = "creationTimestamp";
+	
+	/**
+	 * 取值为plural
+	 */
+	public static final String KUBE_PLURAL                   = "plural";
 	
 	/*************************************
 	 * 

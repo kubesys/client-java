@@ -33,7 +33,7 @@ class KubeUtilTest {
 			+ "}";	
 	@Test
 	void testBinding() throws Exception {
-		assertEquals(EXPECTED_BINDING, KubeUtil.bindingResource("test-pod", "test-ns", "test-node").toPrettyString());
+		assertEquals(EXPECTED_BINDING, KubeUtil.toBinding("test-pod", "test-ns", "test-node").toPrettyString());
 	}
 	
 }

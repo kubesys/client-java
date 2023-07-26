@@ -73,6 +73,7 @@ import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
 import io.github.kubesys.client.exceptions.KubernetesUnauthorizedTokenException;
 import io.github.kubesys.client.exceptions.KubernetesUnknownException;
 import io.github.kubesys.client.exceptions.KubernetesUnknownUrlException;
+import io.github.kubesys.client.utils.KubeUtil;
 import io.github.kubesys.client.utils.ReqUtil;
 import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
@@ -554,7 +555,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	public String listResourcesUsingYamml(String kind) throws Exception {
+	public String listResourcesUsingYaml(String kind) throws Exception {
 		return new YAMLMapper()
 				.writeValueAsString(listResources(kind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null));
 	}
@@ -901,6 +902,23 @@ public class KubernetesClient {
 		return thread;
 	}
 
+	
+	/**
+	 * for Scheduler
+	 * 
+	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
+	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
+	 * 
+	 * @param pod  pod
+	 * @param namespace namespace
+	 * @param host hostname
+	 * @return json json from Kubernetes
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	public JsonNode bindingResource(String pod, String namespace, String host) throws Exception {
+		return createResource(KubeUtil.toBinding(pod, namespace, host));
+	}
+	
 	/**********************************************************
 	 * 
 	 * 
