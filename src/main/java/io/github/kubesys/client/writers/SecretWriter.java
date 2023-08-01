@@ -3,7 +3,6 @@
  */
 package io.github.kubesys.client.writers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -26,11 +25,7 @@ public class SecretWriter extends KindWriter {
 	}
 
 	public SecretWriter withData(String key, String value) {
-		if (!json.has("data")) {
-			json.set("data", new ObjectMapper().createObjectNode());
-		}
-		
-		ObjectNode data = (ObjectNode) json.get("data");
+		ObjectNode data = getObjectValue("data");
 		data.put(key, value);
 		return this;
 	}

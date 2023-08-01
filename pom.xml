@@ -14,6 +14,7 @@
 	<properties>
 		<jackson.version>2.15.2</jackson.version>
 		<httpclient.version>5.2.1</httpclient.version>
+		
 		<junit.version>5.9.3</junit.version>
 		<maven.assembly.version>3.6.0</maven.assembly.version>
 		<maven.dependency.version>3.6.0</maven.dependency.version>

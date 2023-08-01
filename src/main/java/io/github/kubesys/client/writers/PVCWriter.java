@@ -33,7 +33,7 @@ public class PVCWriter extends KindWriter {
 	public PVCWriter withCapacity(String gb) throws Exception {
 		ObjectNode size = toObjectNode(CAPACITY, new String[] {"#SIZE#", gb});
 		ObjectNode requests = toObjectNode("requests", size);
-		ObjectNode spec = (ObjectNode) json.get("spec");
+		ObjectNode spec = getObjectValue("spec");
 		spec.set("resources", requests);
 		return this;
 	}

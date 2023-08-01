@@ -41,7 +41,7 @@ public class PVWriter extends KindWriter {
 			+ "namespace: #PV_NAMESPACE#";
 	
 	public PVWriter withPVC(String name, String namespace) throws Exception {
-		ObjectNode spec = (ObjectNode) json.get("spec");
+		ObjectNode spec = getObjectValue("spec");
 		spec.set("claimRef", toObjectNode(CLAIMREF, new String[] {"#PV_NAME#", name, "#PV_NAMESPACE#", namespace}));
 		return this;
 	}
@@ -49,7 +49,7 @@ public class PVWriter extends KindWriter {
 	static final String HOSTPATH = "path: #PATH#";
 	
 	public PVWriter withPath(String hostpath) throws Exception {
-		ObjectNode spec = (ObjectNode) json.get("spec");
+		ObjectNode spec = getObjectValue("spec");
 		spec.set("hostPath", toObjectNode(HOSTPATH, new String[] {"#PATH#", hostpath}));
 		return this;
 	}

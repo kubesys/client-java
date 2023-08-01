@@ -7,6 +7,7 @@ import java.io.PrintStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -21,9 +22,9 @@ import io.github.kubesys.client.addons.KubernetesWriter;
  */
 public abstract class KindWriter {
 
-	protected final KubernetesWriter writer;
+	protected KubernetesWriter writer;
 	
-	protected final ObjectNode json; 
+	protected ObjectNode json; 
 
 	public KindWriter(String name) throws Exception {
 		this.writer = new KubernetesWriter();
@@ -33,6 +34,11 @@ public abstract class KindWriter {
 	public KindWriter(String name, String namespace) throws Exception {
 		this.writer = new KubernetesWriter();
 		this.json = toObjectNode(getTemplate(), new String[] {"#NAME#", name, "#NAMESPACE#", namespace});
+	}
+	
+	public KindWriter(String name, String namespace, String[] kvs) throws Exception {
+		this.writer = new KubernetesWriter();
+		this.json = toObjectNode(getTemplate(), kvs);
 	}
 	
 	public void stream(PrintStream ps) throws Exception {
@@ -45,6 +51,30 @@ public abstract class KindWriter {
 	
 	public void yaml(String path) {
 		writer.writeAsYaml(path, json);
+	}
+	
+	public ObjectNode getObjectValue(String key) {
+		if (!json.has(key)) {
+			ObjectNode val = new ObjectMapper().createObjectNode();
+			json.set(key, val);
+		}
+		return (ObjectNode) json.get(key);
+	}
+	
+	public ObjectNode getObjectValue(ObjectNode node, String key) {
+		if (!node.has(key)) {
+			ObjectNode val = new ObjectMapper().createObjectNode();
+			node.set(key, val);
+		}
+		return (ObjectNode) node.get(key);
+	}
+	
+	public ArrayNode getArrayValue(ObjectNode node, String key) {
+		if (!node.has(key)) {
+			ArrayNode val = new ObjectMapper().createArrayNode();
+			node.set(key, val);
+		}
+		return (ArrayNode) node.get(key);
 	}
 	
 	public ObjectNode toObjectNode(String str, String[] list) throws Exception {
@@ -60,5 +90,15 @@ public abstract class KindWriter {
 		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(val.toPrettyString());
 	}
 	
+	public ObjectNode toObjectNode(Object obj) throws Exception {
+		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(
+				new ObjectMapper().writeValueAsString(obj));
+	}
+	
+	public ObjectNode toObjectNode(String json) throws Exception {
+		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(json);
+	}
+	
 	public abstract String getTemplate();
+	
 }
