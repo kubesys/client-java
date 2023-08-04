@@ -3,6 +3,8 @@
  */
 package io.github.kubesys.client.install.stack;
 
+import java.util.Base64;
+
 /**
  * @author wuheng@iscas.ac.cn
  * @since  2023/08/02
@@ -11,9 +13,11 @@ package io.github.kubesys.client.install.stack;
  * get real Url from <code>KubernetesRuleBase</code>
  * 
  */
-public class StackConstants {
+public class StackCommon {
 	
 	static final String PATH = "/var/lib/doslab/";
+	
+	static final String NAMESPACE = "kube-stack";
 	
 	static final String CONFIG_USERNAME = "username";
 	
@@ -21,4 +25,11 @@ public class StackConstants {
 	
 	static final String VOLUME_DATA = "data";
 	
+	static final String TOKEN_NAME = "kubernetes-client-token";
+	
+	static final String TOKEN_NAMESPACE = "kube-system";
+	
+	static String base64(String value) {
+		return Base64.getEncoder().encodeToString(value.getBytes());
+	}
 }

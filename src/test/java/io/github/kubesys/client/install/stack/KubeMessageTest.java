@@ -3,8 +3,6 @@
  */
 package io.github.kubesys.client.install.stack;
 
-import java.util.Base64;
-
 import io.github.kubesys.client.writers.DeploymentWriter;
 import io.github.kubesys.client.writers.PVCWriter;
 import io.github.kubesys.client.writers.PVWriter;
@@ -29,43 +27,41 @@ public class KubeMessageTest {
 	
 	static final String NAME = "kube-message";
 	
-	static final String NAMESPACE = "kube-stack";
-
 	static final String RABBITMQ = "rabbitmq";
 	
 	static final String RABBITMQ_IMAGE = "rabbitmq:3.12.2-management";
 	
 	public static void main(String[] args) throws Exception {
-		SecretWriter secret = new SecretWriter(NAME, NAMESPACE);
-		secret.withData(StackConstants.CONFIG_USERNAME, Base64.getEncoder().encodeToString("rabbitmq".getBytes()))
-				.withData(StackConstants.CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
+		SecretWriter secret = new SecretWriter(NAME, StackCommon.NAMESPACE);
+		secret.withData(StackCommon.CONFIG_USERNAME, StackCommon.base64("rabbitmq"))
+				.withData(StackCommon.CONFIG_PASSWORD, StackCommon.base64("onceas")).stream(System.out);
 		
 		PVWriter pv = new PVWriter(NAME);
-		pv.withCapacity("20").withPath(StackConstants.PATH + RABBITMQ).withPVC(NAME, NAMESPACE).stream(System.out);
+		pv.withCapacity("20").withPath(StackCommon.PATH + RABBITMQ).withPVC(NAME, StackCommon.NAMESPACE).stream(System.out);
 		
-		PVCWriter pvc = new PVCWriter(NAME, NAMESPACE);
+		PVCWriter pvc = new PVCWriter(NAME, StackCommon.NAMESPACE);
 		pvc.withCapacity("20").stream(System.out);
 		
-		DeploymentWriter deploy = new DeploymentWriter(NAME, NAMESPACE);
+		DeploymentWriter deploy = new DeploymentWriter(NAME, StackCommon.NAMESPACE);
 		
 		deploy.withMasterEnbale()
 				.withContainer(new Container(RABBITMQ, RABBITMQ_IMAGE, 
 								new Env[] {
 										new Env("RABBITMQ_DEFAULT_USER", new ValueFrom(
-													new SecretKeyRef(NAME, StackConstants.CONFIG_USERNAME))),
+													new SecretKeyRef(NAME, StackCommon.CONFIG_USERNAME))),
 										new Env("RABBITMQ_DEFAULT_PASS", new ValueFrom(
-												new SecretKeyRef(NAME, StackConstants.CONFIG_PASSWORD)))}, 
+												new SecretKeyRef(NAME, StackCommon.CONFIG_PASSWORD)))}, 
 								new Port[] {
 										new Port(15672),
 										new Port(5672)
 								}, 
 								new VolumeMount[] {
-										new VolumeMount(StackConstants.VOLUME_DATA, "/var/lib/rabbitmq")
+										new VolumeMount(StackCommon.VOLUME_DATA, "/var/lib/rabbitmq")
 								}))
-				.withVolume(StackConstants.VOLUME_DATA, NAME)
+				.withVolume(StackCommon.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
-		ServiceWriter service = new ServiceWriter(NAME, NAMESPACE);
+		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);
 		service.withType("NodePort").withSelector(NAME)
 				.withPort(15672, 30305, "management")
 				.withPort(5672, 30304, "rabbitmq")

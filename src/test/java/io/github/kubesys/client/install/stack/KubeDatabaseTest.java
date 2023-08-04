@@ -3,8 +3,6 @@
  */
 package io.github.kubesys.client.install.stack;
 
-import java.util.Base64;
-
 import io.github.kubesys.client.writers.DeploymentWriter;
 import io.github.kubesys.client.writers.PVCWriter;
 import io.github.kubesys.client.writers.PVWriter;
@@ -29,8 +27,6 @@ public class KubeDatabaseTest {
 	
 	static final String NAME = "kube-database";
 	
-	static final String NAMESPACE = "kube-stack";
-
 	static final String POSTGRES = "postgres";
 	
 	static final String POSTGRES_IMAGE = "postgres:15.3-alpine";
@@ -40,29 +36,29 @@ public class KubeDatabaseTest {
 	static final String ADMINER_IMAGE = "adminer:4.8.1-standalone";
 	
 	public static void main(String[] args) throws Exception {
-		SecretWriter secret = new SecretWriter(NAME, NAMESPACE);
-		secret.withData(StackConstants.CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
+		SecretWriter secret = new SecretWriter(NAME, StackCommon.NAMESPACE);
+		secret.withData(StackCommon.CONFIG_PASSWORD, StackCommon.base64("onceas")).stream(System.out);
 		
 		PVWriter pv = new PVWriter(NAME);
 		
-		pv.withCapacity("20").withPath(StackConstants.PATH + POSTGRES).withPVC(NAME, NAMESPACE).stream(System.out);
+		pv.withCapacity("20").withPath(StackCommon.PATH + POSTGRES).withPVC(NAME, StackCommon.NAMESPACE).stream(System.out);
 		
-		PVCWriter pvc = new PVCWriter(NAME, NAMESPACE);
+		PVCWriter pvc = new PVCWriter(NAME, StackCommon.NAMESPACE);
 		pvc.withCapacity("20").stream(System.out);
 		
-		DeploymentWriter deploy = new DeploymentWriter(NAME, NAMESPACE);
+		DeploymentWriter deploy = new DeploymentWriter(NAME, StackCommon.NAMESPACE);
 		
 		deploy.withMasterEnbale()
 				.withContainer(new Container(POSTGRES, POSTGRES_IMAGE, 
 						//POSTGRES_USER
 								new Env[] {
 										new Env("POSTGRES_PASSWORD", new ValueFrom(
-												new SecretKeyRef(NAME, StackConstants.CONFIG_PASSWORD)))}, 
+												new SecretKeyRef(NAME, StackCommon.CONFIG_PASSWORD)))}, 
 								new Port[] {
 										new Port(5432)
 								}, 
 								new VolumeMount[] {
-										new VolumeMount(StackConstants.VOLUME_DATA, "/var/lib/postgresql")
+										new VolumeMount(StackCommon.VOLUME_DATA, "/var/lib/postgresql")
 								}))
 				.withContainer(new Container(ADMINER, ADMINER_IMAGE, 
 								null, 
@@ -70,11 +66,12 @@ public class KubeDatabaseTest {
 										new Port(8080)
 								}, 
 								null))
-				.withVolume(StackConstants.VOLUME_DATA, NAME)
+				.withVolume(StackCommon.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
-		ServiceWriter service = new ServiceWriter(NAME, NAMESPACE);
+		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);
 		service.withType("NodePort").withSelector(NAME).withPort(5432, 30306, POSTGRES)
 				.withPort(8080, 30307, ADMINER).stream(System.out);
 	}
+
 }
