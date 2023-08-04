@@ -45,6 +45,14 @@ public class ServiceWriter extends KindWriter {
 	
 	static final String PORTS = "name: #NAME#";
 	
+	public ServiceWriter withPort(int port, int nodePort, String name) throws Exception {
+		return withPort(port, port, nodePort, "TCP", name);
+	}
+	
+	public ServiceWriter withPort(int port, int targetPort, int nodePort, String name) throws Exception {
+		return withPort(port, targetPort, nodePort, "TCP", name);
+	}
+	
 	public ServiceWriter withPort(int port, int targetPort, int nodePort, String protocol, String name) throws Exception {
 		ArrayNode ports = getArrayValue(getObjectValue("spec"), "ports");
 		
