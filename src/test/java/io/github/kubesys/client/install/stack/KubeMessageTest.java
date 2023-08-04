@@ -1,7 +1,7 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.install;
+package io.github.kubesys.client.install.stack;
 
 import java.util.Base64;
 
@@ -31,23 +31,17 @@ public class KubeMessageTest {
 	
 	static final String NAMESPACE = "kube-stack";
 
-	static final String CONFIG_PASSWORD = "password";
+	static final String RABBITMQ = "rabbitmq";
 	
-	static final String VOLUME_DATA = "data";
-	
-	static final String POSTGRES = "postgres";
-	
-	static final String ADMINER = "adminer";
-	
-	public static final String PATH = "/var/lib/doslab/";
+	static final String RABBITMQ_IMAGE = "rabbitmq:3.12.2-management";
 	
 	public static void main(String[] args) throws Exception {
 		SecretWriter secret = new SecretWriter(NAME, NAMESPACE);
-		secret.withData(CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
+		secret.withData(StackConstants.CONFIG_USERNAME, Base64.getEncoder().encodeToString("rabbitmq".getBytes()))
+				.withData(StackConstants.CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
 		
 		PVWriter pv = new PVWriter(NAME);
-		
-		pv.withCapacity("20").withPath(PATH + POSTGRES).withPVC(NAME, NAMESPACE).stream(System.out);
+		pv.withCapacity("20").withPath(StackConstants.PATH + RABBITMQ).withPVC(NAME, NAMESPACE).stream(System.out);
 		
 		PVCWriter pvc = new PVCWriter(NAME, NAMESPACE);
 		pvc.withCapacity("20").stream(System.out);
@@ -55,27 +49,26 @@ public class KubeMessageTest {
 		DeploymentWriter deploy = new DeploymentWriter(NAME, NAMESPACE);
 		
 		deploy.withMasterEnbale()
-				.withContainer(new Container(POSTGRES, "postgres:14.5-alpine", 
+				.withContainer(new Container(RABBITMQ, RABBITMQ_IMAGE, 
 								new Env[] {
-										new Env("POSTGRES_PASSWOR", new ValueFrom(new SecretKeyRef(NAME, CONFIG_PASSWORD)))}, 
+										new Env("RABBITMQ_DEFAULT_USER", new ValueFrom(
+													new SecretKeyRef(NAME, StackConstants.CONFIG_USERNAME))),
+										new Env("RABBITMQ_DEFAULT_PASS", new ValueFrom(
+												new SecretKeyRef(NAME, StackConstants.CONFIG_PASSWORD)))}, 
 								new Port[] {
-										new Port(5432)
+										new Port(15672),
+										new Port(5672)
 								}, 
 								new VolumeMount[] {
-										new VolumeMount(VOLUME_DATA, "/var/lib/postgresql")
+										new VolumeMount(StackConstants.VOLUME_DATA, "/var/lib/rabbitmq")
 								}))
-				.withContainer(new Container(ADMINER, "adminer:4.8.1-standalone", 
-								new Env[] {
-										new Env("POSTGRES_PASSWOR", new ValueFrom(new SecretKeyRef(NAME, CONFIG_PASSWORD)))}, 
-								new Port[] {
-										new Port(8080)
-								}, 
-								null))
-				.withVolume(NAME, CONFIG_PASSWORD)
+				.withVolume(StackConstants.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
 		ServiceWriter service = new ServiceWriter(NAME, NAMESPACE);
-		service.withSelector(NAME).withPort(5432, 30306, POSTGRES)
-				.withPort(8080, 30307, ADMINER).stream(System.out);
+		service.withType("NodePort").withSelector(NAME)
+				.withPort(15672, 30305, "management")
+				.withPort(5672, 30304, "rabbitmq")
+		.stream(System.out);
 	}
 }

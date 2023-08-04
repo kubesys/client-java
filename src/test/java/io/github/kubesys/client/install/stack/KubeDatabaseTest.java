@@ -1,7 +1,7 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.install;
+package io.github.kubesys.client.install.stack;
 
 import java.util.Base64;
 
@@ -31,10 +31,6 @@ public class KubeDatabaseTest {
 	
 	static final String NAMESPACE = "kube-stack";
 
-	static final String CONFIG_PASSWORD = "password";
-	
-	static final String VOLUME_DATA = "data";
-	
 	static final String POSTGRES = "postgres";
 	
 	static final String POSTGRES_IMAGE = "postgres:15.3-alpine";
@@ -43,15 +39,13 @@ public class KubeDatabaseTest {
 	
 	static final String ADMINER_IMAGE = "adminer:4.8.1-standalone";
 	
-	public static final String PATH = "/var/lib/doslab/";
-	
 	public static void main(String[] args) throws Exception {
 		SecretWriter secret = new SecretWriter(NAME, NAMESPACE);
-		secret.withData(CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
+		secret.withData(StackConstants.CONFIG_PASSWORD, Base64.getEncoder().encodeToString("onceas".getBytes())).stream(System.out);
 		
 		PVWriter pv = new PVWriter(NAME);
 		
-		pv.withCapacity("20").withPath(PATH + POSTGRES).withPVC(NAME, NAMESPACE).stream(System.out);
+		pv.withCapacity("20").withPath(StackConstants.PATH + POSTGRES).withPVC(NAME, NAMESPACE).stream(System.out);
 		
 		PVCWriter pvc = new PVCWriter(NAME, NAMESPACE);
 		pvc.withCapacity("20").stream(System.out);
@@ -60,13 +54,15 @@ public class KubeDatabaseTest {
 		
 		deploy.withMasterEnbale()
 				.withContainer(new Container(POSTGRES, POSTGRES_IMAGE, 
+						//POSTGRES_USER
 								new Env[] {
-										new Env("POSTGRES_PASSWORD", new ValueFrom(new SecretKeyRef(NAME, CONFIG_PASSWORD)))}, 
+										new Env("POSTGRES_PASSWORD", new ValueFrom(
+												new SecretKeyRef(NAME, StackConstants.CONFIG_PASSWORD)))}, 
 								new Port[] {
 										new Port(5432)
 								}, 
 								new VolumeMount[] {
-										new VolumeMount(VOLUME_DATA, "/var/lib/postgresql")
+										new VolumeMount(StackConstants.VOLUME_DATA, "/var/lib/postgresql")
 								}))
 				.withContainer(new Container(ADMINER, ADMINER_IMAGE, 
 								null, 
@@ -74,7 +70,7 @@ public class KubeDatabaseTest {
 										new Port(8080)
 								}, 
 								null))
-				.withVolume(VOLUME_DATA, NAME)
+				.withVolume(StackConstants.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
 		ServiceWriter service = new ServiceWriter(NAME, NAMESPACE);
