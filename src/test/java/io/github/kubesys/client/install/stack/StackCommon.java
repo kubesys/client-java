@@ -25,6 +25,8 @@ public class StackCommon {
 	
 	static final String CONFIG_PASSWORD = "password";
 	
+	static final String VOLUME_CONFIG = "config";
+	
 	static final String VOLUME_DATA = "data";
 	
 	static final String TOKEN_NAME = "kubernetes-client-token";

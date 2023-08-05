@@ -5,7 +5,7 @@ package io.github.kubesys.client.install.stack;
 
 
 import io.github.kubesys.client.writers.ConfigMapWriter;
-import io.github.kubesys.client.writers.DeploymentWriter;
+import io.github.kubesys.client.writers.DaemonSetWriter;
 import io.github.kubesys.client.writers.PVCWriter;
 import io.github.kubesys.client.writers.PVWriter;
 import io.github.kubesys.client.writers.ServiceWriter;
@@ -21,19 +21,17 @@ import io.github.kubesys.client.writers.WorkloadWriter.VolumeMount;
  * get real Url from <code>KubernetesRuleBase</code>
  * 
  */
-public class KubeMonitorTest {
+public class KubeAlertMgrTest {
 	
-	static final String NAME = "kube-monitor";
+	static final String NAME = "kube-alertmgr";
 	
-	static final String CONFIG_YML = "prometheus.yml";
+	static final String ALTERMGR = "alertmanager";
 	
-	static final String YML_PATH = "configs/prometheus.yml";
+	static final String ALTERMGR_IMAGE = "prom/alertmanager:v0.25.0";
 	
-	static final String PROM = "prometheus";
+	static final String CONFIG_YML = "alertmanager.yml";
 	
-	static final String PROM_IMAGE = "prom/prometheus:v2.46.0";
-	
-	static final String VOLUME_CONFIG = "config";
+	static final String YML_PATH = "configs/alertmanager.yml";
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -41,34 +39,34 @@ public class KubeMonitorTest {
 		cm.withYamlData(CONFIG_YML, StackCommon.read(YML_PATH)).stream(System.out);
 		
 		PVWriter pv = new PVWriter(NAME);
-		pv.withCapacity("20").withPath(StackCommon.PATH + PROM).withPVC(NAME, StackCommon.NAMESPACE).stream(System.out);
+		pv.withCapacity("20").withPath(StackCommon.PATH + ALTERMGR).withPVC(NAME, StackCommon.NAMESPACE).stream(System.out);
+		
 		PVCWriter pvc = new PVCWriter(NAME, StackCommon.NAMESPACE);
 		pvc.withCapacity("20").stream(System.out);
 		
-		DeploymentWriter deploy = new DeploymentWriter(NAME, StackCommon.NAMESPACE);
+		DaemonSetWriter ds = new DaemonSetWriter(NAME, StackCommon.NAMESPACE);
 		
-		deploy.withMasterEnbale()
-				.withContainer(new Container(PROM, PROM_IMAGE, 
-								new String[] {
-										"--config.file=/etc/prometheus/prometheus.yml",
-										"--storage.tsdb.path=/prometheus",
-								},
-								null, 
-								new Port[] {
-										new Port(9090)
-								}, 
-								new VolumeMount[] {
-										new VolumeMount(VOLUME_CONFIG, "/etc/prometheus/"),
-										new VolumeMount(StackCommon.VOLUME_DATA, "/prometheus")
-								}))
-				.withConfigMapVolume(VOLUME_CONFIG, NAME, CONFIG_YML, CONFIG_YML)
+		ds.withMasterEnbale()
+				.withContainer(new Container(ALTERMGR, ALTERMGR_IMAGE, 
+						new String[] {
+								"--config.file=/etc/alertmanager/alertmanager.yml",
+								"--storage.path=/alertmanager"
+						},
+						null, 
+						new Port[] {
+								new Port(9093)
+						}, 
+						new VolumeMount[] {
+								new VolumeMount(StackCommon.VOLUME_CONFIG, "/etc/alertmanager"),
+								new VolumeMount(StackCommon.VOLUME_DATA, "/alertmanager")
+						}))
+				.withConfigMapVolume(StackCommon.VOLUME_CONFIG, NAME, CONFIG_YML, CONFIG_YML)
 				.withPVCVolume(StackCommon.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
-		
 		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);
 		service.withType("NodePort").withSelector(NAME)
-				.withPort(9090, 30301, "monitoring")
-				.stream(System.out);
+				.withPort(9093, 30303, "alertmanager")
+		.stream(System.out);
 	}
 }

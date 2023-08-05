@@ -56,7 +56,7 @@ public class KubeExporterTest {
 		
 		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);
 		service.withType("NodePort").withSelector(NAME)
-				.withPort(9100, 30303, "node-exporter")
+				.withPort(9100, 30302, "node-exporter")
 		.stream(System.out);
 	}
 }
