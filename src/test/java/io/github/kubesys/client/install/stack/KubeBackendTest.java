@@ -5,13 +5,9 @@ package io.github.kubesys.client.install.stack;
 
 
 import io.github.kubesys.client.writers.DeploymentWriter;
-import io.github.kubesys.client.writers.SecretWriter;
 import io.github.kubesys.client.writers.ServiceWriter;
 import io.github.kubesys.client.writers.WorkloadWriter.Container;
-import io.github.kubesys.client.writers.WorkloadWriter.Env;
 import io.github.kubesys.client.writers.WorkloadWriter.Port;
-import io.github.kubesys.client.writers.WorkloadWriter.Env.ValueFrom;
-import io.github.kubesys.client.writers.WorkloadWriter.Env.ValueFrom.SecretKeyRef;
 
 /**
  * @author wuheng@iscas.ac.cn

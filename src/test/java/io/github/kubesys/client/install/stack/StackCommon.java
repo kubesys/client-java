@@ -3,6 +3,8 @@
  */
 package io.github.kubesys.client.install.stack;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 /**
@@ -31,5 +33,9 @@ public class StackCommon {
 	
 	static String base64(String value) {
 		return Base64.getEncoder().encodeToString(value.getBytes());
+	}
+	
+	static String read(String path) throws Exception {
+		return Files.readString(Paths.get(path));
 	}
 }

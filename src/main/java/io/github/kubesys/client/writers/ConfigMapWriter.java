@@ -29,20 +29,15 @@ public class ConfigMapWriter extends KindWriter {
 		return this;
 	}
 	
+	public ConfigMapWriter withYamlData(String key, String value) throws Exception {
+		ObjectNode data = getObjectValue("data");
+		data.set(key, toObjectNode(value));
+		return this;
+	}
+	
 	@Override
 	public String getTemplate() {
 		return TEMPLATE;
 	}
 	
-	public static void main(String[] args) throws Exception {
-		ConfigMapWriter writer = new ConfigMapWriter("kube-database", "kube-system");
-		String value = "|-\r\n"
-				+ "    @test \"Test Health\" {\r\n"
-				+ "      url=\"http://grafana/api/health\"\r\n"
-				+ "\r\n"
-				+ "      code=$(wget --server-response --spider --timeout 10 --tries 1 ${url} 2>&1 | awk '/^  HTTP/{print $2}')\r\n"
-				+ "      [ \"$code\" == \"200\" ]\r\n"
-				+ "    }";
-		writer.withData("username", "onceas").withData("run.sh", value.replaceAll("\r\n", "")).stream(System.out);
-	}
 }

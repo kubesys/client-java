@@ -65,8 +65,10 @@ public class KubeDatabaseTest {
 								new Port[] {
 										new Port(8080)
 								}, 
-								null))
-				.withVolume(StackCommon.VOLUME_DATA, NAME)
+								new VolumeMount[] {
+										new VolumeMount(StackCommon.VOLUME_DATA, "/var/lib/postgresql")
+								}))
+				.withPVCVolume(StackCommon.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
 		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);

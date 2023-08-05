@@ -31,8 +31,11 @@ public abstract class WorkloadWriter extends KindWriter {
 			+ "      labels: \r\n"
 			+ "        name: \"#NAME#\"";
 
-	public WorkloadWriter(String name, String namespace, String[] kvs) throws Exception {
-		super(name, namespace, kvs);
+	public WorkloadWriter(String[] kvs) throws Exception {
+		super(kvs);
+		if (this.json.get("spec").get("replicas").asInt() == 0) {
+			((ObjectNode) json.get("spec")).remove("replicas");
+		}
 	}
 	
 	static final String MATSER = "nodeSelector:\r\n"
@@ -59,10 +62,37 @@ public abstract class WorkloadWriter extends KindWriter {
 			+ "persistentVolumeClaim:\r\n"
 			+ "  claimName: #PVC#";
 	
-	public WorkloadWriter withVolume(String name, String pvc) throws Exception {
+	public WorkloadWriter withPVCVolume(String name, String pvc) throws Exception {
 	    ArrayNode volumes = getArrayValue(getObjectValue(
 	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
 	    ObjectNode v = toObjectNode(VOLUME, new String[] {"#NAME#", name, "#PVC#", pvc});
+	    volumes.add(v);
+		return this;
+	}
+	
+	static final String HOST = "name: #NAME#\r\n"
+			+ "hostPath:\r\n"
+			+ "  path: #PATH#";
+	
+	public WorkloadWriter withHostVolume(String name, String path) throws Exception {
+	    ArrayNode volumes = getArrayValue(getObjectValue(
+	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
+	    ObjectNode v = toObjectNode(HOST, new String[] {"#NAME#", name, "#PATH#", path});
+	    volumes.add(v);
+		return this;
+	}
+	
+	static final String CONFIGMAP = "name: #NAME#\r\n"
+			+ "configMap:\r\n"
+			+ "  name: #CONFIGMAP_NAME#\r\n"
+			+ "  items:\r\n"
+			+ "  - key: #CONFIGMAP_KEY#\r\n"
+			+ "    path: #PATH#";
+	
+	public WorkloadWriter withConfigMapVolume(String name, String cm, String cmKey, String path) throws Exception {
+	    ArrayNode volumes = getArrayValue(getObjectValue(
+	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
+	    ObjectNode v = toObjectNode(CONFIGMAP, new String[] {"#NAME#", name, "#CONFIGMAP_NAME#", cm, "#CONFIGMAP_KEY#", cmKey, "#PATH#", path});
 	    volumes.add(v);
 		return this;
 	}
@@ -83,10 +113,22 @@ public abstract class WorkloadWriter extends KindWriter {
 		
 		Env[] env;
 		
+		String[] args;
+		
 		Port[] ports;
 		
 		VolumeMount[] volumeMounts;
 
+		public Container(String name, String image, String[] args, Env[] env, Port[] ports, VolumeMount[] volumeMounts) {
+			super();
+			this.name = name;
+			this.image = image;
+			this.args = args;
+			this.env = env;
+			this.ports = ports;
+			this.volumeMounts = volumeMounts;
+		}
+		
 		public Container(String name, String image, Env[] env, Port[] ports, VolumeMount[] volumeMounts) {
 			super();
 			this.name = name;
@@ -142,6 +184,14 @@ public abstract class WorkloadWriter extends KindWriter {
 
 		public void setImagePullPolicy(String imagePullPolicy) {
 			this.imagePullPolicy = imagePullPolicy;
+		}
+
+		public String[] getArgs() {
+			return args;
+		}
+
+		public void setArgs(String[] args) {
+			this.args = args;
 		}
 		
 	}

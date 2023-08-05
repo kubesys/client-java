@@ -5,6 +5,8 @@ package io.github.kubesys.client.writers;
 
 import java.io.PrintStream;
 
+import org.yaml.snakeyaml.DumperOptions;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -36,7 +38,7 @@ public abstract class KindWriter {
 		this.json = toObjectNode(getTemplate(), new String[] {"#NAME#", name, "#NAMESPACE#", namespace});
 	}
 	
-	public KindWriter(String name, String namespace, String[] kvs) throws Exception {
+	public KindWriter(String[] kvs) throws Exception {
 		this.writer = new KubernetesWriter();
 		this.json = toObjectNode(getTemplate(), kvs);
 	}
@@ -49,6 +51,11 @@ public abstract class KindWriter {
 		writer.writeAsJson(path, json);
 	}
 	
+	static DumperOptions getDumperOptionsWithPipe() {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.LITERAL);
+        return options;
+    }
 	public void yaml(String path) {
 		writer.writeAsYaml(path, json);
 	}

@@ -58,7 +58,7 @@ public class KubeMessageTest {
 								new VolumeMount[] {
 										new VolumeMount(StackCommon.VOLUME_DATA, "/var/lib/rabbitmq")
 								}))
-				.withVolume(StackCommon.VOLUME_DATA, NAME)
+				.withPVCVolume(StackCommon.VOLUME_DATA, NAME)
 		.stream(System.out);
 		
 		ServiceWriter service = new ServiceWriter(NAME, StackCommon.NAMESPACE);
