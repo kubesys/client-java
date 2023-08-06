@@ -254,6 +254,7 @@ public abstract class WorkloadWriter extends KindWriter {
 					this.name = name;
 					this.key = key;
 				}
+				
 
 				public String getName() {
 					return name;
@@ -270,7 +271,7 @@ public abstract class WorkloadWriter extends KindWriter {
 				public void setKey(String key) {
 					this.key = key;
 				}
-				
+
 			}
 		}
 	}
