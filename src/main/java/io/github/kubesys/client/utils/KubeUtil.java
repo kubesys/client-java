@@ -61,6 +61,19 @@ public class KubeUtil {
 	 * @param crd Kubernetes的CRD
 	 * @return 其中一个APIVERSION
 	 */
+	public static String getCrdGroup(JsonNode crd) {
+		return crd.get(KubernetesConstants.KUBE_SPEC)
+						.get(KubernetesConstants.KUBE_SPEC_GROUP)
+						.asText();
+	}
+	
+	/**
+	 * json必须符合Kubernetes的CRD规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param crd Kubernetes的CRD
+	 * @return 其中一个APIVERSION
+	 */
 	public static String getCrdApiversion(JsonNode crd) {
 		String group = crd.get(KubernetesConstants.KUBE_SPEC)
 						.get(KubernetesConstants.KUBE_SPEC_GROUP)
@@ -112,6 +125,20 @@ public class KubeUtil {
 	public static String getFullkind(JsonNode json) {
 		String group = getGroup(json);
 		String kind  = getKind(json);
+		return group.length() == 0 ? kind : group + 
+				KubernetesConstants.KUBE_VALUE_SPLIT + kind;
+	}
+	
+	/**
+	 * json必须符合Kubernetes规范，这里不考虑异常情况
+	 * https://kubernetes.io/docs/concepts/overview/working-with-objects/
+	 * 
+	 * @param json Kubernetes对应kind的apiVersion
+	 * @return fullkind
+	 */
+	public static String getCRDFullkind(JsonNode json) {
+		String group = getCrdGroup(json);
+		String kind  = getCrdKind(json);
 		return group.length() == 0 ? kind : group + 
 				KubernetesConstants.KUBE_VALUE_SPLIT + kind;
 	}
