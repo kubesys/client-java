@@ -84,7 +84,7 @@ public class KubeUtil {
 						.get(KubernetesConstants.KUBE_SPEC_VERSIONS_NAME)
 						.asText();
 		
-		return group + KubernetesConstants.KUBE_VALUE_SPLIT + version;
+		return group + KubernetesConstants.KUBE_VERSION_SPLIT + version;
 	}
 	
 	/**

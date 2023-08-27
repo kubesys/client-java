@@ -140,6 +140,11 @@ public final class KubernetesConstants {
 	public static final String KUBE_VALUE_SPLIT              = ".";
 	
 	/**
+	 * 取值为.
+	 */
+	public static final String KUBE_VERSION_SPLIT              = "/";
+	
+	/**
 	 * 取值为creationTimestamp
 	 */
 	public static final String KUBE_METADATA_CREATED         = "creationTimestamp";
