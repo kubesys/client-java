@@ -228,6 +228,9 @@ public class KubeUtil {
 	 * @return           是否支持被watch，像其见Kubernetes的Watch机制
 	 */
 	public static boolean supportWatch(JsonNode value) {
+		if (!value.has("verbs")) {
+			return true;
+		}
 		return value.get("verbs").toPrettyString().contains("watch");
 	}
 }
