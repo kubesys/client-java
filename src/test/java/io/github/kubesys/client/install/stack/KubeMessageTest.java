@@ -52,6 +52,7 @@ public class KubeMessageTest {
 										new Env("RABBITMQ_DEFAULT_PASS", new ValueFrom(
 												new SecretKeyRef(NAME, StackCommon.CONFIG_PASSWORD)))}, 
 								new Port[] {
+										new Port(15674),
 										new Port(15672),
 										new Port(5672)
 								}, 
@@ -65,6 +66,7 @@ public class KubeMessageTest {
 		service.withType("NodePort").withSelector(NAME)
 				.withPort(15672, 30305, "management")
 				.withPort(5672, 30304, "rabbitmq")
+				.withPort(15674, 30303, "web")
 		.stream(System.out);
 	}
 }

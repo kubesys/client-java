@@ -58,6 +58,7 @@ import org.apache.hc.core5.util.Timeout;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -1617,15 +1618,20 @@ public class KubernetesClient {
 			switch (response.getCode()) {
 				case 200:
 				try {
-					return new ObjectMapper().readTree(response.getEntity().getContent());
+					ObjectMapper objectMapper = new ObjectMapper();
+					objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+					return objectMapper.readTree(response.getEntity().getContent());
 				} catch (Exception e) {
 					throw new KubernetesUnknownException(e.toString());
 				} 
-//					if (result.has("status") && result.get("status").asText().equals("Failure")) {
-//						int code = result.get("code").asInt();
-//						String cause = statusDesc.get(code);
-//						throw new Exception(cause != null ? cause : result.toPrettyString());
-//					}
+				case 201:
+					try {
+						ObjectMapper objectMapper = new ObjectMapper();
+						objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+						return objectMapper.readTree(response.getEntity().getContent());
+					} catch (Exception e) {
+						throw new KubernetesUnknownException(e.toString());
+					} 
 				case 400:
 					throw new KubernetesBadRequestException(response.toString());
 				case 401:
