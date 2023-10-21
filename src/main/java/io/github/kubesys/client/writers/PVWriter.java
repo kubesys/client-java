@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class PVWriter extends KindWriter {
 
+	/**
+	 * template
+	 */
 	static final String TEMPLATE = "apiVersion: v1\r\n"
 			+ "kind: PersistentVolume\r\n"
 			+ "metadata:\r\n"
@@ -23,31 +26,60 @@ public class PVWriter extends KindWriter {
 			+ "  persistentVolumeReclaimPolicy: Retain\r\n"
 			+ "  volumeMode: Filesystem";
 	
+	/**
+	 * @param name name
+	 * @throws Exception exception
+	 */
 	public PVWriter(String name) throws Exception {
 		super(name);
 	}
 
+	/**
+	 * capacity
+	 */
 	static final String CAPACITY = "storage: #SIZE#Gi";
 	
+	/**
+	 * @param gb gb
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public PVWriter withCapacity(String gb) throws Exception {
 		ObjectNode spec = (ObjectNode) json.get("spec");
 		spec.set("capacity", toObjectNode(CAPACITY, new String[] {"#SIZE#", gb}));
 		return this;
 	}
 	
+	/**
+	 * claimref
+	 */
 	static final String CLAIMREF = "apiVersion: v1\r\n"
 			+ "kind: PersistentVolumeClaim\r\n"
 			+ "name: #PV_NAME#\r\n"
 			+ "namespace: #PV_NAMESPACE#";
 	
+	/**
+	 * @param name name
+	 * @param namespace namespace
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public PVWriter withPVC(String name, String namespace) throws Exception {
 		ObjectNode spec = getObjectValue("spec");
 		spec.set("claimRef", toObjectNode(CLAIMREF, new String[] {"#PV_NAME#", name, "#PV_NAMESPACE#", namespace}));
 		return this;
 	}
 	
+	/**
+	 * hostpath
+	 */
 	static final String HOSTPATH = "path: #PATH#";
 	
+	/**
+	 * @param hostpath hostpath
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public PVWriter withPath(String hostpath) throws Exception {
 		ObjectNode spec = getObjectValue("spec");
 		spec.set("hostPath", toObjectNode(HOSTPATH, new String[] {"#PATH#", hostpath}));

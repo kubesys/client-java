@@ -5,7 +5,6 @@ package io.github.kubesys.client.cores;
 
 import java.util.logging.Logger;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.KubernetesClient;
@@ -54,7 +53,7 @@ public class KubernetesListener {
 		String path = KubernetesConstants.VALUE_APIS + "/" +  apiGroup + "/" + version;
 		
 		try {
-			registry.registerKinds(client.getRequester(), path);
+			registry.registerKinds(client.getKubernetesAdminConfig(), path);
 		} catch (Exception e) {
 			m_logger.warning("fail to register: " + e);
 		}

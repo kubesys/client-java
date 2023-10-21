@@ -39,7 +39,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		String path =  KubernetesConstants.VALUE_APIS + "/" + apiGroup + "/" + version;
 		
 		try {
-			client.getAnalyzer().registry.registerKinds(client.getRequester(), path);
+			client.getAnalyzer().registry.registerKinds(client.getKubernetesAdminConfig(), path);
 		} catch (Exception e) {
 			m_logger.severe(e.toString());
 		}

@@ -21,9 +21,18 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Env {
 
+	/**
+	 * @return description
+	 */
 	String description() default "";
 	
+	/**
+	 * @return example
+	 */
 	String example() default "";
 	
+	/**
+	 * @return value
+	 */
 	String defaultValue() default "";
 }

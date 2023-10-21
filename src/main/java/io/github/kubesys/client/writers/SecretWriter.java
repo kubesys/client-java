@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class SecretWriter extends KindWriter {
 
+	/**
+	 * template
+	 */
 	static final String TEMPLATE = "apiVersion: v1\r\n"
 			+ "kind: Secret\r\n"
 			+ "metadata:\r\n"
@@ -20,10 +23,20 @@ public class SecretWriter extends KindWriter {
 			+ "  namespace: #NAMESPACE#\r\n"
 			+ "type: Opaque";
 	
+	/**
+	 * @param name name
+	 * @param namespace namespace
+	 * @throws Exception exception
+	 */
 	public SecretWriter(String name, String namespace) throws Exception {
 		super(name, namespace);
 	}
 
+	/**
+	 * @param key key
+	 * @param value value
+	 * @return this object
+	 */
 	public SecretWriter withData(String key, String value) {
 		ObjectNode data = getObjectValue("data");
 		data.put(key, value);

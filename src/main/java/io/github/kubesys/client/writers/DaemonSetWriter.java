@@ -11,6 +11,11 @@ package io.github.kubesys.client.writers;
  */
 public class DaemonSetWriter extends WorkloadWriter {
 
+	/**
+	 * @param name name
+	 * @param namespace namespace
+	 * @throws Exception exception
+	 */
 	public DaemonSetWriter(String name, String namespace) throws Exception {
 		super(new String[] {
 				"#APIVERSION#", "apps/v1",

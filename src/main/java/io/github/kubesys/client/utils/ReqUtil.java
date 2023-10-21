@@ -15,7 +15,7 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
-import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
+import io.github.kubesys.client.beans.KubernetesAdminConfig;
 
 /**
  * 
@@ -42,7 +42,7 @@ public class ReqUtil {
 	 * @param body  body
 	 * @return request
 	 */
-	private static HttpUriRequestBase createRequest(HttpUriRequestBase url, BaseRequestConfig config, String body) {
+	private static HttpUriRequestBase createRequest(HttpUriRequestBase url, KubernetesAdminConfig config, String body) {
 		try {
 			url.setEntity(new StringEntity(body == null ? "" : body, ContentType.APPLICATION_JSON));
 		} catch (Exception ex) {
@@ -90,7 +90,7 @@ public class ReqUtil {
 	 * @return request or null
 	 * @throws MalformedURLException MalformedURLException
 	 */
-	public static HttpPost post(BaseRequestConfig config, String uri, String body) throws MalformedURLException {
+	public static HttpPost post(KubernetesAdminConfig config, String uri, String body) throws MalformedURLException {
 		return (HttpPost) createRequest(new HttpPost(new URL(uri).toString()), config, body);
 	}
 
@@ -101,7 +101,7 @@ public class ReqUtil {
 	 * @return request or null
 	 * @throws MalformedURLException MalformedURLException
 	 */
-	public static HttpPut put(BaseRequestConfig config, String uri, String body) throws MalformedURLException {
+	public static HttpPut put(KubernetesAdminConfig config, String uri, String body) throws MalformedURLException {
 		return (HttpPut) createRequest(new HttpPut(new URL(uri).toString()), config, body);
 	}
 
@@ -111,7 +111,7 @@ public class ReqUtil {
 	 * @return request or null
 	 * @throws MalformedURLException MalformedURLException
 	 */
-	public static HttpDelete delete(BaseRequestConfig config, String uri) throws MalformedURLException {
+	public static HttpDelete delete(KubernetesAdminConfig config, String uri) throws MalformedURLException {
 		return (HttpDelete) createRequest(new HttpDelete(new URL(uri).toString()), config, null);
 	}
 
@@ -121,7 +121,7 @@ public class ReqUtil {
 	 * @return request or null
 	 * @throws MalformedURLException MalformedURLException
 	 */
-	public static HttpGet get(BaseRequestConfig config, String uri) throws MalformedURLException {
+	public static HttpGet get(KubernetesAdminConfig config, String uri) throws MalformedURLException {
 		return (HttpGet) createRequest(new HttpGet(new URL(uri).toString()), config, null);
 	}
 

@@ -10,8 +10,8 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
 import io.github.kubesys.client.KubernetesConstants;
+import io.github.kubesys.client.beans.KubernetesAdminConfig;
 import io.github.kubesys.client.utils.ReqUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
@@ -57,7 +57,7 @@ public class KubernetesRegistry {
 	 * @param path                path
 	 * @throws Exception          exception
 	 */
-	public void registerKinds(BaseRequestConfig caller, String path) throws Exception {
+	public void registerKinds(KubernetesAdminConfig caller, String path) throws Exception {
 		
 		String uri = URLUtil.join(caller.getMasterUrl(), path);
 		

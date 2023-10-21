@@ -24,42 +24,78 @@ import io.github.kubesys.client.addons.KubernetesWriter;
  */
 public abstract class KindWriter {
 
+	/**
+	 * writer
+	 */
 	protected KubernetesWriter writer;
 	
+	/**
+	 * json
+	 */
 	protected ObjectNode json; 
 
+	/**
+	 * @param name name
+	 * @throws Exception exception
+	 */
 	public KindWriter(String name) throws Exception {
 		this.writer = new KubernetesWriter();
 		this.json = toObjectNode(getTemplate(), new String[] {"#NAME#", name});
 	}
 	
+	/**
+	 * @param name name
+	 * @param namespace namespace
+	 * @throws Exception exception
+	 */
 	public KindWriter(String name, String namespace) throws Exception {
 		this.writer = new KubernetesWriter();
 		this.json = toObjectNode(getTemplate(), new String[] {"#NAME#", name, "#NAMESPACE#", namespace});
 	}
 	
+	/**
+	 * @param kvs key and value
+	 * @throws Exception exception
+	 */
 	public KindWriter(String[] kvs) throws Exception {
 		this.writer = new KubernetesWriter();
 		this.json = toObjectNode(getTemplate(), kvs);
 	}
 	
+	/**
+	 * @param ps printStream
+	 * @throws Exception exception
+	 */
 	public void stream(PrintStream ps) throws Exception {
 		ps.println(new YAMLMapper().writeValueAsString(json));
 	}
 	
+	/**
+	 * @param path  path
+	 */
 	public void json(String path) {
 		writer.writeAsJson(path, json);
 	}
 	
+	/**
+	 * @return options
+	 */
 	static DumperOptions getDumperOptionsWithPipe() {
         DumperOptions options = new DumperOptions();
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.LITERAL);
         return options;
     }
+	/**
+	 * @param path path
+	 */
 	public void yaml(String path) {
 		writer.writeAsYaml(path, json);
 	}
 	
+	/**
+	 * @param key key
+	 * @return objectNode
+	 */
 	public ObjectNode getObjectValue(String key) {
 		if (!json.has(key)) {
 			ObjectNode val = new ObjectMapper().createObjectNode();
@@ -68,6 +104,11 @@ public abstract class KindWriter {
 		return (ObjectNode) json.get(key);
 	}
 	
+	/**
+	 * @param node node
+	 * @param key key
+	 * @return objectNode
+	 */
 	public ObjectNode getObjectValue(ObjectNode node, String key) {
 		if (!node.has(key)) {
 			ObjectNode val = new ObjectMapper().createObjectNode();
@@ -76,6 +117,11 @@ public abstract class KindWriter {
 		return (ObjectNode) node.get(key);
 	}
 	
+	/**
+	 * @param node node
+	 * @param key key
+	 * @return arrayNode
+	 */
 	public ArrayNode getArrayValue(ObjectNode node, String key) {
 		if (!node.has(key)) {
 			ArrayNode val = new ObjectMapper().createArrayNode();
@@ -84,6 +130,12 @@ public abstract class KindWriter {
 		return (ArrayNode) node.get(key);
 	}
 	
+	/**
+	 * @param str str
+	 * @param list list
+	 * @return obejctNode
+	 * @throws Exception exception
+	 */
 	public ObjectNode toObjectNode(String str, String[] list) throws Exception {
 		for (int i = 0; i < list.length; i = i + 2) {
 			str = str.replaceAll(list[i], list[i + 1]);
@@ -91,21 +143,40 @@ public abstract class KindWriter {
 		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(str);
 	}
 	
+	/**
+	 * @param key key
+	 * @param json json
+	 * @return objectNode
+	 * @throws Exception exception
+	 */
 	public ObjectNode toObjectNode(String key, JsonNode json) throws Exception {
 		ObjectNode val = new ObjectMapper().createObjectNode();
 		val.set(key, json);
 		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(val.toPrettyString());
 	}
 	
+	/**
+	 * @param obj obj
+	 * @return objectNode
+	 * @throws Exception exception
+	 */
 	public ObjectNode toObjectNode(Object obj) throws Exception {
 		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(
 				new ObjectMapper().writeValueAsString(obj));
 	}
 	
+	/**
+	 * @param json json
+	 * @return objectNode
+	 * @throws Exception exception
+	 */
 	public ObjectNode toObjectNode(String json) throws Exception {
 		return  (ObjectNode) new ObjectMapper(new YAMLFactory()).readTree(json);
 	}
 	
+	/**
+	 * @return template
+	 */
 	public abstract String getTemplate();
 	
 }

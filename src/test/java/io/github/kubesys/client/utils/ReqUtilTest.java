@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
+import io.github.kubesys.client.beans.KubernetesAdminConfig;
 
 
 /**
@@ -24,7 +24,7 @@ class ReqUtilTest {
 
 	@Test
 	void testNullUrl() throws Exception {
-		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		KubernetesAdminConfig config = new KubernetesAdminConfig("127.0.0.1", "abc");
 		assertThrows(MalformedURLException.class, () -> {
 			ReqUtil.post(config, null, "abc");
         });
@@ -33,7 +33,7 @@ class ReqUtilTest {
 	
 	@Test
 	void testInvalidNullUrl() throws Exception  {
-		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		KubernetesAdminConfig config = new KubernetesAdminConfig("127.0.0.1", "abc");
 		assertThrows(MalformedURLException.class, () -> {
 			ReqUtil.post(config, "abc", "abc");
         });
@@ -42,14 +42,14 @@ class ReqUtilTest {
 	
 	@Test
 	void testNotNullToken() throws Exception {
-		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		KubernetesAdminConfig config = new KubernetesAdminConfig("127.0.0.1", "abc");
 		assertNotNull(ReqUtil.post(config, "http://abc.com", "abc"));
 	}
 	
 	
 	@Test
 	void testNotNullBody() throws Exception {
-		BaseRequestConfig config = new BaseRequestConfig("127.0.0.1", "abc");
+		KubernetesAdminConfig config = new KubernetesAdminConfig("127.0.0.1", "abc");
 		assertNotNull(ReqUtil.post(config, "http://abc.com", "abc"));
 	}
 	

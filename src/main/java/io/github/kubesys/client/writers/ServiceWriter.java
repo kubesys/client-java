@@ -13,8 +13,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @version 1.0.2
  *
  */
+/**
+ * @author henry
+ *
+ */
 public class ServiceWriter extends KindWriter {
 
+	/**
+	 * template
+	 */
 	static final String TEMPLATE = "apiVersion: v1\r\n"
 			+ "kind: Service\r\n"
 			+ "metadata:\r\n"
@@ -23,36 +30,84 @@ public class ServiceWriter extends KindWriter {
 			+ "  labels: \r\n"
 			+ "    name: #NAME#\r\n";
 	
+	/**
+	 * @param name name
+	 * @param namespace namespace
+	 * @throws Exception exception
+	 */
 	public ServiceWriter(String name, String namespace) throws Exception {
 		super(name, namespace);
 	}
 	
+	/**
+	 * type
+	 */
 	static final String TYPE = "type: #TYPE#";
 	
+	/**
+	 * @param type type
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public ServiceWriter withType(String type) throws Exception {
 		ObjectNode spec = getObjectValue("spec");
 		spec.set("type", toObjectNode(TYPE, new String[] {"#TYPE#", type}).get("type"));
 		return this;
 	}
 	
+	/**
+	 * selector
+	 */
 	static final String SELECTOR = "name: #NAME#";
 	
+	/**
+	 * @param name name
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public ServiceWriter withSelector(String name) throws Exception {
 		ObjectNode spec = getObjectValue("spec");
 		spec.set("selector", toObjectNode(SELECTOR, new String[] {"#NAME#", name}));
 		return this;
 	}
 	
+	/**
+	 * ports
+	 */
 	static final String PORTS = "name: #NAME#";
 	
+	/**
+	 * @param port port
+	 * @param nodePort nodePort
+	 * @param name name
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public ServiceWriter withPort(int port, int nodePort, String name) throws Exception {
 		return withPort(port, port, nodePort, "TCP", name);
 	}
 	
+	/**
+	 * @param port port
+	 * @param targetPort tartgetPort
+	 * @param nodePort nodePort
+	 * @param name name
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public ServiceWriter withPort(int port, int targetPort, int nodePort, String name) throws Exception {
 		return withPort(port, targetPort, nodePort, "TCP", name);
 	}
 	
+	/**
+	 * @param port port
+	 * @param targetPort targetPort
+	 * @param nodePort nodePort
+	 * @param protocol protocol
+	 * @param name name
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public ServiceWriter withPort(int port, int targetPort, int nodePort, String protocol, String name) throws Exception {
 		ArrayNode ports = getArrayValue(getObjectValue("spec"), "ports");
 		

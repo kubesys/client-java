@@ -21,11 +21,23 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Api {
 
+	/**
+	 * @return api description
+	 */
 	String description() default "";
 	
+	/**
+	 * @return author and/or email
+	 */
 	String[] author() default {};
 	
+	/**
+	 * @return MM-YY-DD
+	 */
 	String date() default "";
 
+	/**
+	 * @return all exceptions
+	 */
 	Class<?>[] exceptions() default {};
 }

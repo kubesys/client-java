@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import io.github.kubesys.client.exceptions.KubernetesBadRequestException;
 import io.github.kubesys.client.exceptions.KubernetesConflictResourceException;
+import io.github.kubesys.client.exceptions.KubernetesConnectionException;
 import io.github.kubesys.client.exceptions.KubernetesForbiddenAccessException;
 import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
-import io.github.kubesys.client.exceptions.KubernetesUnknownUrlException;
 
 /**
  * @author wuheng09@gmail.com
@@ -45,7 +45,7 @@ public class KubernetesClientTest {
 	
 	@Test
 	void test402() throws Exception {
-		assertThrows(KubernetesUnknownUrlException.class, () -> {
+		assertThrows(KubernetesConnectionException.class, () -> {
 			new KubernetesClient("139.9.165.93:6443","");
         });
 	}

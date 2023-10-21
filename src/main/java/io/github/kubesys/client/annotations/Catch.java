@@ -21,7 +21,13 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Catch {
 
+	/**
+	 * @return code, see io.github.kubesys.client.exceptions
+	 */
 	int code() default -1;
 	
+	/**
+	 * @return description for a given exception
+	 */
 	String description() default "";
 }

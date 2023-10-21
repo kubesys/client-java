@@ -7,12 +7,12 @@ import io.github.kubesys.client.annotations.Catch;
 
 /**
  * @author  wuheng@iscas.ac.cn
- * @since   2023/07/25
- * @version 1.0.0
+ * @since   2023/10/20
+ * @version 1.0.5
  *
  */
-@Catch(code = 501, description = "服务器未知错误")
-public class KubernetesUnknownException extends RuntimeException {
+@Catch(code = 600, description = "Kubernetes无法连接")
+public class KubernetesConnectionException extends RuntimeException {
 
 	/**
 	 * 
@@ -20,7 +20,7 @@ public class KubernetesUnknownException extends RuntimeException {
 	private static final long serialVersionUID = 3209894198735325182L;
 
 
-	public KubernetesUnknownException(String message) {
+	public KubernetesConnectionException(String message) {
 		super(message);
 	}
 

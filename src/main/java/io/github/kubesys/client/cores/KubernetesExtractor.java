@@ -11,8 +11,8 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.KubernetesClient;
-import io.github.kubesys.client.KubernetesClient.BaseRequestConfig;
 import io.github.kubesys.client.KubernetesConstants;
+import io.github.kubesys.client.beans.KubernetesAdminConfig;
 import io.github.kubesys.client.utils.ReqUtil;
 
 
@@ -34,7 +34,7 @@ public class KubernetesExtractor {
 	/**
 	 * httpCaller
 	 */
-	protected final BaseRequestConfig caller;
+	protected final KubernetesAdminConfig caller;
 	
 	/**
 	 * kubeRegistry
@@ -53,7 +53,7 @@ public class KubernetesExtractor {
 	 */
 	public KubernetesExtractor(KubernetesClient client, 
 							KubernetesRegistry registry)  {
-		this.caller = client.getRequester();
+		this.caller = client.getKubernetesAdminConfig();
 		this.registry = registry;
 		
 	}

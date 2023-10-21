@@ -21,8 +21,14 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Param {
 
+	/**
+	 * @return description
+	 */
 	String description() default "";
 	
+	/**
+	 * @return regexp
+	 */
 	String regexp() default "";
 	
 }

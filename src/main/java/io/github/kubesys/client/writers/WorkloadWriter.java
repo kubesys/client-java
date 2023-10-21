@@ -14,6 +14,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public abstract class WorkloadWriter extends KindWriter {
 
+	/**
+	 * template
+	 */
 	static final String TEMPLATE = "apiVersion: \"#APIVERSION#\"\r\n"
 			+ "kind: \"#KIND#\"\r\n"
 			+ "metadata: \r\n"
@@ -31,6 +34,10 @@ public abstract class WorkloadWriter extends KindWriter {
 			+ "      labels: \r\n"
 			+ "        name: \"#NAME#\"";
 
+	/**
+	 * @param kvs key and value
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter(String[] kvs) throws Exception {
 		super(kvs);
 		if (this.json.get("spec").get("replicas").asInt() == 0) {
@@ -38,18 +45,30 @@ public abstract class WorkloadWriter extends KindWriter {
 		}
 	}
 	
+	/**
+	 * mater
+	 */
 	static final String MATSER = "nodeSelector:\r\n"
 			+ "  node-role.kubernetes.io/control-plane: \"\"\r\n"
 			+ "tolerations:\r\n"
 			+ "  - key: node-role.kubernetes.io/control-plane\r\n"
 			+ "    effect: NoSchedule";
 	
+	/**
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter withMasterEnbale() throws Exception {
 	    ObjectNode template = getObjectValue(getObjectValue("spec"), "template");
 	    template.set("spec", toObjectNode(MATSER));
 		return this;
 	}
 	
+	/**
+	 * @param container container
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter withContainer(Container container) throws Exception {
 	    ArrayNode containers = getArrayValue(getObjectValue(
 	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "containers");
@@ -58,10 +77,19 @@ public abstract class WorkloadWriter extends KindWriter {
 		return this;
 	}
 	
+	/**
+	 * volume
+	 */
 	static final String VOLUME = "name: \"#NAME#\"\r\n"
 			+ "persistentVolumeClaim:\r\n"
 			+ "  claimName: #PVC#";
 	
+	/**
+	 * @param name name
+	 * @param pvc pvc
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter withPVCVolume(String name, String pvc) throws Exception {
 	    ArrayNode volumes = getArrayValue(getObjectValue(
 	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
@@ -70,10 +98,19 @@ public abstract class WorkloadWriter extends KindWriter {
 		return this;
 	}
 	
+	/**
+	 * host
+	 */
 	static final String HOST = "name: #NAME#\r\n"
 			+ "hostPath:\r\n"
 			+ "  path: #PATH#";
 	
+	/**
+	 * @param name name
+	 * @param path path
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter withHostVolume(String name, String path) throws Exception {
 	    ArrayNode volumes = getArrayValue(getObjectValue(
 	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
@@ -82,6 +119,9 @@ public abstract class WorkloadWriter extends KindWriter {
 		return this;
 	}
 	
+	/**
+	 * configmap
+	 */
 	static final String CONFIGMAP = "name: #NAME#\r\n"
 			+ "configMap:\r\n"
 			+ "  name: #CONFIGMAP_NAME#\r\n"
@@ -89,6 +129,14 @@ public abstract class WorkloadWriter extends KindWriter {
 			+ "  - key: #CONFIGMAP_KEY#\r\n"
 			+ "    path: #PATH#";
 	
+	/**
+	 * @param name name
+	 * @param cm configmap
+	 * @param cmKey key
+	 * @param path path
+	 * @return this object
+	 * @throws Exception exception
+	 */
 	public WorkloadWriter withConfigMapVolume(String name, String cm, String cmKey, String path) throws Exception {
 	    ArrayNode volumes = getArrayValue(getObjectValue(
 	    		getObjectValue(getObjectValue("spec"), "template"), "spec"), "volumes");
@@ -103,22 +151,55 @@ public abstract class WorkloadWriter extends KindWriter {
 	}
 	
 	
+	/**
+	 * @author henry
+	 *
+	 */
 	public static class Container {
 		
+		/**
+		 * name
+		 */
 		String name;
 		
+		/**
+		 * image
+		 */
 		String image;
 		
+		/**
+		 * imagePullPolicy
+		 */
 		String imagePullPolicy = "IfNotPresent";
 		
+		/**
+		 * env
+		 */
 		Env[] env;
 		
+		/**
+		 * args
+		 */
 		String[] args;
 		
+		/**
+		 * ports
+		 */
 		Port[] ports;
 		
+		/**
+		 * volumeMounts
+		 */
 		VolumeMount[] volumeMounts;
 
+		/**
+		 * @param name name
+		 * @param image image
+		 * @param args args
+		 * @param env env
+		 * @param ports ports
+		 * @param volumeMounts volumeMounts
+		 */
 		public Container(String name, String image, String[] args, Env[] env, Port[] ports, VolumeMount[] volumeMounts) {
 			super();
 			this.name = name;
@@ -129,6 +210,13 @@ public abstract class WorkloadWriter extends KindWriter {
 			this.volumeMounts = volumeMounts;
 		}
 		
+		/**
+		 * @param name name
+		 * @param image image
+		 * @param env env
+		 * @param ports ports
+		 * @param volumeMounts volumeMounts
+		 */
 		public Container(String name, String image, Env[] env, Port[] ports, VolumeMount[] volumeMounts) {
 			super();
 			this.name = name;
@@ -138,58 +226,100 @@ public abstract class WorkloadWriter extends KindWriter {
 			this.volumeMounts = volumeMounts;
 		}
 
+		/**
+		 * @return env
+		 */
 		public Env[] getEnv() {
 			return env;
 		}
 
+		/**
+		 * @param env env
+		 */
 		public void setEnv(Env[] env) {
 			this.env = env;
 		}
 
+		/**
+		 * @return ports
+		 */
 		public Port[] getPorts() {
 			return ports;
 		}
 
+		/**
+		 * @param ports ports
+		 */
 		public void setPorts(Port[] ports) {
 			this.ports = ports;
 		}
 
+		/**
+		 * @return volumeMounts
+		 */
 		public VolumeMount[] getVolumeMounts() {
 			return volumeMounts;
 		}
 
+		/**
+		 * @param volumeMounts volumeMounts
+		 */
 		public void setVolumeMounts(VolumeMount[] volumeMounts) {
 			this.volumeMounts = volumeMounts;
 		}
 
+		/**
+		 * @return name
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * @param name name
+		 */
 		public void setName(String name) {
 			this.name = name;
 		}
 
+		/**
+		 * @return image
+		 */
 		public String getImage() {
 			return image;
 		}
 
+		/**
+		 * @param image image
+		 */
 		public void setImage(String image) {
 			this.image = image;
 		}
 
+		/**
+		 * @return imagePullPolicy
+		 */
 		public String getImagePullPolicy() {
 			return imagePullPolicy;
 		}
 
+		/**
+		 * @param imagePullPolicy imagePullPolicy
+		 */
 		public void setImagePullPolicy(String imagePullPolicy) {
 			this.imagePullPolicy = imagePullPolicy;
 		}
 
+		/**
+		 * @return args
+		 */
 		public String[] getArgs() {
 			return args;
 		}
 
+		/**
+		 * @param args args
+		 */
 		public void setArgs(String[] args) {
 			this.args = args;
 		}
@@ -198,11 +328,20 @@ public abstract class WorkloadWriter extends KindWriter {
 	
 	public static class Env {
 		
+		/**
+		 * name
+		 */
 		String name;
 		
+		/**
+		 * valueFrom
+		 */
 		ValueFrom valueFrom;
 		
-		
+		/**
+		 * @param name name
+		 * @param valueFrom valueFrom
+		 */
 		public Env(String name, ValueFrom valueFrom) {
 			super();
 			this.name = name;
@@ -210,45 +349,88 @@ public abstract class WorkloadWriter extends KindWriter {
 		}
 
 
+		/**
+		 * @return name
+		 */
 		public String getName() {
 			return name;
 		}
 
 
+		/**
+		 * @param name name
+		 */
 		public void setName(String name) {
 			this.name = name;
 		}
 
+		/**
+		 * @return valueFrom
+		 */
 		public ValueFrom getValueFrom() {
 			return valueFrom;
 		}
 
+		/**
+		 * @param valueFrom valueFrom
+		 */
 		public void setValueFrom(ValueFrom valueFrom) {
 			this.valueFrom = valueFrom;
 		}
 
+		/**
+		 * @author henry
+		 *
+		 */
 		public static class ValueFrom {
 			
+			/**
+			 * secretKeyRef
+			 */
 			SecretKeyRef secretKeyRef;
 			
+			/**
+			 * @param secretKeyRef secretKeyRef
+			 */
 			public ValueFrom(SecretKeyRef secretKeyRef) {
 				super();
 				this.secretKeyRef = secretKeyRef;
 			}
 
+			/**
+			 * @return secretKeyRef
+			 */
 			public SecretKeyRef getSecretKeyRef() {
 				return secretKeyRef;
 			}
 
+			/**
+			 * @param secretKeyRef secretKeyRef
+			 */
 			public void setSecretKeyRef(SecretKeyRef secretKeyRef) {
 				this.secretKeyRef = secretKeyRef;
 			}
 
+			/**
+			 * @author henry
+			 *
+			 */
 			public static class SecretKeyRef {
+				
+				/**
+				 * name 
+				 */
 				String name;
 				
+				/**
+				 * key
+				 */
 				String key;
 
+				/**
+				 * @param name name
+				 * @param key  key
+				 */
 				public SecretKeyRef(String name, String key) {
 					super();
 					this.name = name;
@@ -256,18 +438,30 @@ public abstract class WorkloadWriter extends KindWriter {
 				}
 				
 
+				/**
+				 * @return name
+				 */
 				public String getName() {
 					return name;
 				}
 
+				/**
+				 * @param name name
+				 */
 				public void setName(String name) {
 					this.name = name;
 				}
 
+				/**
+				 * @return key
+				 */
 				public String getKey() {
 					return key;
 				}
 
+				/**
+				 * @param key key
+				 */
 				public void setKey(String key) {
 					this.key = key;
 				}
@@ -276,48 +470,90 @@ public abstract class WorkloadWriter extends KindWriter {
 		}
 	}
 	
+	/**
+	 * @author henry
+	 *
+	 */
 	public static class Port {
 		
+		/**
+		 * containerPort
+		 */
 		int containerPort;
 
+		/**
+		 * @param containerPort containerPort
+		 */
 		public Port(int containerPort) {
 			super();
 			this.containerPort = containerPort;
 		}
 
+		/**
+		 * @return containerPort
+		 */
 		public int getContainerPort() {
 			return containerPort;
 		}
 
+		/**
+		 * @param containerPort containerPort
+		 */
 		public void setContainerPort(int containerPort) {
 			this.containerPort = containerPort;
 		}
 		
 	}
 	
+	/**
+	 * @author henry
+	 *
+	 */
 	public static class VolumeMount {
+		/**
+		 * name
+		 */
 		String name;
 		
+		/**
+		 * mountPath
+		 */
 		String mountPath;
 
+		/**
+		 * @param name name
+		 * @param mountPath mountPath
+		 */
 		public VolumeMount(String name, String mountPath) {
 			super();
 			this.name = name;
 			this.mountPath = mountPath;
 		}
 
+		/**
+		 * @return name
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * @param name name
+		 */
 		public void setName(String name) {
 			this.name = name;
 		}
 
+		/**
+		 * @return mountPath
+		 */
 		public String getMountPath() {
 			return mountPath;
 		}
 
+		/**
+		 * @param mountPath mountPath
+		 */
 		public void setMountPath(String mountPath) {
 			this.mountPath = mountPath;
 		}
