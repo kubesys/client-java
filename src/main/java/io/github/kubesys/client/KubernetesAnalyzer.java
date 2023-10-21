@@ -24,12 +24,12 @@ public final class KubernetesAnalyzer {
 	/**
 	 * convertor
 	 */
-	protected final KubernetesConvertor convertor;
+	public final KubernetesConvertor convertor;
 
 	/**
 	 * registry
 	 */
-	protected final KubernetesRegistry registry;
+	public final KubernetesRegistry registry;
 
 	/*******************************************
 	 * 

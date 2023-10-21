@@ -1,13 +1,16 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client;
+package io.github.kubesys.client.watchers;
 
 
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.kubesys.client.KubernetesClient;
+import io.github.kubesys.client.KubernetesWatcher;
 
 /**
  * @author  wuheng09@gmail.com

@@ -7,11 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.kubesys.client.exceptions.KubernetesBadRequestException;
-import io.github.kubesys.client.exceptions.KubernetesConflictResourceException;
 import io.github.kubesys.client.exceptions.KubernetesConnectionException;
-import io.github.kubesys.client.exceptions.KubernetesForbiddenAccessException;
-import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
 
 /**
  * @author wuheng09@gmail.com

@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.github.kubesys.client.KubernetesClient;
 import io.github.kubesys.client.KubernetesConstants;
-import io.github.kubesys.client.beans.KubernetesAdminConfig;
 import io.github.kubesys.client.utils.ReqUtil;
 
 
@@ -34,7 +33,7 @@ public class KubernetesExtractor {
 	/**
 	 * httpCaller
 	 */
-	protected final KubernetesAdminConfig caller;
+	protected final KubernetesClient caller;
 	
 	/**
 	 * kubeRegistry
@@ -53,14 +52,16 @@ public class KubernetesExtractor {
 	 */
 	public KubernetesExtractor(KubernetesClient client, 
 							KubernetesRegistry registry)  {
-		this.caller = client.getKubernetesAdminConfig();
+		this.caller = client;
 		this.registry = registry;
 		
 	}
 	
 	public void start() throws Exception {
 
-		HttpGet request = ReqUtil.get(caller, caller.getMasterUrl());
+		HttpGet request = ReqUtil.get(
+				caller.getKubernetesAdminConfig(), 
+				caller.getKubernetesAdminConfig().getMasterUrl());
 		
 		JsonNode resp = caller.getResponse(request);
 		

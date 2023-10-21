@@ -53,7 +53,7 @@ public class KubernetesListener {
 		String path = KubernetesConstants.VALUE_APIS + "/" +  apiGroup + "/" + version;
 		
 		try {
-			registry.registerKinds(client.getKubernetesAdminConfig(), path);
+			registry.registerKinds(client, path);
 		} catch (Exception e) {
 			m_logger.warning("fail to register: " + e);
 		}

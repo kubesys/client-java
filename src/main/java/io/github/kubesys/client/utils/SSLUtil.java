@@ -23,7 +23,7 @@ import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
  * it is used for supporting ssl connections
  * 
  * @author wuheng@iscas.ac.cn
- * @since 2.0.5
+ * @since 1.0.5
  **/
 public class SSLUtil {
 

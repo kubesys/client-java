@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.addons;
+package io.github.kubesys.client;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.kubesys.client.KubernetesClient;
-import io.github.kubesys.client.KubernetesObjectWatcher;
+import io.github.kubesys.client.watchers.KubernetesObjectWatcher;
 
 /**
  * @author  wuheng09@gmail.com

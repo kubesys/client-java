@@ -22,7 +22,7 @@ import io.github.kubesys.client.beans.KubernetesAdminConfig;
  * It is used for creating various HttpRequest
  * 
  * @author wuheng@iscas.ac.cn
- * @since 2.0.5
+ * @since 1.0.5
  **/
 public class ReqUtil {
 

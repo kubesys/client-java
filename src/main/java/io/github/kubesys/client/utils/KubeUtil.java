@@ -3,9 +3,12 @@
  */
 package io.github.kubesys.client.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import io.github.kubesys.client.KubernetesConstants;
 
@@ -23,6 +26,26 @@ public class KubeUtil {
 		super();
 	}
 
+	
+	/**
+	 * @param json jsonNode
+	 * @return yamlString
+	 * @throws JsonProcessingException JsonProcessingException
+	 */
+	public static String jsonNodeToYamlString(JsonNode json) throws JsonProcessingException {
+		return new YAMLMapper().writeValueAsString(json);
+	}
+	
+	/**
+	 * @param yaml  yaml
+	 * @return jsonNode
+	 * @throws JsonProcessingException JsonProcessingException
+	 */
+	public static JsonNode yamlStringToJsonNode(String yaml) throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		return mapper.readTree(yaml);
+	}
+	
 	/**
 	 * for Scheduler
 	 * 

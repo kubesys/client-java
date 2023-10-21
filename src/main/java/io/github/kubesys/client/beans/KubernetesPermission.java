@@ -15,12 +15,12 @@ import java.util.logging.Logger;
  * @since 2.0.0
  * 
  */
-public class KubernetesRule {
+public class KubernetesPermission {
 
 	/**
 	 * m_logger
 	 */
-	public static final Logger m_logger = Logger.getLogger(KubernetesRule.class.getName());
+	public static final Logger m_logger = Logger.getLogger(KubernetesPermission.class.getName());
 
 	protected String[] apiGroups;
 

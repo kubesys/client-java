@@ -13,7 +13,6 @@ import io.github.kubesys.client.KubernetesConstants;
 /**
  * This is a copy of io.fabric8.kubernetes.client.utils.URLUtils in project kubernetes-client
  * 
- * 
  **/
 public class URLUtil {
 

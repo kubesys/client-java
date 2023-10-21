@@ -1,17 +1,20 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client;
+package io.github.kubesys.client.watchers;
 
 import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.github.kubesys.client.KubernetesClient;
+import io.github.kubesys.client.KubernetesConstants;
+import io.github.kubesys.client.KubernetesWatcher;
 import io.github.kubesys.client.cores.KubernetesRuleBase;
 
 /**
  * @author wuheng@iscas.ac.cn
- * @since  2.0.0
+ * @since  1.0.0
  *
  */
 public class KubernetesCRDWacther extends KubernetesWatcher {
@@ -39,7 +42,7 @@ public class KubernetesCRDWacther extends KubernetesWatcher {
 		String path =  KubernetesConstants.VALUE_APIS + "/" + apiGroup + "/" + version;
 		
 		try {
-			client.getAnalyzer().registry.registerKinds(client.getKubernetesAdminConfig(), path);
+			client.getAnalyzer().registry.registerKinds(client, path);
 		} catch (Exception e) {
 			m_logger.severe(e.toString());
 		}

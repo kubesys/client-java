@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import io.github.kubesys.client.addons.KubernetesWriter;
+import io.github.kubesys.client.KubernetesWriter;
 
 /**
  * @author wuheng@iscas.ac.cn

@@ -4,8 +4,9 @@
 package io.github.kubesys.client;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -13,9 +14,23 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.core5.http.URIScheme;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.util.Timeout;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -23,34 +38,42 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.github.kubesys.client.annotations.Api;
 import io.github.kubesys.client.beans.KubernetesAdminConfig;
 import io.github.kubesys.client.cores.KubernetesRuleBase;
+import io.github.kubesys.client.exceptions.KubernetesBadRequestException;
+import io.github.kubesys.client.exceptions.KubernetesConflictResourceException;
 import io.github.kubesys.client.exceptions.KubernetesConnectionException;
+import io.github.kubesys.client.exceptions.KubernetesForbiddenAccessException;
+import io.github.kubesys.client.exceptions.KubernetesInternalServerErrorException;
+import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
+import io.github.kubesys.client.exceptions.KubernetesUnauthorizedTokenException;
+import io.github.kubesys.client.exceptions.KubernetesUnknownException;
 import io.github.kubesys.client.utils.KubeUtil;
 import io.github.kubesys.client.utils.ReqUtil;
+import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * Kubernetes的客户端，根据https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
+ * Kubernetes客户端
+ * 根据
+ * https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
  * URL规则生产URL
  * 
  * 对于JSON参数，可参见https://kubernetes.io/docs/reference/kubernetes-api/
  * 
  * @author wuheng@iscas.ac.cn
- * @since 2.0.0
+ * @since 1.0.0
  * 
  */
 public class KubernetesClient {
 
 	/**
-	 * m_logger
+	 * 日志
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 
 
 	/**
-	 * it is used for sending requests to Kuberenetes kube-apiserver, and then
-	 * receiving response from it.
-	 * 
-	 * see /etc/kubernetes/admin.conf or /root/.kube/config
+	 * 用于连接Kubernetes api-server的配置文件，安装好Kubernetes后，
+	 * 通常位于/etc/kubernetes/admin.conf 或者 /root/.kube/config
 	 */
 	protected KubernetesAdminConfig kubernetesAdminConfig;
 
@@ -60,25 +83,12 @@ public class KubernetesClient {
 	 * (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/)
 	 */
 	protected KubernetesAnalyzer analyzer;
-
-	/**
-	 * for the Pods running on the leader nodes
-	 * 
-	 */
-	public KubernetesClient() {
-		this(new File(KubernetesConstants.KUBE_CONFIG));
-	}
-
-	/**
-	 * for the Pods running on all nodes
-	 * 
-	 * @param file such as $HOME$/.kube/conf
-	 */
-	public KubernetesClient(File file) {
-		this(file, new KubernetesAnalyzer());
-	}
-
 	
+	/**
+	 * client
+	 */
+	protected final CloseableHttpClient httpClient;
+
 	/***************************************************************************
 	 * 
 	 * using config 
@@ -86,21 +96,48 @@ public class KubernetesClient {
 	 ***************************************************************************/
 	
 	/**
+	 * 根据配置文件创建Kubernetes客户端
+	 * 
+	 * @throws KubernetesConnectionException
+	 */
+	public KubernetesClient() throws KubernetesConnectionException {
+		this(new File(KubernetesConstants.KUBE_CONFIG));
+	}
+
+	/**
+	 * 根据配置文件创建Kubernetes客户端
+	 * 
+	 * @param file 比如$HOME$/.kube/conf
+	 * @throws KubernetesConnectionException
+	 */
+	public KubernetesClient(File file) throws KubernetesConnectionException {
+		this(file, new KubernetesAnalyzer());
+	}
+
+	
+	/**
 	 * invoke Kubernetes using x509
 	 * 
 	 * @param file     file
 	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
+	 * @throws KubernetesConnectionException
 	 */
-	public KubernetesClient(File file, KubernetesAnalyzer analyzer) {
+	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(new YAMLMapper().readTree(file));
 			this.analyzer = analyzer.initIfNeed(this);
-		} catch (Exception e) {
-			m_logger.severe(e.toString());
-			System.exit(1);
+			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
+		} catch (Exception ex) {
+			throw new KubernetesConnectionException(ex.toString());
 		}
 	}
 
+	/***************************************************************************
+	 * 
+	 * using bearer token 
+	 * 
+	 ***************************************************************************/
+	
 	/**
 	 * invoke Kubernetes using token,see
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
@@ -108,9 +145,9 @@ public class KubernetesClient {
 	 * @param url   default is https://IP:6443/
 	 * @param token bearer token, you can create it using ServiceAccount and
 	 *              ClusterRoleBinding
-	 * @throws Exception 
+	 * @throws KubernetesConnectionException 
 	 */
-	public KubernetesClient(String url, String token) throws Exception {
+	public KubernetesClient(String url, String token) throws KubernetesConnectionException {
 		this(url, token, new KubernetesAnalyzer());
 	}
 
@@ -122,23 +159,22 @@ public class KubernetesClient {
 	 * @param token    bearer token, you can create it using ServiceAccount and
 	 *                 ClusterRoleBinding
 	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
-	 * @throws Exception 
+	 * @throws KubernetesConnectionException 
 	 */
-	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws Exception {
+	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(url, token);
 			this.analyzer = analyzer.initIfNeed(this);
-		} catch (MalformedURLException ex) {
-			throw new KubernetesConnectionException(ex.toString());
+			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
 		} catch (Exception ex) {
-			throw ex;
-		}
+			throw new KubernetesConnectionException(ex.toString());
+		} 
 	}
 
 	
 	/***************************************************************************
 	 * 
-	 * using bearer token 
+	 * using usename and password 
 	 * 
 	 ***************************************************************************/
 	
@@ -149,8 +185,9 @@ public class KubernetesClient {
 	 * @param url      default is https://IP:6443/
 	 * @param username basic authing
 	 * @param password basic authing
+	 * @throws KubernetesConnectionException 
 	 */
-	public KubernetesClient(String url, String username, String password) {
+	public KubernetesClient(String url, String username, String password) throws KubernetesConnectionException {
 		this(url, username, password, new KubernetesAnalyzer());
 	}
 
@@ -162,18 +199,143 @@ public class KubernetesClient {
 	 * @param username basic authing
 	 * @param password basic authing
 	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
-	 * 
+	 * @throws KubernetesConnectionException 
 	 */
-	public KubernetesClient(String url, String username, String password, KubernetesAnalyzer analyzer) {
+	public KubernetesClient(String url, String username, String password, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(url, username, password);
 			this.analyzer = analyzer.initIfNeed(this);
-		} catch (Exception e) {
-			m_logger.severe(e.toString());
-			System.exit(1);
+			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
+		} catch (Exception ex) {
+			throw new KubernetesConnectionException(ex.toString());
 		}
 	}
 
+	/**********************************************************
+	 * 
+	 * 
+	 * 
+	 * HttpClient
+	 * 
+	 * 
+	 * 
+	 **********************************************************/
+	// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
+	static Map<Integer, String> statusDesc = new HashMap<>();
+
+	static {
+		statusDesc.put(400, "Bad Request. The server could not parse or understand the request.");
+		statusDesc.put(401, "Unauthorized. A request was received without a known authentication scheme.");
+		statusDesc.put(403,
+				"Bad Request. Forbidden. The request was received and understood, but access is forbidden.");
+		statusDesc.put(409,
+				"Conflict. The request was received, but it was a request to update an older version of the object.");
+		statusDesc.put(422,
+				"Unprocessable entity. The request was parsed correctly but failed some sort of validation.");
+	}
+		
+	/**
+	 * @return httpClient
+	 * @throws Exception
+	 */
+	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac)
+			throws Exception {
+
+		@SuppressWarnings("deprecation")
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.DISABLED)
+				.setConnectionKeepAlive(Timeout.DISABLED).setConnectionRequestTimeout(Timeout.DISABLED)
+				.setResponseTimeout(Timeout.DISABLED).build();
+
+		return HttpClients.custom().setDefaultRequestConfig(requestConfig)
+				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+				.setConnectionManager(
+						new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
+								.register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
+								.register(URIScheme.HTTPS.id,
+										SSLUtil.createSocketFactory(
+												kac.keyManagers(), 
+												kac.trustManagers()))
+								.build()))
+				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy()).build();
+	}
+	
+	/**
+	 * 200 OK: 请求成功，服务器成功处理了请求并返回所请求的数据。 201 Created: 请求成功，服务器创建了新资源。 204 No
+	 * Content: 请求成功，服务器处理成功，但没有返回数据。 400 Bad Request: 请求无效，服务器无法理解请求。 401
+	 * Unauthorized: 未授权，需要进行身份验证或令牌无效。 403 Forbidden: 请求被拒绝，客户端没有访问资源的权限。 404 Not
+	 * Found: 请求的资源不存在。 409 Conflict: 请求冲突，通常用于表示资源的当前状态与请求的条件不匹配。 500 Internal
+	 * Server Error: 服务器内部错误，表示服务器在处理请求时遇到了问题。
+	 * 
+	 * @param response response
+	 * @return json json
+	 */
+	protected synchronized JsonNode parseResponse(CloseableHttpResponse response) {
+
+		switch (response.getCode()) {
+		case 200:
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+				return objectMapper.readTree(response.getEntity().getContent());
+			} catch (Exception e) {
+				throw new KubernetesUnknownException(e.toString());
+			}
+		case 201:
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+				return objectMapper.readTree(response.getEntity().getContent());
+			} catch (Exception e) {
+				throw new KubernetesUnknownException(e.toString());
+			}
+		case 400:
+			throw new KubernetesBadRequestException(response.toString());
+		case 401:
+			throw new KubernetesUnauthorizedTokenException(response.toString());
+		case 403:
+			throw new KubernetesForbiddenAccessException(response.toString());
+		case 404:
+			throw new KubernetesResourceNotFoundException(response.toString());
+		case 409:
+			throw new KubernetesConflictResourceException(response.toString());
+		case 500:
+			throw new KubernetesInternalServerErrorException(response.toString());
+		default:
+			throw new KubernetesUnknownException(response.toString());
+		}
+
+	}
+
+	/**
+	 * @param req req
+	 * @return json json
+	 * @throws Exception exception
+	 */
+	@SuppressWarnings("deprecation")
+	public synchronized JsonNode getResponse(HttpUriRequestBase req) throws Exception {
+		return parseResponse(httpClient.execute(req));
+	}
+
+	/**
+	 * @return httpClient
+	 */
+	public CloseableHttpClient getHttpClient() {
+		return httpClient;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void close() {
+		if (httpClient != null) {
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				m_logger.warning(e.toString());
+			}
+		}
+	}
+	
 	/**********************************************************
 	 * 
 	 * 
@@ -183,18 +345,6 @@ public class KubernetesClient {
 	 * 
 	 * 
 	 **********************************************************/
-
-	/**
-	 * @param yaml yaml
-	 * @return String
-	 * @throws Exception Exception
-	 */
-	@Api(description = "通过YAML文件创建Kubernetes资源", date = "2023/07/25", exceptions = {})
-	public String createResourceUsingYaml(String yaml) throws Exception {
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-		JsonNode jsonNode = mapper.readTree(yaml);
-		return new YAMLMapper().writeValueAsString(createResource(jsonNode));
-	}
 
 	/**
 	 * create a Kubernetes resource using JSON. <br>
@@ -216,6 +366,7 @@ public class KubernetesClient {
 	 * @return json Kubernetes may add come fields according to Kubernetes' context
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
+	@Api(description = "通过Json字符串创建Kubernetes资源", date = "2023/1007/21", exceptions = {})
 	public JsonNode createResource(String json) throws Exception {
 		return createResource(new ObjectMapper().readTree(json));
 	}
@@ -241,12 +392,22 @@ public class KubernetesClient {
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
 	public JsonNode createResource(JsonNode json) throws Exception {
-
 		final String uri = analyzer.getConvertor().createUrl(json);
 		HttpPost request = ReqUtil.post(kubernetesAdminConfig, uri, json.toString());
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
+	/**
+	 * @param yaml yaml
+	 * @return String
+	 * @throws Exception Exception
+	 */
+	@Api(description = "通过YAML文件创建Kubernetes资源", date = "2023/07/25", exceptions = {})
+	public String createResourceUsingYaml(String yaml) throws Exception {
+		JsonNode jsonNode = KubeUtil.yamlStringToJsonNode(yaml);
+		return KubeUtil.jsonNodeToYamlString(createResource(jsonNode));
+	}
+	
 	/**
 	 * delete a Kubernetes resource using JSON <br>
 	 * 
@@ -336,7 +497,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().deleteUrl(kind, namespace, name);
 		HttpDelete request = ReqUtil.delete(kubernetesAdminConfig, uri);
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
 	/**
@@ -418,7 +579,7 @@ public class KubernetesClient {
 		}
 
 		HttpPut request = ReqUtil.put(kubernetesAdminConfig, uri, json.toString());
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
 	/**
@@ -459,7 +620,7 @@ public class KubernetesClient {
 
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 		HttpGet request = ReqUtil.get(kubernetesAdminConfig, uri);
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
 	/**
@@ -489,7 +650,7 @@ public class KubernetesClient {
 		final String uri = analyzer.getConvertor().getUrl(kind, namespace, name);
 		try {
 			HttpGet request = ReqUtil.get(kubernetesAdminConfig, uri);
-			kubernetesAdminConfig.getResponse(request);
+			getResponse(request);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -701,7 +862,7 @@ public class KubernetesClient {
 		}
 
 		HttpGet request = ReqUtil.get(kubernetesAdminConfig, uri.toString());
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
 	/**
@@ -748,7 +909,7 @@ public class KubernetesClient {
 
 		HttpPut request = ReqUtil.put(kubernetesAdminConfig, uri, json.toString());
 
-		return kubernetesAdminConfig.getResponse(request);
+		return getResponse(request);
 	}
 
 	/**
@@ -913,7 +1074,6 @@ public class KubernetesClient {
 
 		ObjectNode map = new ObjectMapper().createObjectNode();
 		KubernetesRuleBase ruleBase = analyzer.getConvertor().getRuleBase();
-
 		for (String kind : ruleBase.fullKindToNamespacedMapper.keySet()) {
 			ObjectNode node = new ObjectMapper().createObjectNode();
 			node.put(KubernetesConstants.KUBE_APIVERSION, ruleBase.fullKindToVersionMapper.get(kind));
@@ -952,12 +1112,17 @@ public class KubernetesClient {
 	 * @return httpCaller
 	 * @throws Exception exception
 	 */
-	public KubernetesAdminConfig copy() throws Exception {
-		if (kubernetesAdminConfig.getToken() != null) {
-			return new KubernetesAdminConfig(kubernetesAdminConfig.getMasterUrl(), kubernetesAdminConfig.getToken());
-		}
-		return new KubernetesAdminConfig(kubernetesAdminConfig.getMasterUrl(), kubernetesAdminConfig.getCaCertData(), kubernetesAdminConfig.getClientCertData(),
-				kubernetesAdminConfig.getClientKeyData());
+	public CloseableHttpClient copy() throws Exception {
+		KubernetesAdminConfig kac = (kubernetesAdminConfig.getToken() != null) 
+				? new KubernetesAdminConfig(
+						kubernetesAdminConfig.getMasterUrl(), 
+						kubernetesAdminConfig.getToken()) 
+				: new KubernetesAdminConfig(
+						kubernetesAdminConfig.getMasterUrl(), 
+						kubernetesAdminConfig.getCaCertData(), 
+						kubernetesAdminConfig.getClientCertData(),
+						kubernetesAdminConfig.getClientKeyData());
+		return createDefaultHttpClient(kac);
 	}
 
 }

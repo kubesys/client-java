@@ -26,8 +26,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -36,33 +34,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
-import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.core5.http.URIScheme;
-import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.util.Timeout;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import io.github.kubesys.client.exceptions.KubernetesBadRequestException;
-import io.github.kubesys.client.exceptions.KubernetesConflictResourceException;
-import io.github.kubesys.client.exceptions.KubernetesConnectionException;
-import io.github.kubesys.client.exceptions.KubernetesForbiddenAccessException;
-import io.github.kubesys.client.exceptions.KubernetesInternalServerErrorException;
-import io.github.kubesys.client.exceptions.KubernetesResourceNotFoundException;
-import io.github.kubesys.client.exceptions.KubernetesUnauthorizedTokenException;
-import io.github.kubesys.client.exceptions.KubernetesUnknownException;
-import io.github.kubesys.client.utils.SSLUtil;
 
 /**
  * Kubernetes的客户端，根据https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
@@ -81,19 +54,7 @@ public class KubernetesAdminConfig {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAdminConfig.class.getName());
 
-	// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
-	static Map<Integer, String> statusDesc = new HashMap<>();
-
-	static {
-		statusDesc.put(400, "Bad Request. The server could not parse or understand the request.");
-		statusDesc.put(401, "Unauthorized. A request was received without a known authentication scheme.");
-		statusDesc.put(403,
-				"Bad Request. Forbidden. The request was received and understood, but access is forbidden.");
-		statusDesc.put(409,
-				"Conflict. The request was received, but it was a request to update an older version of the object.");
-		statusDesc.put(422,
-				"Unprocessable entity. The request was parsed correctly but failed some sort of validation.");
-	}
+	
 
 	/**
 	 * master IP
@@ -131,11 +92,6 @@ public class KubernetesAdminConfig {
 	protected String clientKeyData;
 
 	/**
-	 * client
-	 */
-	protected final CloseableHttpClient httpClient;
-
-	/**
 	 * @param requester requester
 	 * @throws Exception exception
 	 */
@@ -152,7 +108,6 @@ public class KubernetesAdminConfig {
 		super();
 		this.masterUrl = masterUrl;
 		this.token = token;
-		this.httpClient = createDefaultHttpClient();
 	}
 
 	/**
@@ -166,7 +121,6 @@ public class KubernetesAdminConfig {
 		this.masterUrl = masterUrl;
 		this.username = username;
 		this.password = password;
-		this.httpClient = createDefaultHttpClient();
 	}
 
 	/**
@@ -181,7 +135,6 @@ public class KubernetesAdminConfig {
 		this.caCertData = caCertData;
 		this.clientCertData = clientCertData;
 		this.clientKeyData = clientKeyData;
-		this.httpClient = createDefaultHttpClient();
 	}
 
 	/**
@@ -195,31 +148,8 @@ public class KubernetesAdminConfig {
 		JsonNode user = json.get("users").get(0).get("user");
 		this.clientCertData = user.get("client-certificate-data").asText();
 		this.clientKeyData = user.get("client-key-data").asText();
-		this.httpClient = createDefaultHttpClient();
 	}
 
-	/**
-	 * @return httpClient
-	 * @throws Exception
-	 */
-	protected CloseableHttpClient createDefaultHttpClient()
-			throws Exception {
-
-		@SuppressWarnings("deprecation")
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.DISABLED)
-				.setConnectionKeepAlive(Timeout.DISABLED).setConnectionRequestTimeout(Timeout.DISABLED)
-				.setResponseTimeout(Timeout.DISABLED).build();
-
-		return HttpClients.custom().setDefaultRequestConfig(requestConfig)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.setConnectionManager(
-						new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
-								.register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
-								.register(URIScheme.HTTPS.id,
-										SSLUtil.createSocketFactory(keyManagers(), trustManagers()))
-								.build()))
-				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy()).build();
-	}
 
 	public String getCaCertData() {
 		return caCertData;
@@ -251,14 +181,6 @@ public class KubernetesAdminConfig {
 
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	public static Map<Integer, String> getStatusDesc() {
-		return statusDesc;
-	}
-
-	public static void setStatusDesc(Map<Integer, String> statusDesc) {
-		KubernetesAdminConfig.statusDesc = statusDesc;
 	}
 
 	public String getUsername() {
@@ -372,7 +294,7 @@ public class KubernetesAdminConfig {
 		return parser.read().getInteger();
 	}
 
-	protected TrustManager[] trustManagers()
+	public TrustManager[] trustManagers()
 			throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 		if (this.caCertData == null) {
 			return null;
@@ -449,75 +371,6 @@ public class KubernetesAdminConfig {
 		return new ByteArrayInputStream(bytes);
 	}
 
-	/**
-	 * 200 OK: 请求成功，服务器成功处理了请求并返回所请求的数据。 201 Created: 请求成功，服务器创建了新资源。 204 No
-	 * Content: 请求成功，服务器处理成功，但没有返回数据。 400 Bad Request: 请求无效，服务器无法理解请求。 401
-	 * Unauthorized: 未授权，需要进行身份验证或令牌无效。 403 Forbidden: 请求被拒绝，客户端没有访问资源的权限。 404 Not
-	 * Found: 请求的资源不存在。 409 Conflict: 请求冲突，通常用于表示资源的当前状态与请求的条件不匹配。 500 Internal
-	 * Server Error: 服务器内部错误，表示服务器在处理请求时遇到了问题。
-	 * 
-	 * @param response response
-	 * @return json json
-	 */
-	protected synchronized JsonNode parseResponse(CloseableHttpResponse response) {
-
-		switch (response.getCode()) {
-		case 200:
-			try {
-				ObjectMapper objectMapper = new ObjectMapper();
-				objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-				return objectMapper.readTree(response.getEntity().getContent());
-			} catch (Exception e) {
-				throw new KubernetesUnknownException(e.toString());
-			}
-		case 201:
-			try {
-				ObjectMapper objectMapper = new ObjectMapper();
-				objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-				return objectMapper.readTree(response.getEntity().getContent());
-			} catch (Exception e) {
-				throw new KubernetesUnknownException(e.toString());
-			}
-		case 400:
-			throw new KubernetesBadRequestException(response.toString());
-		case 401:
-			throw new KubernetesUnauthorizedTokenException(response.toString());
-		case 403:
-			throw new KubernetesForbiddenAccessException(response.toString());
-		case 404:
-			throw new KubernetesResourceNotFoundException(response.toString());
-		case 409:
-			throw new KubernetesConflictResourceException(response.toString());
-		case 500:
-			throw new KubernetesInternalServerErrorException(response.toString());
-		default:
-			throw new KubernetesUnknownException(response.toString());
-		}
-
-	}
-
-	/**
-	 * @param req req
-	 * @return json json
-	 * @throws Exception exception
-	 */
-	@SuppressWarnings("deprecation")
-	public synchronized JsonNode getResponse(HttpUriRequestBase req) throws Exception {
-		return parseResponse(httpClient.execute(req));
-	}
-
-	/**
-	 * 
-	 */
-	protected void close() {
-		if (httpClient != null) {
-			try {
-				httpClient.close();
-			} catch (IOException e) {
-				m_logger.warning(e.toString());
-			}
-		}
-	}
 
 	/**
 	 * @return masterUrl
@@ -533,12 +386,6 @@ public class KubernetesAdminConfig {
 		return token;
 	}
 
-	/**
-	 * @return httpClient
-	 */
-	public CloseableHttpClient getHttpClient() {
-		return httpClient;
-	}
 
 	static class DerParser {
 
