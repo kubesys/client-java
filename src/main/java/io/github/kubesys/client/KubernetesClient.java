@@ -15,9 +15,9 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
-import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -52,12 +52,13 @@ import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * Kubernetes客户端
- * 根据
- * https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
- * URL规则生产URL
+ * Kubernetes客户端，具备自动学习Kubernetes中kind生命周期变化的能力，
+ * 好处是，当Kubernetes通过CRD机制重新注册一个kind资源时，本接口无需
+ * 重新编译，即可在线对其进行生命周期管理
  * 
- * 对于JSON参数，可参见https://kubernetes.io/docs/reference/kubernetes-api/
+ * 参见：
+ * - https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27 
+ * - https://kubernetes.io/docs/reference/kubernetes-api/
  * 
  * @author wuheng@iscas.ac.cn
  * @since 1.0.0
@@ -78,14 +79,13 @@ public class KubernetesClient {
 	protected KubernetesAdminConfig kubernetesAdminConfig;
 
 	/**
-	 * it is used for getting the metadata of all kinds in Kubernetes according to
-	 * [Kubernetes API pattern]
-	 * (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/)
+	 * 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url，
+	 * 参见https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/
 	 */
 	protected KubernetesAnalyzer analyzer;
 	
 	/**
-	 * client
+	 * 用于与Kubernetes进行交互
 	 */
 	protected final CloseableHttpClient httpClient;
 
@@ -116,17 +116,17 @@ public class KubernetesClient {
 
 	
 	/**
-	 * invoke Kubernetes using x509
-	 * 
-	 * @param file     file
-	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
+	 *  根据配置文件创建Kubernetes客户端
+	 *  
+	 * @param file     比如$HOME$/.kube/conf
+	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
 	 * @throws KubernetesConnectionException
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(new YAMLMapper().readTree(file));
-			this.analyzer = analyzer.initIfNeed(this);
 			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
+			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception ex) {
 			throw new KubernetesConnectionException(ex.toString());
 		}
@@ -139,12 +139,11 @@ public class KubernetesClient {
 	 ***************************************************************************/
 	
 	/**
-	 * invoke Kubernetes using token,see
+	 * 根据token访问kubernetes
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
-	 * @param url   default is https://IP:6443/
-	 * @param token bearer token, you can create it using ServiceAccount and
-	 *              ClusterRoleBinding
+	 * @param url   如https://IP:6443/
+	 * @param token bearer token, 通过ServiceAccount和ClusterRoleBinding进行创建
 	 * @throws KubernetesConnectionException 
 	 */
 	public KubernetesClient(String url, String token) throws KubernetesConnectionException {
@@ -152,20 +151,19 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * invoke Kubernetes using token, see
+	 * 根据token访问kubernetes
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
-	 * @param url      default is https://IP:6443/
-	 * @param token    bearer token, you can create it using ServiceAccount and
-	 *                 ClusterRoleBinding
-	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
+	 * @param url      如https://IP:6443/
+	 * @param token    bearer token, 通过ServiceAccount和ClusterRoleBinding进行创建
+	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
 	 * @throws KubernetesConnectionException 
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(url, token);
-			this.analyzer = analyzer.initIfNeed(this);
 			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
+			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception ex) {
 			throw new KubernetesConnectionException(ex.toString());
 		} 
@@ -179,10 +177,10 @@ public class KubernetesClient {
 	 ***************************************************************************/
 	
 	/**
-	 * invoke Kubernetes using token,see
+	 * 根据用户名密码创建Kubernetes连接
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
-	 * @param url      default is https://IP:6443/
+	 * @param url      如https://IP:6443/
 	 * @param username basic authing
 	 * @param password basic authing
 	 * @throws KubernetesConnectionException 
@@ -192,20 +190,20 @@ public class KubernetesClient {
 	}
 
 	/**
-	 * invoke Kubernetes using token, see
+	 * 根据用户名密码创建Kubernetes连接
 	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 	 * 
 	 * @param url      default is https://IP:6443/
 	 * @param username basic authing
 	 * @param password basic authing
-	 * @param analyzer it is used for getting the metadata for each Kubernetes kind.
+	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
 	 * @throws KubernetesConnectionException 
 	 */
 	public KubernetesClient(String url, String username, String password, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
 			this.kubernetesAdminConfig = new KubernetesAdminConfig(url, username, password);
-			this.analyzer = analyzer.initIfNeed(this);
 			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
+			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception ex) {
 			throw new KubernetesConnectionException(ex.toString());
 		}
@@ -238,24 +236,32 @@ public class KubernetesClient {
 	 * @return httpClient
 	 * @throws Exception
 	 */
-	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac)
-			throws Exception {
+	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac) throws Exception {
 
-		@SuppressWarnings("deprecation")
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.DISABLED)
-				.setConnectionKeepAlive(Timeout.DISABLED).setConnectionRequestTimeout(Timeout.DISABLED)
-				.setResponseTimeout(Timeout.DISABLED).build();
-
-		return HttpClients.custom().setDefaultRequestConfig(requestConfig)
-				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-				.setConnectionManager(
-						new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
-								.register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
-								.register(URIScheme.HTTPS.id,
-										SSLUtil.createSocketFactory(
-												kac.keyManagers(), 
-												kac.trustManagers()))
-								.build()))
+		ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
+                .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
+                .build();
+		
+		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
+				.register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
+				.register(URIScheme.HTTPS.id,
+						SSLUtil.createSocketFactory(
+								kac.keyManagers(), 
+								kac.trustManagers()))
+				.build());
+		
+		connManager.setDefaultConnectionConfig(connectionConfig);
+		
+		RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectionKeepAlive(Timeout.ZERO_MILLISECONDS)
+				.setConnectionRequestTimeout(Timeout.ZERO_MILLISECONDS)
+				.setResponseTimeout(Timeout.ZERO_MILLISECONDS)
+				.build();
+		
+		return HttpClients.custom()
+				.setDefaultRequestConfig(requestConfig)
+				.setConnectionManager(connManager)
 				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy()).build();
 	}
 	

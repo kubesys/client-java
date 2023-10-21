@@ -44,7 +44,9 @@ public class WatchKindTest extends AbstractKubernetesClientTest {
 			}
 
 		};
-		client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+		
+//		client.watchResources("apiextensions.k8s.io.CustomResourceDefinition", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		// or
 //		client.watchResources("apps.Deployment", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
