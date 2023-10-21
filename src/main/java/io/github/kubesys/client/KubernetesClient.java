@@ -1045,6 +1045,115 @@ public class KubernetesClient {
 		return createResource(KubeUtil.toBinding(pod, namespace, host));
 	}
 	
+	
+	/**
+	 * {
+	"kind": "CustomResourceDefinition",
+	"apiVersion": "apiextensions.k8s.io/v1",
+	"metadata": {
+		"name": "virtualmachines.doslab.io",
+		"uid": "eac76c1c-254d-4895-b815-381755805da7",
+		"resourceVersion": "10577917",
+		"generation": 1,
+		"creationTimestamp": "2023-10-21T08:23:57Z",
+		"labels": {
+			"kubevirt.io": ""
+		},
+		"annotations": {
+			"kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apiextensions.k8s.io/v1\",\"kind\":\"CustomResourceDefinition\",\"metadata\":{\"annotations\":{},\"labels\":{\"kubevirt.io\":\"\"},\"name\":\"virtualmachines.doslab.io\"},\"spec\":{\"group\":\"doslab.io\",\"names\":{\"kind\":\"VirtualMachine\",\"plural\":\"virtualmachines\",\"shortNames\":[\"vm\",\"vms\"],\"singular\":\"virtualmachine\"},\"scope\":\"Namespaced\",\"versions\":[{\"additionalPrinterColumns\":[{\"jsonPath\":\".spec.domain.uuid.text\",\"name\":\"UUID\",\"type\":\"string\"},{\"jsonPath\":\".spec.domain._type\",\"name\":\"TYPE\",\"type\":\"string\"},{\"jsonPath\":\".spec.domain.vcpu._current\",\"name\":\"CPU\",\"type\":\"string\"},{\"jsonPath\":\".spec.domain.currentMemory.text\",\"name\":\"RAM(KB)\",\"type\":\"string\"},{\"jsonPath\":\".spec.powerstate\",\"name\":\"STATUS\",\"type\":\"string\"},{\"jsonPath\":\".metadata.creationTimestamp\",\"name\":\"AGE\",\"type\":\"date\"},{\"jsonPath\":\".spec.nodeName\",\"name\":\"NODE\",\"type\":\"string\"},{\"jsonPath\":\".spec.status.conditions.state.waiting.reason\",\"name\":\"MESSAGE\",\"type\":\"string\"},{\"jsonPath\":\".spec.image\",\"name\":\"IMAGE\",\"type\":\"string\"}],\"name\":\"v1\",\"schema\":{\"openAPIV3Schema\":{\"properties\":{\"spec\":{\"type\":\"object\",\"x-kubernetes-preserve-unknown-fields\":true}},\"type\":\"object\"}},\"served\":true,\"storage\":true}]}}\n"
+		},
+		"spec": {
+			"group": "doslab.io",
+			"names": {
+				"plural": "virtualmachines",
+				"singular": "virtualmachine",
+				"shortNames": ["vm", "vms"],
+				"kind": "VirtualMachine",
+				"listKind": "VirtualMachineList"
+			},
+			"scope": "Namespaced",
+			"versions": [{
+				"name": "v1",
+				"served": true,
+				"storage": true,
+				"schema": {
+					"openAPIV3Schema": {
+						"type": "object",
+						"properties": {
+							"spec": {
+								"type": "object",
+								"x-kubernetes-preserve-unknown-fields": true
+							}
+						}
+					}
+				},
+				"additionalPrinterColumns": [{
+					"name": "UUID",
+					"type": "string",
+					"jsonPath": ".spec.domain.uuid.text"
+				}, {
+					"name": "TYPE",
+					"type": "string",
+					"jsonPath": ".spec.domain._type"
+				}, {
+					"name": "CPU",
+					"type": "string",
+					"jsonPath": ".spec.domain.vcpu._current"
+				}, {
+					"name": "RAM(KB)",
+					"type": "string",
+					"jsonPath": ".spec.domain.currentMemory.text"
+				}, {
+					"name": "STATUS",
+					"type": "string",
+					"jsonPath": ".spec.powerstate"
+				}, {
+					"name": "AGE",
+					"type": "date",
+					"jsonPath": ".metadata.creationTimestamp"
+				}, {
+					"name": "NODE",
+					"type": "string",
+					"jsonPath": ".spec.nodeName"
+				}, {
+					"name": "MESSAGE",
+					"type": "string",
+					"jsonPath": ".spec.status.conditions.state.waiting.reason"
+				}, {
+					"name": "IMAGE",
+					"type": "string",
+					"jsonPath": ".spec.image"
+				}]
+			}],
+			"conversion": {
+				"strategy": "None"
+			}
+		},
+		"status": {
+			"conditions": null,
+			"acceptedNames": {
+				"plural": "",
+				"kind": ""
+			},
+			"storedVersions": ["v1"]
+		}
+	}
+	 * 
+	 * @param crd 上面就是一个CRD例子
+	 * @return /apis/doslab.io/v1
+	 * @throws Exception 
+	 */
+	public boolean registerResource(JsonNode crd) throws Exception {
+		if (crd.has("kind") && crd.get("kind").asText().equals("CustomResourceDefinition")) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("/apis/").append(crd.get("spec").get("group").asText()).append("/")
+				.append(crd.get("spec").get("versions").get(0).get("name").asText());
+			getAnalyzer().getRegistry().registerKinds(this, sb.toString());
+			return true;
+		}
+		
+		throw new KubernetesInternalServerErrorException("it is not a valid crd.");
+	}
 	/**********************************************************
 	 * 
 	 * 

@@ -78,7 +78,7 @@ public class KubernetesRegistry {
 			
 			// we only support a version for each resources
 			if (ruleBase.getNameMapping().containsKey(fullKind) ||
-					(fullKind == shortKind && fullKind.endsWith("Options"))) {
+					(fullKind.equals(shortKind) && fullKind.endsWith("Options"))) {
 				continue;
 			}
 
