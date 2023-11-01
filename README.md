@@ -52,7 +52,7 @@ Add this dependency to your project's POM:
    <repository>
        <id>pdos-repos</id>
        <name>PDOS Releases</name>
-       <url>https://g-ubjg5602.coding.net/public-artifacts/iscas-system/kubesys/packages</url>
+       <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/maven</url>
     </repository>
 </repositories>
 ```
