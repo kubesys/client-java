@@ -77,7 +77,7 @@ Add this dependency to your project's POM:
             <repository>
                 <id>g-ubjg5602-iscas-system-maven</id>
                 <name>maven</name>
-                <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/maven/</url>
+                <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/jars/</url>
                 <releases>
                     <enabled>true</enabled>
                 </releases>

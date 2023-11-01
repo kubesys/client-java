@@ -255,7 +255,7 @@
             <!--必须与 settings.xml 的 id 一致-->
             <id>g-ubjg5602-iscas-system-maven</id>
             <name>maven</name>
-            <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/maven/</url>
+            <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/jars/</url>
         </repository>
     </distributionManagement>
 </project>
