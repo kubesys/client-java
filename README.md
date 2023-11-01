@@ -47,14 +47,47 @@ Add this dependency to your project's POM:
   <artifactId>client-java</artifactId>
   <version>1.0.5</version> 
 </dependency>
+```
 
-<repositories>
-   <repository>
-       <id>pdos-repos</id>
-       <name>PDOS Releases</name>
-       <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/maven</url>
-    </repository>
-</repositories>
+1. maven setting
+
+```
+<settings>
+    <!-- omitted xml -->
+    <servers>
+        <server>
+            <id>g-ubjg5602-iscas-system-maven</id>
+            <username>wuheng@iscas.ac.cn</username>
+            <password>[PASSWORD]</password>
+        </server>
+    </servers>
+</settings>
+```
+
+2. pom setting
+
+```
+<profiles>
+    <profile>
+        <id>Repository Proxy</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <repositories>
+            <repository>
+                <id>g-ubjg5602-iscas-system-maven</id>
+                <name>maven</name>
+                <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/maven/</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+            </repository>
+        </repositories>
+    </profile>
+</profiles>
 ```
 
 ## Quick start
