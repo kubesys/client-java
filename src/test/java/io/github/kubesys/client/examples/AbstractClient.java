@@ -1,15 +1,18 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client;
+package io.github.kubesys.client.examples;
 
 import java.io.File;
+
+import io.github.kubesys.client.KubernetesAnalyzer;
+import io.github.kubesys.client.KubernetesClient;
 
 /**
  * @author wuheng09@gmail.com
  *
  */
-public abstract class AbstractKubernetesClientTest {
+public abstract class AbstractClient {
 
 	public static KubernetesClient createClient1(KubernetesAnalyzer ana) throws Exception {
 		return (ana == null) ? new KubernetesClient(System.getenv("url"), System.getenv("token")) : 

@@ -29,13 +29,8 @@ public @interface Api {
 	/**
 	 * @return author and/or email
 	 */
-	String[] author() default {};
+	String[] author() default {"wuheng@iscas.ac.cn"};
 	
-	/**
-	 * @return MM-YY-DD
-	 */
-	String date() default "";
-
 	/**
 	 * @return all exceptions
 	 */

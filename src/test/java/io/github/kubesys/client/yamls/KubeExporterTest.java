@@ -1,7 +1,7 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.install.stack;
+package io.github.kubesys.client.yamls;
 
 
 import io.github.kubesys.client.writers.DaemonSetWriter;

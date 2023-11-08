@@ -52,12 +52,12 @@ public class KubeUtil {
 	 * { "apiVersion": "v1", "kind": "Binding", "metadata": { "name": "podName" },
 	 * "target": { "apiVersion": "v1", "kind": "Node", "name": "hostName" } }
 	 * 
-	 * @param podName  name
 	 * @param podNamespace namespace
+	 * @param podName  name
 	 * @param hostName hostname
 	 * @return json json from Kubernetes
 	 */
-	public static JsonNode toBinding(String podName, String podNamespace, String hostName) {
+	public static JsonNode toBinding(String podNamespace, String podName, String hostName) {
 
 		ObjectNode binding = new ObjectMapper().createObjectNode();
 		binding.put(KubernetesConstants.KUBE_APIVERSION, KubernetesConstants.DEFAULT_APIVERSION);

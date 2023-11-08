@@ -1,7 +1,7 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.utils;
+package io.github.kubesys.client.unit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import org.junit.jupiter.api.Test;
 
 import io.github.kubesys.client.beans.KubernetesAdminConfig;
+import io.github.kubesys.client.utils.ReqUtil;
 
 
 /**

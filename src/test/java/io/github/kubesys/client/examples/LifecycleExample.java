@@ -1,14 +1,12 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.testcases;
+package io.github.kubesys.client.examples;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.github.kubesys.client.AbstractKubernetesClientTest;
 import io.github.kubesys.client.KubernetesClient;
 import io.github.kubesys.client.KubernetesWatcher;
 
@@ -17,7 +15,7 @@ import io.github.kubesys.client.KubernetesWatcher;
  * @author wuheng09@gmail.com
  *
  */
-public class LifecycleTest extends AbstractKubernetesClientTest {
+public class LifecycleExample extends AbstractClient {
 
 	static String CreateYaml = "apiVersion: v1\r\n"
 			+ "kind: Pod\r\n"
@@ -69,21 +67,26 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	
 	
 	public static void main(String[] args) throws Exception {
-//		System.out.println(CreateJSON);
 		KubernetesClient client = createClient1(null);
 
+		System.out.println("------List");
+		list(client);
+		System.out.println("------Create");
 		create(client);
 //		updateStatus(client);
-//		update(client);
-//		get(client);
-//		list(client);
-//		watch(client);
-//		delete(client);
+		System.out.println("------Update");
+		update(client);
+		System.out.println("------Get");
+		get(client);
+		System.out.println("------Watch");
+		watch(client);
+		System.out.println("------Delete");
+		delete(client);
 	}
 
 
 	static void watch(KubernetesClient client) throws Exception {
-		client.watchResources("Namespace", new KubernetesWatcher(client) {
+		client.watchResourcesByFullkind("Namespace", new KubernetesWatcher(client) {
 			
 			@Override
 			public void doModified(JsonNode node) {
@@ -109,7 +112,7 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 
 
 	protected static void updateStatus(KubernetesClient client) throws Exception {
-		ObjectNode node = client.getResource("Pod", "default", "busybox").deepCopy();
+		ObjectNode node = client.getResourceByNamespaceAndName("Pod", "default", "busybox").deepCopy();
 		JsonNode status = node.get("status");
 		((ObjectNode) status).put("phase", "Testing");
 		System.out.println(client.updateResourceStatus(node));
@@ -133,7 +136,7 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 //		System.out.println(client.deleteResource("Deployment", "default", "busybox").toPrettyString());
 		// or
 //		System.out.println(client.deleteResource("apps.Deployment", "default", "busybox").toPrettyString());
-		System.out.println(client.deleteResource("Pod", "default", "busybox").toPrettyString());
+		System.out.println(client.deleteResourceByNamespaceAndName("Pod", "default", "busybox").toPrettyString());
 	}
 
 
@@ -141,13 +144,13 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 //		System.out.println(client.getResource("Deployment", "default", "busybox").toPrettyString());
 		// or
 //		System.out.println(client.getResource("apps.Deployment", "default", "busybox").toPrettyString());
-		System.out.println(client.getResource("Pod", "default", "busybox"));
+		System.out.println(client.getResourceByNamespaceAndName("Pod", "default", "busybox"));
 	}
 
 
 	protected static void create(KubernetesClient client) throws Exception {
 //		System.out.println(client.createResource(new ObjectMapper().readTree(CreateJSON)));
-		System.out.println(client.createResourceUsingYaml(CreateYaml));
+		System.out.println(client.createResourceByYaml(CreateYaml));
 	}
 	
 	protected static void create(KubernetesClient client, JsonNode json) throws Exception {
@@ -155,12 +158,12 @@ public class LifecycleTest extends AbstractKubernetesClientTest {
 	}
 
 	protected static void update(KubernetesClient client) throws Exception {
-//		ObjectNode node = client.getResource("Deployment", "default", "busybox").deepCopy();
+		ObjectNode node = client.getResourceByNamespaceAndName("Deployment", "default", "busybox").deepCopy();
 		// or
-		ObjectNode node = client.getResource("apps.Deployment", "default", "busybox").deepCopy();
-		ObjectNode spec = (ObjectNode) node.get("spec");
-		spec.put("replicas", 2);
-		System.out.println(client.updateResource(new ObjectMapper()
-				.readTree(node.toString())).toPrettyString());
+//		ObjectNode node = client.getResource("apps.Deployment", "default", "busybox").deepCopy();
+//		ObjectNode spec = (ObjectNode) node.get("spec");
+//		spec.put("replicas", 2);
+//		System.out.println(client.updateResource(new ObjectMapper()
+//				.readTree(node.toString())).toPrettyString());
 	}
 }

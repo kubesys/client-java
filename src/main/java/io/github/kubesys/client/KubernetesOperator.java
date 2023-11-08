@@ -42,7 +42,7 @@ public abstract class KubernetesOperator<O> {
 	
 	protected KubernetesOperator(KubernetesClient client, String kind) throws Exception {
 		this.client = client;
-		client.watchResources(kind, new KubernetesObjectWatcher<O>(client) {
+		client.watchResourcesByFullkind(kind, new KubernetesObjectWatcher<O>(client) {
 
 			@Override
 			public void doObjectAdded(O node) {

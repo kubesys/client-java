@@ -1,13 +1,12 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.testcases;
+package io.github.kubesys.client.examples;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.kubesys.client.AbstractKubernetesClientTest;
 import io.github.kubesys.client.KubernetesWriter;
 
 
@@ -15,7 +14,7 @@ import io.github.kubesys.client.KubernetesWriter;
  * @author wuheng09@gmail.com
  *
  */
-public class WriterTest extends AbstractKubernetesClientTest {
+public class JsonAndYamlExample extends AbstractClient {
 
 	static String CreateJSON = "{\r\n"
 			+ "  \"apiVersion\": \"v1\",\r\n"

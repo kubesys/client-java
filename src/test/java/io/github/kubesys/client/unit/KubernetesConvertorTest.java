@@ -1,7 +1,7 @@
 /**
  * Copyright (2022, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.core;
+package io.github.kubesys.client.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -217,7 +217,4 @@ public class KubernetesConvertorTest {
 		assertEquals("https://39.100.71.73:6443/apis/networking.k8s.io/v1/watch/ingressclasses?watch=true&timeoutSeconds=315360000", convertor.watchAllUrl("networking.k8s.io.IngressClass", ""));
 	}
 	
-	public static void main() {
-		
-	}
 }

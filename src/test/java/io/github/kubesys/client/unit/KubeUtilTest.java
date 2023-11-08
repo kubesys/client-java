@@ -1,12 +1,14 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.utils;
+package io.github.kubesys.client.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 import org.junit.jupiter.api.Test;
+
+import io.github.kubesys.client.utils.KubeUtil;
 
 /**
  * @author  wuheng@iscas.ac.cn
