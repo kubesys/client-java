@@ -36,6 +36,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import io.github.kubesys.client.annotations.Api;
+import io.github.kubesys.client.annotations.Param;
 import io.github.kubesys.client.beans.KubernetesAdminConfig;
 import io.github.kubesys.client.cores.KubernetesRuleBase;
 import io.github.kubesys.client.exceptions.KubernetesBadRequestException;
@@ -375,8 +376,8 @@ public class KubernetesClient {
 	 * @return json Kubernetes may add come fields according to Kubernetes' context
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
-	@Api(description = "通过对象创建Kubernetes资源", exceptions = {})
-	public JsonNode createResourceByObject(Object obj) throws Exception {
+	@Api(desc = "通过对象创建Kubernetes资源", catches = {})
+	public JsonNode createResourceByObject(@Param() Object obj) throws Exception {
 		return createResource(new ObjectMapper().valueToTree(obj));
 	}
 	
@@ -400,7 +401,7 @@ public class KubernetesClient {
 	 * @return json Kubernetes may add come fields according to Kubernetes' context
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
-	@Api(description = "通过JSON字符串创建Kubernetes资源", exceptions = {})
+	@Api(desc = "通过JSON字符串创建Kubernetes资源", catches = {})
 	public JsonNode createResourceByJson(String json) throws Exception {
 		return createResource(new ObjectMapper().readTree(json));
 	}
@@ -410,7 +411,7 @@ public class KubernetesClient {
 	 * @return String
 	 * @throws Exception Exception
 	 */
-	@Api(description = "通过YAML文件创建Kubernetes资源", exceptions = {})
+	@Api(desc = "通过YAML文件创建Kubernetes资源", catches = {})
 	public String createResourceByYaml(String yaml) throws Exception {
 		JsonNode jsonNode = KubeUtil.yamlStringToJsonNode(yaml);
 		return KubeUtil.jsonNodeToYamlString(createResource(jsonNode));
@@ -436,7 +437,7 @@ public class KubernetesClient {
 	 * @return json Kubernetes may add come fields according to Kubernetes' context
 	 * @throws Exception see link HttpCaller.getResponse
 	 */
-	@Api(description = "通过Jackson对象创建Kubernetes资源", exceptions = {})
+	@Api(desc = "通过Jackson对象创建Kubernetes资源", catches = {})
 	public JsonNode createResource(JsonNode json) throws Exception {
 		final String uri = analyzer.getConvertor().createUrl(json);
 		HttpPost request = ReqUtil.post(kubernetesAdminConfig, uri, json.toString());
@@ -463,7 +464,7 @@ public class KubernetesClient {
 	 * @return json the deleted object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过对象删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过对象删除Kubernetes资源", catches = {})
 	public JsonNode deleteResourceByObject(Object obj) throws Exception {
 		return deleteResource(new ObjectMapper().valueToTree(obj));
 	}
@@ -488,7 +489,7 @@ public class KubernetesClient {
 	 * @return json the deleted object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过JSON对象删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过JSON对象删除Kubernetes资源", catches = {})
 	public JsonNode deleteResourceByJson(String json) throws Exception {
 		return deleteResource(new ObjectMapper().readTree(json));
 	}
@@ -498,7 +499,7 @@ public class KubernetesClient {
 	 * @return string
 	 * @throws Exception Exception
 	 */
-	@Api(description = "通过YAML删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过YAML删除Kubernetes资源", catches = {})
 	public String deleteResourceByYaml(String yaml) throws Exception {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		JsonNode jsonNode = mapper.readTree(yaml);
@@ -525,7 +526,7 @@ public class KubernetesClient {
 	 * @return json the deleted object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过Jackson对象删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过Jackson对象删除Kubernetes资源", catches = {})
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 
 		return deleteResourceByNamespaceAndName(analyzer.getConvertor().fullkind(json), analyzer.getConvertor().namespace(json),
@@ -542,7 +543,7 @@ public class KubernetesClient {
 	 * @return json the deleted object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过名称删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过名称删除Kubernetes资源", catches = {})
 	public JsonNode deleteResourceByName(String fullkind, String name) throws Exception {
 		return deleteResourceByNamespaceAndName(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
 	}
@@ -557,7 +558,7 @@ public class KubernetesClient {
 	 * @return json the deleted object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过namespace和name删除Kubernetes资源", exceptions = {})
+	@Api(desc = "通过namespace和name删除Kubernetes资源", catches = {})
 	public JsonNode deleteResourceByNamespaceAndName(String fullkind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().deleteUrl(fullkind, namespace, name);
@@ -587,7 +588,7 @@ public class KubernetesClient {
 	 * @return json updated object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过对象更新Kubernetes资源", exceptions = {})
+	@Api(desc = "通过对象更新Kubernetes资源", catches = {})
 	public JsonNode updateResourceByObject(Object obj) throws Exception {
 		return updateResource(new ObjectMapper().valueToTree(obj));
 	}
@@ -612,7 +613,7 @@ public class KubernetesClient {
 	 * @return json updated object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过JSON更新Kubernetes资源", exceptions = {})
+	@Api(desc = "通过JSON更新Kubernetes资源", catches = {})
 	public JsonNode updateResourceByJson(String json) throws Exception {
 		return updateResource(new ObjectMapper().readTree(json));
 	}
@@ -622,7 +623,7 @@ public class KubernetesClient {
 	 * @return string
 	 * @throws Exception Exception
 	 */
-	@Api(description = "通过YAML更新Kubernetes资源", exceptions = {})
+	@Api(desc = "通过YAML更新Kubernetes资源", catches = {})
 	public String updateResourceByYaml(String yaml) throws Exception {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		JsonNode jsonNode = mapper.readTree(yaml);
@@ -649,7 +650,7 @@ public class KubernetesClient {
 	 * @return json updated object with json style
 	 * @throws Exception see HttpCaller.getResponse
 	 */
-	@Api(description = "通过jackson对象更新Kubernetes资源", exceptions = {})
+	@Api(desc = "通过jackson对象更新Kubernetes资源", catches = {})
 	public JsonNode updateResource(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().updateUrl(analyzer.getConvertor().fullkind(json),
@@ -671,7 +672,7 @@ public class KubernetesClient {
 	 * @return json expected object with json style
 	 * @throws Exception json object, which must meet the Kubernetes' specification
 	 */
-	@Api(description = "通过name获取Kubernetes资源", exceptions = {})
+	@Api(desc = "通过name获取Kubernetes资源", catches = {})
 	public JsonNode getResourceByName(String fullkind, String name) throws Exception {
 
 		return getResourceByNamespaceAndName(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
@@ -687,7 +688,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "通过namespace和name获取Kubernetes资源", exceptions = {})
+	@Api(desc = "通过namespace和name获取Kubernetes资源", catches = {})
 	public JsonNode getResourceByNamespaceAndName(String fullkind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().getUrl(fullkind, namespace, name);
@@ -705,7 +706,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "通过name判断Kubernetes资源是否存在", exceptions = {})
+	@Api(desc = "通过name判断Kubernetes资源是否存在", catches = {})
 	public boolean hasResourceByName(String fullkind, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().getUrl(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
@@ -727,7 +728,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "通过namespace和name判断Kubernetes资源是否存在", exceptions = {})
+	@Api(desc = "通过namespace和name判断Kubernetes资源是否存在", catches = {})
 	public boolean hasResourceByNamespaceAndName(String fullkind, String namespace, String name) throws Exception {
 
 		final String uri = analyzer.getConvertor().getUrl(fullkind, namespace, name);
@@ -747,7 +748,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind查询所有Kubernetes资源", catches = {})
 	public JsonNode listResources(String fullkind) throws Exception {
 		return listResources(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, null, 0, null);
 	}
@@ -761,7 +762,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind和条件查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind和条件查询所有Kubernetes资源", catches = {})
 	public JsonNode listResourcesByField(String fullkind, Map<String, String> fields) throws Exception {
 		return listResources(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, URLUtil.fromMap(fields), null, 0, null);
 	}
@@ -775,7 +776,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind和lables查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind和lables查询所有Kubernetes资源", catches = {})
 	public JsonNode listResourcesByLabel(String fullkind, Map<String, String> labels) throws Exception {
 		return listResources(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, null, URLUtil.fromMap(labels), 0, null);
 	}
@@ -788,7 +789,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind和namespace查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind和namespace查询所有Kubernetes资源", catches = {})
 	public JsonNode listResourcesByNamespace(String fullkind, String namespace) throws Exception {
 		return listResources(fullkind, namespace, null, null, 0, null);
 	}
@@ -802,7 +803,7 @@ public class KubernetesClient {
 	 * @return fields fields
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind、namespace和filed查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind、namespace和filed查询所有Kubernetes资源", catches = {})
 	public JsonNode listResourcesByNamespaceAndField(String fullkind, String namespace, Map<String, String> fields) throws Exception {
 		return listResources(fullkind, namespace, URLUtil.fromMap(fields), null, 0, null);
 	}
@@ -816,7 +817,7 @@ public class KubernetesClient {
 	 * @return labels labels
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind、namespace和label查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind、namespace和label查询所有Kubernetes资源", catches = {})
 	public JsonNode listResourcesByNamespaceAndLabel(String fullkind, String namespace, Map<String, String> labels) throws Exception {
 		return listResources(fullkind, namespace, null, URLUtil.fromMap(labels), 0, null);
 	}
@@ -832,7 +833,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind、namespace、field和label查询所有Kubernetes资源", exceptions = {})
+	@Api(desc = "根据fullkind、namespace、field和label查询所有Kubernetes资源", catches = {})
 	public JsonNode listResources(String fullkind, String namespace, Map<String, String> fields, Map<String, String> labels)
 			throws Exception {
 
@@ -886,7 +887,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据对象更新Kubernetes资源状态", exceptions = {})
+	@Api(desc = "根据对象更新Kubernetes资源状态", catches = {})
 	public JsonNode updateResourceStatusByObject(String obj) throws Exception {
 		return updateResourceStatus(new ObjectMapper().readTree(obj));
 	}
@@ -898,7 +899,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据Json更新Kubernetes资源状态", exceptions = {})
+	@Api(desc = "根据Json更新Kubernetes资源状态", catches = {})
 	public JsonNode updateResourceStatusByJson(String obj) throws Exception {
 		return updateResourceStatus(new ObjectMapper().valueToTree(obj));
 	}
@@ -910,7 +911,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "通过YAML更新Kubernetes资源状态", exceptions = {})
+	@Api(desc = "通过YAML更新Kubernetes资源状态", catches = {})
 	public String updateResourceStatusByYaml(String yaml) throws Exception {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		JsonNode jsonNode = mapper.readTree(yaml);
@@ -924,7 +925,7 @@ public class KubernetesClient {
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据jackson对象更新Kubernetes资源状态", exceptions = {})
+	@Api(desc = "根据jackson对象更新Kubernetes资源状态", catches = {})
 	public JsonNode updateResourceStatus(JsonNode json) throws Exception {
 
 		final String uri = analyzer.getConvertor().updateStatusUrl(analyzer.getConvertor().kind(json),
@@ -944,7 +945,7 @@ public class KubernetesClient {
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind和name监听具体资源的生命周期变化", exceptions = {})
+	@Api(desc = "根据fullkind和name监听具体资源的生命周期变化", catches = {})
 	public Thread watchResourceByName(String fullkind, String name, KubernetesWatcher watcher) throws Exception {
 		return watchResourceByNamespaceAndName(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name, watcher);
 	}
@@ -959,7 +960,7 @@ public class KubernetesClient {
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind、namespace和name监听具体资源的生命周期变化", exceptions = {})
+	@Api(desc = "根据fullkind、namespace和name监听具体资源的生命周期变化", catches = {})
 	public Thread watchResourceByNamespaceAndName(String fullkind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
 		String watchName = fullkind.toLowerCase() + "-"
@@ -994,7 +995,7 @@ public class KubernetesClient {
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind监听具体某类资源的生命周期变化", exceptions = {})
+	@Api(desc = "根据fullkind监听具体某类资源的生命周期变化", catches = {})
 	public Thread watchResourcesByFullkind(String fullkind, KubernetesWatcher watcher) throws Exception {
 		return watchResourcesByFullkindAndNamespace(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 	}
@@ -1008,7 +1009,7 @@ public class KubernetesClient {
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "根据fullkind和Namespace监听具体某类资源的生命周期变化", exceptions = {})
+	@Api(desc = "根据fullkind和Namespace监听具体某类资源的生命周期变化", catches = {})
 	public Thread watchResourcesByFullkindAndNamespace(String fullkind, String namespace, KubernetesWatcher watcher) throws Exception {
 		String watchName = fullkind.toLowerCase() + "-"
 				+ (namespace == null || "".equals(namespace) ? "all-namespaces" : namespace);
@@ -1040,7 +1041,7 @@ public class KubernetesClient {
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "监听需要本Node节点处理的所有容器生命周期", exceptions = {})
+	@Api(desc = "监听需要本Node节点处理的所有容器生命周期", catches = {})
 	public Thread watchPodsOnLocalNode(KubernetesWatcher watcher) throws Exception {
 		String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
 		watcher.setRequest(ReqUtil.get(kubernetesAdminConfig,
@@ -1063,7 +1064,7 @@ public class KubernetesClient {
 	 * @return json json from Kubernetes
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
-	@Api(description = "用于调度，将pod和host进行绑定", exceptions = {})
+	@Api(desc = "用于调度，将pod和host进行绑定", catches = {})
 	public JsonNode bindingResource(String namespace, String pod,  String host) throws Exception {
 		return createResource(KubeUtil.toBinding(namespace, pod, host));
 	}
@@ -1166,7 +1167,7 @@ public class KubernetesClient {
 	 * @return /apis/doslab.io/v1
 	 * @throws Exception 
 	 */
-	@Api(description = "将运行过程中CRD进行注册", exceptions = {})
+	@Api(desc = "将运行过程中CRD进行注册", catches = {})
 	public JsonNode registerResource(JsonNode crd) throws Exception {
 		if (crd.has("kind") && crd.get("kind").asText().equals("CustomResourceDefinition")) {
 			StringBuilder sb = new StringBuilder();
@@ -1192,7 +1193,7 @@ public class KubernetesClient {
 	 * @return kinds kind, see Kubernetes kind
 	 * @throws Exception Kubernetes unavailability
 	 */
-	@Api(description = "获取所有的kinds", exceptions = {})
+	@Api(desc = "获取所有的kinds", catches = {})
 	public JsonNode getKinds() throws Exception {
 		return new ObjectMapper().readTree(new ObjectMapper()
 				.writeValueAsString(getAnalyzer().getConvertor().getRuleBase().fullKindToKindMapper.values()));
@@ -1202,16 +1203,27 @@ public class KubernetesClient {
 	 * @return fullkinds fullkind = apiversion + "." + kind
 	 * @throws Exception Kubernetes unavailability
 	 */
-	@Api(description = "获取所有的fullkinds", exceptions = {})
+	@Api(desc = "获取所有的fullkinds", catches = {})
 	public JsonNode getFullKinds() throws Exception {
 		return new ObjectMapper().readTree(new ObjectMapper()
 				.writeValueAsString(getAnalyzer().getConvertor().getRuleBase().fullKindToKindMapper.keySet()));
+	}
+	
+	/**
+	 * @param kind kind
+	 * @return fullkinds fullkind = apiversion + "." + kind
+	 * @throws Exception Kubernetes unavailability
+	 */
+	@Api(desc = "获取所有的fullkinds", catches = {})
+	public JsonNode getFullKind(String kind) throws Exception {
+		return new ObjectMapper().readTree(new ObjectMapper()
+				.writeValueAsString(getAnalyzer().getConvertor().getRuleBase().kindToFullKindMapper.get(kind)));
 	}
 
 	/**
 	 * @return json, which includes kind, apiversion, supported operators
 	 */
-	@Api(description = "获取所有的kind的描述", exceptions = {})
+	@Api(desc = "获取所有的kind的描述", catches = {})
 	public JsonNode getKindDesc() {
 
 		ObjectNode map = new ObjectMapper().createObjectNode();

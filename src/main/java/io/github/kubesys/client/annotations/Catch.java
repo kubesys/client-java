@@ -29,5 +29,5 @@ public @interface Catch {
 	/**
 	 * @return description for a given exception
 	 */
-	String description() default "";
+	String desc() default "";
 }

@@ -86,10 +86,6 @@ public class KubernetesConvertorTest {
 		igrsJson.set("metadata", igrsMeta);
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(convertor.createUrl(podJson));
-	}
-	
 	@Test
 	void testNullCreateURL() {
 		assertThrows(NullPointerException.class, () -> {

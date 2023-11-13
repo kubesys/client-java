@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.5
  *
  */
-@Catch(code = 600, description = "Kubernetes无法连接")
+@Catch(code = 600, desc = "Kubernetes无法连接")
 public class KubernetesConnectionException extends RuntimeException {
 
 	/**

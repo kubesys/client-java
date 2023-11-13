@@ -24,15 +24,10 @@ public @interface Api {
 	/**
 	 * @return api description
 	 */
-	String description() default "";
-	
-	/**
-	 * @return author and/or email
-	 */
-	String[] author() default {"wuheng@iscas.ac.cn"};
+	String desc() default "";
 	
 	/**
 	 * @return all exceptions
 	 */
-	Class<?>[] exceptions() default {};
+	Class<?>[] catches() default {};
 }

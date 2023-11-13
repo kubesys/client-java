@@ -24,7 +24,7 @@ public @interface Param {
 	/**
 	 * @return description
 	 */
-	String description() default "";
+	String desc() default "";
 	
 	/**
 	 * @return regexp

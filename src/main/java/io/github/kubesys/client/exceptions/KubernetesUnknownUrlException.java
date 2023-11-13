@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 402, description = "Kubernetes的请求地址缺少协议 http，或者是https")
+@Catch(code = 402, desc = "Kubernetes的请求地址缺少协议 http，或者是https")
 public class KubernetesUnknownUrlException extends RuntimeException {
 
 	/**

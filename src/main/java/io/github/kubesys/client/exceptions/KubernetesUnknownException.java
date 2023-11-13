@@ -11,7 +11,7 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 501, description = "服务器未知错误")
+@Catch(code = 501, desc = "服务器未知错误")
 public class KubernetesUnknownException extends RuntimeException {
 
 	/**

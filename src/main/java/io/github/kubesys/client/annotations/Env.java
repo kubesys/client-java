@@ -24,7 +24,7 @@ public @interface Env {
 	/**
 	 * @return description
 	 */
-	String description() default "";
+	String desc() default "";
 	
 	/**
 	 * @return example
