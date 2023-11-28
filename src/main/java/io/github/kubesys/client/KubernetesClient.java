@@ -17,7 +17,7 @@ import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -26,6 +26,7 @@ import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.core5.http.URIScheme;
 import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -242,31 +243,36 @@ public class KubernetesClient {
 	 */
 	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac) throws Exception {
 
-		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
-                .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
-                .build();
-		
 		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
-				.register(URIScheme.HTTP.id, PlainConnectionSocketFactory.getSocketFactory())
+				.register(URIScheme.HTTP.id, 
+						PlainConnectionSocketFactory.getSocketFactory())
 				.register(URIScheme.HTTPS.id,
 						SSLUtil.createSocketFactory(
 								kac.keyManagers(), 
 								kac.trustManagers()))
 				.build());
 		
+		connManager.setDefaultMaxPerRoute(10);
+		connManager.setMaxTotal(20);
+		
+		ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
+                .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
+                .build();
+		
 		connManager.setDefaultConnectionConfig(connectionConfig);
 		
 		RequestConfig requestConfig = RequestConfig.custom()
 				.setConnectionKeepAlive(Timeout.ZERO_MILLISECONDS)
 				.setConnectionRequestTimeout(Timeout.ZERO_MILLISECONDS)
-				.setResponseTimeout(Timeout.ZERO_MILLISECONDS)
 				.build();
 		
 		return HttpClients.custom()
 				.setDefaultRequestConfig(requestConfig)
 				.setConnectionManager(connManager)
-				.setConnectionReuseStrategy(new DefaultClientConnectionReuseStrategy()).build();
+				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(
+						Integer.MAX_VALUE, TimeValue.ofSeconds(10)))
+				.build();
 	}
 	
 	/**
