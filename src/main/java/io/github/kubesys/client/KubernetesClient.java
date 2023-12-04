@@ -1078,6 +1078,74 @@ public class KubernetesClient {
 	
 	/**
 	 * {
+     * "apiVersion": "apiextensions.k8s.io/v1",
+     *  "kind": "CustomResourceDefinition",
+     *  "metadata": {
+     *   "name": "frontends.doslab.io"
+     *},
+     *"spec": {
+     * "group": "doslab.io",
+     *"names": {
+     * "kind": "Frontend",
+     * "plural": "frontends",
+     * "shortNames": [
+     *   "frontend"
+     * ],
+     * "singular": "frontend"
+     *},
+     *"scope": "Namespaced",
+     *"versions": [
+     *  {
+     *   "name": "v1",
+     *  "served": true,
+     *  "storage": true,
+     *  "schema": {
+     *    "openAPIV3Schema": {
+     *      "type": "object",
+     *      "properties": {
+     *        "spec": {
+     *          "type": "object",
+     *          "x-kubernetes-preserve-unknown-fields": true
+     *        }
+     *      }
+     *    }
+     *  }
+     *}
+     *]
+     *}
+     * }
+	 * 
+	 * @param group group
+	 * @param kind  kind
+	 * @param plural plural
+	 * @return JSON
+	 * @throws Exception
+	 */
+	@Api(desc = "创建和注册CRD资源", catches = {})
+	public JsonNode registerResource(String group, String kind, String plural) throws Exception {
+		String json = KubernetesConstants.TEMP_CRD_KIND.replaceAll("#GROUP#", group)
+												.replaceAll("#PLURAL#", plural).replaceAll("#KIND#", kind)
+												.replaceAll("#LOWCASE_KIND#", kind.toLowerCase());
+		return createResourceByJson(json);
+	}
+	
+	@Api(desc = "创建和注册CRD资源", catches = {})
+	public JsonNode createWebHook() throws Exception {
+		return null;
+	}
+	
+	/**********************************************************
+	 * 
+	 * 
+	 * 
+	 * Get
+	 * 
+	 * 
+	 * 
+	 **********************************************************/
+
+	/**
+	 * {
 	"kind": "CustomResourceDefinition",
 	"apiVersion": "apiextensions.k8s.io/v1",
 	"metadata": {
@@ -1173,8 +1241,8 @@ public class KubernetesClient {
 	 * @return /apis/doslab.io/v1
 	 * @throws Exception 
 	 */
-	@Api(desc = "将运行过程中CRD进行注册", catches = {})
-	public JsonNode registerResource(JsonNode crd) throws Exception {
+	@Api(desc = "提取CRD信息", catches = {})
+	public JsonNode extractResource(JsonNode crd) throws Exception {
 		if (crd.has("kind") && crd.get("kind").asText().equals("CustomResourceDefinition")) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("/apis/").append(crd.get("spec").get("group").asText()).append("/")
@@ -1185,16 +1253,7 @@ public class KubernetesClient {
 		
 		throw new KubernetesInternalServerErrorException("it is not a valid crd.");
 	}
-	/**********************************************************
-	 * 
-	 * 
-	 * 
-	 * Get
-	 * 
-	 * 
-	 * 
-	 **********************************************************/
-
+	
 	/**
 	 * @return kinds kind, see Kubernetes kind
 	 * @throws Exception Kubernetes unavailability

@@ -333,4 +333,52 @@ public final class KubernetesConstants {
 	 */
 	public static final String JSON_TYPE_DELETED             = "DELETED";
 	
+	
+	/*************************************
+	 * 
+	 * JSON type
+	 * 
+	 *************************************/
+	
+	/**
+	 * CRD template  
+	 */
+	public static final String TEMP_CRD_KIND                 = "{\r\n"
+			+ "  \"apiVersion\": \"apiextensions.k8s.io/v1\",\r\n"
+			+ "  \"kind\": \"CustomResourceDefinition\",\r\n"
+			+ "  \"metadata\": {\r\n"
+			+ "    \"name\": \"#PLURAL#.#GROUP#\"\r\n"
+			+ "  },\r\n"
+			+ "  \"spec\": {\r\n"
+			+ "    \"group\": \"#GROUP#\",\r\n"
+			+ "    \"names\": {\r\n"
+			+ "      \"kind\": \"#KIND#\",\r\n"
+			+ "      \"plural\": \"#PLURAL#\",\r\n"
+			+ "      \"shortNames\": [\r\n"
+			+ "        \"#LOWCASE_KIND#\"\r\n"
+			+ "      ],\r\n"
+			+ "      \"singular\": \"frontend\"\r\n"
+			+ "    },\r\n"
+			+ "    \"scope\": \"Namespaced\",\r\n"
+			+ "    \"versions\": [\r\n"
+			+ "      {\r\n"
+			+ "        \"name\": \"v1\",\r\n"
+			+ "        \"served\": true,\r\n"
+			+ "        \"storage\": true,\r\n"
+			+ "        \"schema\": {\r\n"
+			+ "          \"openAPIV3Schema\": {\r\n"
+			+ "            \"type\": \"object\",\r\n"
+			+ "            \"properties\": {\r\n"
+			+ "              \"spec\": {\r\n"
+			+ "                \"type\": \"object\",\r\n"
+			+ "                \"x-kubernetes-preserve-unknown-fields\": true\r\n"
+			+ "              }\r\n"
+			+ "            }\r\n"
+			+ "          }\r\n"
+			+ "        }\r\n"
+			+ "      }\r\n"
+			+ "    ]\r\n"
+			+ "  }\r\n"
+			+ "}";
+	
 }

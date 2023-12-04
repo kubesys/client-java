@@ -36,7 +36,7 @@ public class WatchFullkindExample extends AbstractClient {
 			public void doAdded(JsonNode node) {
 				System.out.println(node);
 				try {
-					client.registerResource(node);
+					client.extractResource(node);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
