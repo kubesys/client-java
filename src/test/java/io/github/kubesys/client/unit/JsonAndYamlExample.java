@@ -1,7 +1,7 @@
 /**
  * Copyright (2020, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.examples;
+package io.github.kubesys.client.unit;
 
 
 import com.fasterxml.jackson.databind.JsonNode;

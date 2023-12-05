@@ -1,7 +1,7 @@
 /**
  * Copyright (2023, ) Institute of Software, Chinese Academy of Sciences
  */
-package io.github.kubesys.client.examples;
+package io.github.kubesys.client.unit;
 
 
 import io.github.kubesys.client.KubernetesClient;
