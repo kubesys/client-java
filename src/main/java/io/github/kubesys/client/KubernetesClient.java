@@ -535,7 +535,9 @@ public class KubernetesClient {
 	@Api(desc = "通过Jackson对象删除Kubernetes资源", catches = {})
 	public JsonNode deleteResource(JsonNode json) throws Exception {
 
-		return deleteResourceByNamespaceAndName(analyzer.getConvertor().fullkind(json), analyzer.getConvertor().namespace(json),
+		return deleteResourceByNamespaceAndName(
+				analyzer.getConvertor().fullkind(json), 
+				analyzer.getConvertor().namespace(json),
 				analyzer.getConvertor().name(json));
 	}
 
@@ -714,15 +716,7 @@ public class KubernetesClient {
 	 */
 	@Api(desc = "通过name判断Kubernetes资源是否存在", catches = {})
 	public boolean hasResourceByName(String fullkind, String name) throws Exception {
-
-		final String uri = analyzer.getConvertor().getUrl(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
-		try {
-			HttpGet request = ReqUtil.get(kubernetesAdminConfig, uri);
-			getResponse(request);
-			return true;
-		} catch (Exception ex) {
-			return false;
-		}
+		return hasResourceByNamespaceAndName(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, name);
 	}
 	
 	/**
@@ -1002,7 +996,7 @@ public class KubernetesClient {
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
 	@Api(desc = "根据fullkind监听具体某类资源的生命周期变化", catches = {})
-	public Thread watchResourcesByFullkind(String fullkind, KubernetesWatcher watcher) throws Exception {
+	public Thread watchResources(String fullkind, KubernetesWatcher watcher) throws Exception {
 		return watchResourcesByFullkindAndNamespace(fullkind, KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 	}
 

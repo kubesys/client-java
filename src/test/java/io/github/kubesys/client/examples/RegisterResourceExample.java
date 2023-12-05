@@ -86,7 +86,7 @@ public class RegisterResourceExample extends AbstractClient {
 
 
 	static void watch(KubernetesClient client) throws Exception {
-		client.watchResourcesByFullkind("Namespace", new KubernetesWatcher(client) {
+		client.watchResources("Namespace", new KubernetesWatcher(client) {
 			
 			@Override
 			public void doModified(JsonNode node) {
