@@ -16,7 +16,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -129,8 +128,7 @@ public class KubernetesAdminConfig {
 	 * @param clientCertData clientCertData
 	 * @param clientKeyData  clientKeyData
 	 */
-	public KubernetesAdminConfig(String masterUrl, String caCertData, String clientCertData, String clientKeyData)
-			throws Exception {
+	public KubernetesAdminConfig(String masterUrl, String caCertData, String clientCertData, String clientKeyData) {
 		this.masterUrl = masterUrl;
 		this.caCertData = caCertData;
 		this.clientCertData = clientCertData;
@@ -139,7 +137,7 @@ public class KubernetesAdminConfig {
 
 	/**
 	 * @param json json
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	public KubernetesAdminConfig(JsonNode json) throws Exception {
 		JsonNode cluster = json.get("clusters").get(0).get("cluster");
@@ -151,50 +149,86 @@ public class KubernetesAdminConfig {
 	}
 
 
+	/**
+	 * @return CaCertData
+	 */
 	public String getCaCertData() {
 		return caCertData;
 	}
 
+	/**
+	 * @param caCertData caCertData
+	 */
 	public void setCaCertData(String caCertData) {
 		this.caCertData = caCertData;
 	}
 
+	/**
+	 * @return ClientCertData
+	 */
 	public String getClientCertData() {
 		return clientCertData;
 	}
 
+	/**
+	 * @param clientCertData clientCertData
+	 */
 	public void setClientCertData(String clientCertData) {
 		this.clientCertData = clientCertData;
 	}
 
+	/**
+	 * @return getClientKeyData
+	 */
 	public String getClientKeyData() {
 		return clientKeyData;
 	}
 
+	/**
+	 * @param clientKeyData clientKeyData
+	 */
 	public void setClientKeyData(String clientKeyData) {
 		this.clientKeyData = clientKeyData;
 	}
 
+	/**
+	 * @param masterUrl url
+	 */
 	public void setMasterUrl(String masterUrl) {
 		this.masterUrl = masterUrl;
 	}
 
+	/**
+	 * @param token token
+	 */
 	public void setToken(String token) {
 		this.token = token;
 	}
 
+	/**
+	 * @return username
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * @param username username
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
+	/**
+	 * @return password
+	 */
 	public String getPassword() {
 		return password;
 	}
 
+	/**
+	 * @param password password
+	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -205,8 +239,11 @@ public class KubernetesAdminConfig {
 	 * 
 	 **********************************************************************/
 
-	public KeyManager[] keyManagers() throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException,
-			CertificateException, InvalidKeySpecException, IOException {
+	/**
+	 * @return keyManagers
+	 * @throws Exception Exception
+	 */
+	public KeyManager[] keyManagers() throws Exception {
 		if (this.clientCertData == null || this.clientKeyData == null) {
 			return null;
 		}
@@ -220,6 +257,17 @@ public class KubernetesAdminConfig {
 		return keyManagers;
 	}
 
+	/**
+	 * @param certInputStream certInputStream
+	 * @param keyInputStream keyInputStream
+	 * @param clientKeyPassphrase clientKeyPassphrase
+	 * @return KeyStore
+	 * @throws IOException IOException
+	 * @throws CertificateException CertificateException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException InvalidKeySpecException
+	 * @throws KeyStoreException KeyStoreException
+	 */
 	public KeyStore createKeyStore(InputStream certInputStream, InputStream keyInputStream, char[] clientKeyPassphrase)
 			throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeySpecException,
 			KeyStoreException {
@@ -237,6 +285,11 @@ public class KubernetesAdminConfig {
 		return keyStore;
 	}
 
+	/**
+	 * @param keyInputStream is
+	 * @return bytes
+	 * @throws IOException IOException
+	 */
 	protected byte[] decodePem(InputStream keyInputStream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(keyInputStream));
 		try {
@@ -252,6 +305,12 @@ public class KubernetesAdminConfig {
 		}
 	}
 
+	/**
+	 * @param reader reader
+	 * @param endMarker endMarker
+	 * @return bytes
+	 * @throws IOException IOException
+	 */
 	protected byte[] readBytes(BufferedReader reader, String endMarker) throws IOException {
 		String line;
 		StringBuffer buf = new StringBuffer();
@@ -265,6 +324,14 @@ public class KubernetesAdminConfig {
 		throw new IOException("PEM is invalid : No end marker");
 	}
 
+	/** 
+	 * @param keyInputStream is 
+	 * @param clientKeyAlgo clientKeyAlgo
+	 * @return PrivateKey
+	 * @throws IOException IOException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException InvalidKeySpecException
+	 */
 	protected PrivateKey handleOtherKeys(InputStream keyInputStream, String clientKeyAlgo)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		byte[] keyBytes = decodePem(keyInputStream);
@@ -279,6 +346,11 @@ public class KubernetesAdminConfig {
 		}
 	}
 
+	/**
+	 * @param keyBytes keyBytes
+	 * @return RSAPrivateCrtKeySpec
+	 * @throws IOException IOException
+	 */
 	public RSAPrivateCrtKeySpec decodePKCS1(byte[] keyBytes) throws IOException {
 		DerParser parser = new DerParser(keyBytes);
 		Asn1Object sequence = parser.read();
@@ -290,10 +362,22 @@ public class KubernetesAdminConfig {
 				next(parser), next(parser), next(parser));
 	}
 
+	/**
+	 * @param parser parse
+	 * @return BigInteger
+	 * @throws IOException IOException
+	 */
 	protected BigInteger next(DerParser parser) throws IOException {
 		return parser.read().getInteger();
 	}
 
+	/**
+	 * @return trustManagers
+	 * @throws CertificateException CertificateException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 * @throws KeyStoreException KeyStoreException
+	 * @throws IOException IOException
+	 */
 	public TrustManager[] trustManagers()
 			throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 		if (this.caCertData == null) {
@@ -305,6 +389,14 @@ public class KubernetesAdminConfig {
 		return tmf.getTrustManagers();
 	}
 
+	/**
+	 * @param pemInputStream is
+	 * @return KeyStore
+	 * @throws IOException IOException
+	 * @throws CertificateException IOException
+	 * @throws KeyStoreException KeyStoreException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 */
 	protected KeyStore createTrustStore(InputStream pemInputStream)
 			throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
 		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -318,6 +410,13 @@ public class KubernetesAdminConfig {
 		return trustStore;
 	}
 
+	/**
+	 * @param keyStore keyStore
+	 * @param trustStorePassphrase trustStorePassphrase
+	 * @throws CertificateException CertificateException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 * @throws IOException IOException
+	 */
 	protected void loadDefaultTrustStoreFile(KeyStore keyStore, char[] trustStorePassphrase)
 			throws CertificateException, NoSuchAlgorithmException, IOException {
 
@@ -328,6 +427,15 @@ public class KubernetesAdminConfig {
 		}
 	}
 
+	/**
+	 * @param keyStore keyStore
+	 * @param fileToLoad fileToLoad
+	 * @param passphrase passphrase
+	 * @return true or false
+	 * @throws CertificateException CertificateException
+	 * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+	 * @throws IOException IOException
+	 */
 	protected boolean loadDefaultStoreFile(KeyStore keyStore, File fileToLoad, char[] passphrase)
 			throws CertificateException, NoSuchAlgorithmException, IOException {
 
@@ -343,6 +451,9 @@ public class KubernetesAdminConfig {
 		return false;
 	}
 
+	/**
+	 * @return file
+	 */
 	protected File getDefaultTrustStoreFile() {
 		String securityDirectory = System.getProperty("java.home") + File.separator + "lib" + File.separator
 				+ "security" + File.separator;
@@ -360,6 +471,10 @@ public class KubernetesAdminConfig {
 		return new File(securityDirectory + "cacerts");
 	}
 
+	/**
+	 * @param data data
+	 * @return  stream
+	 */
 	protected ByteArrayInputStream createInputStreamFromBase64EncodedString(String data) {
 		byte[] bytes;
 		try {
@@ -389,12 +504,23 @@ public class KubernetesAdminConfig {
 
 	static class DerParser {
 
+		/**
+		 * is
+		 */
 		private InputStream in;
 
+		/**
+		 * @param bytes bytes
+		 * @throws IOException IOException
+		 */
 		DerParser(byte[] bytes) throws IOException {
 			this.in = new ByteArrayInputStream(bytes);
 		}
 
+		/**
+		 * @return  Asn1Object
+		 * @throws IOException IOException
+		 */
 		Asn1Object read() throws IOException {
 			int tag = in.read();
 
@@ -411,6 +537,10 @@ public class KubernetesAdminConfig {
 			return new Asn1Object(tag, value);
 		}
 
+		/**
+		 * @return len
+		 * @throws IOException IOException
+		 */
 		private int getLength() throws IOException {
 			int i = in.read();
 			if (i == -1) {
@@ -435,22 +565,49 @@ public class KubernetesAdminConfig {
 		}
 	}
 
+	/**
+	 * @author henry
+	 *
+	 */
 	static class Asn1Object {
 
+		/**
+		 * type
+		 */
 		private final int type;
+		
+		/**
+		 * values
+		 */
 		private final byte[] value;
+		
+		
+		/**
+		 * tag
+		 */
 		private final int tag;
 
+		/**
+		 * @param tag tag
+		 * @param value value
+		 */
 		public Asn1Object(int tag, byte[] value) {
 			this.tag = tag;
 			this.type = tag & 0x1F;
 			this.value = value;
 		}
 
+		/**
+		 * @return bytes
+		 */
 		public byte[] getValue() {
 			return value;
 		}
 
+		/**
+		 * @return BigInteger
+		 * @throws IOException IOException
+		 */
 		BigInteger getInteger() throws IOException {
 			if (type != 0x02) {
 				throw new IOException("Invalid DER: object is not integer"); //$NON-NLS-1$
@@ -458,6 +615,9 @@ public class KubernetesAdminConfig {
 			return new BigInteger(value);
 		}
 
+		/**
+		 * @throws IOException IOException
+		 */
 		void validateSequence() throws IOException {
 			if (type != 0x10) {
 				throw new IOException("Invalid DER: not a sequence");

@@ -15,11 +15,14 @@ import io.github.kubesys.client.annotations.Catch;
 public class KubernetesBadRequestException extends RuntimeException {
 
 	/**
-	 * 
+	 * uid
 	 */
 	private static final long serialVersionUID = 3209894198735325182L;
 
 
+	/**
+	 * @param message messsage
+	 */
 	public KubernetesBadRequestException(String message) {
 		super(message);
 	}

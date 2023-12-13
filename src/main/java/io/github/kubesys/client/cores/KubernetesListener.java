@@ -25,15 +25,28 @@ public class KubernetesListener {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesListener.class.getName());
 
+	/**
+	 * client
+	 */
 	protected final KubernetesClient client;
 	
+	/**
+	 * registry
+	 */
 	protected final KubernetesRegistry registry;
 	
+	/**
+	 * @param client client
+	 * @param registry registry
+	 */
 	public KubernetesListener(KubernetesClient client, KubernetesRegistry registry) {
 		this.client = client;
 		this.registry = registry;
 	}
 
+	/**
+	 * @throws Exception Exception
+	 */
 	public void start() throws Exception {
 		JsonNode items = client.listResources("apiextensions.k8s.io.CustomResourceDefinition").get("items");
 		for (int i = 0; i < items.size(); i++) {
@@ -41,6 +54,9 @@ public class KubernetesListener {
 		}
 	}
 	
+	/**
+	 * @param node node
+	 */
 	public void register(JsonNode node) {
 		
 		JsonNode spec = node.get(KubernetesConstants.KUBE_SPEC);

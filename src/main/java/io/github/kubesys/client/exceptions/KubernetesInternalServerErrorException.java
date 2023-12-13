@@ -15,11 +15,14 @@ import io.github.kubesys.client.annotations.Catch;
 public class KubernetesInternalServerErrorException extends RuntimeException {
 
 	/**
-	 * 
+	 * uid
 	 */
 	private static final long serialVersionUID = 3209894198735325182L;
 
 
+	/**
+	 * @param message message
+	 */
 	public KubernetesInternalServerErrorException(String message) {
 		super(message);
 	}

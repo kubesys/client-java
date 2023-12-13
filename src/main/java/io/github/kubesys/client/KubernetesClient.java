@@ -101,7 +101,7 @@ public class KubernetesClient {
 	/**
 	 * 根据配置文件创建Kubernetes客户端
 	 * 
-	 * @throws KubernetesConnectionException
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient() throws KubernetesConnectionException {
 		this(new File(KubernetesConstants.KUBE_CONFIG));
@@ -111,7 +111,7 @@ public class KubernetesClient {
 	 * 根据配置文件创建Kubernetes客户端
 	 * 
 	 * @param file 比如$HOME$/.kube/conf
-	 * @throws KubernetesConnectionException
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient(File file) throws KubernetesConnectionException {
 		this(file, new KubernetesAnalyzer());
@@ -123,7 +123,7 @@ public class KubernetesClient {
 	 *  
 	 * @param file     比如$HOME$/.kube/conf
 	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
-	 * @throws KubernetesConnectionException
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
@@ -147,7 +147,7 @@ public class KubernetesClient {
 	 * 
 	 * @param url   如https://IP:6443/
 	 * @param token bearer token, 通过ServiceAccount和ClusterRoleBinding进行创建
-	 * @throws KubernetesConnectionException 
+	 * @throws KubernetesConnectionException  KubernetesConnectionException
 	 */
 	public KubernetesClient(String url, String token) throws KubernetesConnectionException {
 		this(url, token, new KubernetesAnalyzer());
@@ -160,7 +160,7 @@ public class KubernetesClient {
 	 * @param url      如https://IP:6443/
 	 * @param token    bearer token, 通过ServiceAccount和ClusterRoleBinding进行创建
 	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
-	 * @throws KubernetesConnectionException 
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient(String url, String token, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
@@ -189,7 +189,7 @@ public class KubernetesClient {
 	 * @param url      如https://IP:6443/
 	 * @param username basic authing
 	 * @param password basic authing
-	 * @throws KubernetesConnectionException 
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient(String url, String username, String password) throws KubernetesConnectionException {
 		this(url, username, password, new KubernetesAnalyzer());
@@ -203,7 +203,7 @@ public class KubernetesClient {
 	 * @param username basic authing
 	 * @param password basic authing
 	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
-	 * @throws KubernetesConnectionException 
+	 * @throws KubernetesConnectionException KubernetesConnectionException
 	 */
 	public KubernetesClient(String url, String username, String password, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
@@ -225,6 +225,9 @@ public class KubernetesClient {
 	 * 
 	 **********************************************************/
 	// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
+	/**
+	 * statusDesc
+	 */
 	static Map<Integer, String> statusDesc = new HashMap<>();
 
 	static {
@@ -238,9 +241,11 @@ public class KubernetesClient {
 				"Unprocessable entity. The request was parsed correctly but failed some sort of validation.");
 	}
 		
+	
 	/**
-	 * @return httpClient
-	 * @throws Exception
+	 * @param kac kac
+	 * @return CloseableHttpClient
+	 * @throws Exception Exception
 	 */
 	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac) throws Exception {
 
@@ -323,8 +328,9 @@ public class KubernetesClient {
 
 	}
 
+	
 	/**
-	 * @param inputStream is
+	 * @param resp response
 	 * @return string
 	 */
 	public static String convertToString(CloseableHttpResponse resp) {
@@ -340,9 +346,10 @@ public class KubernetesClient {
 			return ex.toString();
 		}
     }
+	
 	/**
 	 * @param req req
-	 * @return json json
+	 * @return json 
 	 * @throws Exception exception
 	 */
 	@SuppressWarnings("deprecation")
@@ -727,7 +734,6 @@ public class KubernetesClient {
 	 * get a Kubernetes resource using kind, namespace and name
 	 * 
 	 * @param fullkind      kind
-	 * @param namespace namespace, if this kind unsupports namespace, it is null
 	 * @param name      name
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
@@ -818,7 +824,8 @@ public class KubernetesClient {
 	 * 
 	 * @param fullkind      kind
 	 * @param namespace namespace
-	 * @return fields fields
+	 * @param fields fields
+	 * @return json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
 	@Api(desc = "根据fullkind、namespace和filed查询所有Kubernetes资源", catches = {})
@@ -832,7 +839,8 @@ public class KubernetesClient {
 	 * 
 	 * @param fullkind      kind
 	 * @param namespace namespace
-	 * @return labels labels
+	 * @param labels labels
+	 * @return json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
 	@Api(desc = "根据fullkind、namespace和label查询所有Kubernetes资源", catches = {})
@@ -925,7 +933,7 @@ public class KubernetesClient {
 	/**
 	 * update a Kubernetes resource status using JSON
 	 * 
-	 * @param obj json
+	 * @param yaml yaml
 	 * @return json json
 	 * @throws Exception Kubernetes cannot parsing this jsonStr
 	 */
@@ -1131,7 +1139,7 @@ public class KubernetesClient {
 	 * @param kind  kind
 	 * @param plural plural
 	 * @return JSON
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	@Api(desc = "创建和注册CRD资源", catches = {})
 	public JsonNode registerResource(String group, String kind, String plural) throws Exception {
@@ -1141,6 +1149,10 @@ public class KubernetesClient {
 		return createResourceByJson(json);
 	}
 	
+	/**
+	 * @return json
+	 * @throws Exception Exception
+	 */
 	@Api(desc = "创建和注册CRD资源", catches = {})
 	public JsonNode createWebHook() throws Exception {
 		return null;
@@ -1251,7 +1263,7 @@ public class KubernetesClient {
 	 * 
 	 * @param crd 上面就是一个CRD例子
 	 * @return /apis/doslab.io/v1
-	 * @throws Exception 
+	 * @throws Exception  Exception
 	 */
 	@Api(desc = "提取CRD信息", catches = {})
 	public JsonNode extractResource(JsonNode crd) throws Exception {

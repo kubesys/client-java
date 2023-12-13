@@ -24,8 +24,15 @@ public abstract class KubernetesObjectWatcher<O> extends KubernetesWatcher {
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesObjectWatcher.class.getName());
 	
+	/**
+	 * clz
+	 */
 	protected final Class<?> clz;
 	
+	/**
+	 * @param client client
+	 * @throws Exception  Exception
+	 */
 	protected KubernetesObjectWatcher(KubernetesClient client) throws Exception {
 		super(client);
 		String gSclz = getClass().getGenericSuperclass().getTypeName();
