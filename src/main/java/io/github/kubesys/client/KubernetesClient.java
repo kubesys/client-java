@@ -3,6 +3,7 @@
  */
 package io.github.kubesys.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -317,11 +318,28 @@ public class KubernetesClient {
 		case 500:
 			throw new KubernetesInternalServerErrorException(response.toString());
 		default:
-			throw new KubernetesUnknownException(response.toString());
+			throw new KubernetesUnknownException(convertToString(response));
 		}
 
 	}
 
+	/**
+	 * @param inputStream is
+	 * @return string
+	 */
+	public static String convertToString(CloseableHttpResponse resp) {
+		try {
+	        ByteArrayOutputStream result = new ByteArrayOutputStream();
+	        byte[] buffer = new byte[1024];
+	        int length;
+	        while ((length = resp.getEntity().getContent().read(buffer)) != -1) {
+	            result.write(buffer, 0, length);
+	        }
+	        return result.toString("UTF-8");
+		} catch (IOException ex) {
+			return ex.toString();
+		}
+    }
 	/**
 	 * @param req req
 	 * @return json json
