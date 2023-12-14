@@ -311,17 +311,17 @@ public class KubernetesClient {
 				throw new KubernetesUnknownException(e.toString());
 			}
 		case 400:
-			throw new KubernetesBadRequestException(response.toString());
+			throw new KubernetesBadRequestException(convertToString(response));
 		case 401:
-			throw new KubernetesUnauthorizedTokenException(response.toString());
+			throw new KubernetesUnauthorizedTokenException(convertToString(response));
 		case 403:
-			throw new KubernetesForbiddenAccessException(response.toString());
+			throw new KubernetesForbiddenAccessException(convertToString(response));
 		case 404:
-			throw new KubernetesResourceNotFoundException(response.toString());
+			throw new KubernetesResourceNotFoundException(convertToString(response));
 		case 409:
-			throw new KubernetesConflictResourceException(response.toString());
+			throw new KubernetesConflictResourceException(convertToString(response));
 		case 500:
-			throw new KubernetesInternalServerErrorException(response.toString());
+			throw new KubernetesInternalServerErrorException(convertToString(response));
 		default:
 			throw new KubernetesUnknownException(convertToString(response));
 		}

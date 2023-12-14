@@ -35,12 +35,6 @@ public class WatchFullkindExample extends AbstractClient {
 			@Override
 			public void doAdded(JsonNode node) {
 				System.out.println(node);
-				try {
-					client.extractResource(node);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 
 			@Override
@@ -49,9 +43,9 @@ public class WatchFullkindExample extends AbstractClient {
 			}
 
 		};
-//		client.watchResources("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+		client.watchResourcesByFullkindAndNamespace("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
-		client.watchResourcesByFullkindAndNamespace("apiextensions.k8s.io.CustomResourceDefinition", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
+//		client.watchResourcesByFullkindAndNamespace("apiextensions.k8s.io.CustomResourceDefinition", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
 		
 		
 	}
