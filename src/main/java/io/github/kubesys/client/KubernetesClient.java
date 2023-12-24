@@ -55,9 +55,10 @@ import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * Kubernetes客户端，具备自动学习Kubernetes中kind生命周期变化的能力，
- * 好处是，当Kubernetes通过CRD机制重新注册一个kind资源时，本接口无需
- * 重新编译，即可在线对其进行生命周期管理
+ * Kubernetes客户端，建立与Kubernetes的连接，
+ * 然后对Kubernetes中的Kind资源进行生命周期管理
+ * 
+ * kind是Kuberentes的重要概念，参见https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/
  * 
  * 参见：
  * - https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27 
@@ -83,7 +84,7 @@ public class KubernetesClient {
 
 	/**
 	 * 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url，
-	 * 参见https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/
+	 * 参见https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27 
 	 */
 	protected KubernetesAnalyzer analyzer;
 	
@@ -119,11 +120,13 @@ public class KubernetesClient {
 
 	
 	/**
-	 *  根据配置文件创建Kubernetes客户端
+	 * 根据配置文件创建Kubernetes客户端
 	 *  
 	 * @param file     比如$HOME$/.kube/conf
 	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
 	 * @throws KubernetesConnectionException KubernetesConnectionException
+	 * 
+	 * 一个典型
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
