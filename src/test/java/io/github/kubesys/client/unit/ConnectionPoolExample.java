@@ -73,22 +73,22 @@ public class ConnectionPoolExample extends AbstractClient {
 //		
 //		Thread.sleep(10000);
 		
-		for (int i = 0; i < 200; i++) {
-			String INS = INS_TEMP.replaceAll("#KIND#", "TEST" + i)
-							.replaceAll("#KIND_LOWCASE#", "test" + i);
-			System.out.println(INS);
-			client.createResourceByJson(INS);
-		}
-		
 //		for (int i = 0; i < 200; i++) {
-//			try {
-//				client.deleteResourceByName(
-//						"apiextensions.k8s.io.CustomResourceDefinition", 
-//						"tests" + i + ".doslab.io");
-//			} catch (Exception ex) {
-//				
-//			}
+//			String INS = INS_TEMP.replaceAll("#KIND#", "TEST" + i)
+//							.replaceAll("#KIND_LOWCASE#", "test" + i);
+//			System.out.println(INS);
+//			client.createResourceByJson(INS);
 //		}
+		
+		for (int i = 0; i < 200; i++) {
+			try {
+				client.deleteResourceByName(
+						"apiextensions.k8s.io.CustomResourceDefinition", 
+						"tests" + i + ".doslab.io");
+			} catch (Exception ex) {
+				
+			}
+		}
 		
 //		System.out.println(client.getFullKinds());
 	}

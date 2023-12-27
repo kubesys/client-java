@@ -18,6 +18,7 @@ import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -25,8 +26,10 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.URIScheme;
 import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
@@ -281,6 +284,18 @@ public class KubernetesClient {
 				.setConnectionManager(connManager)
 				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(
 						Integer.MAX_VALUE, TimeValue.ofSeconds(10)))
+				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy() {
+
+					@Override
+					public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context) {
+						TimeValue keepAlive = super.getKeepAliveDuration(response, context);
+					      if (keepAlive.getDuration() == -1) {
+					         keepAlive = TimeValue.MAX_VALUE;
+					      }
+					      return keepAlive;
+					}
+					
+				})
 				.build();
 	}
 	
