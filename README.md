@@ -292,10 +292,8 @@ io.fabric8.kubernetes.api.model.Pod pod = new ObjectMapper().readValue(json.toSt
 
 ## Roadmap
 
-- 1.0.0: product ready
-- 1.1.0: support webhook
-- 1.2.0: support cluster
-- 1.3.0: Auto API generation
+- 1.2.x: support webhook
+- 1.3.x: example doc generation
 
 [Sonatype](https://mp.weixin.qq.com/s?__biz=Mzg2MDYzODI5Nw==&mid=2247493958&idx=1&sn=d7e47334823f58db7ce012783045f382&source=41#wechat_redirect)
 
