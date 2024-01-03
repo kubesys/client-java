@@ -268,15 +268,19 @@ public class KubernetesClient {
 		connManager.setMaxTotal(20);
 		
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(10))
-                .setSocketTimeout(Timeout.ofSeconds(10))
+                .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
+                .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
+                .setTimeToLive(TimeValue.ofDays(365 * 100))
                 .build();
 		
 		connManager.setDefaultConnectionConfig(connectionConfig);
 		
+		@SuppressWarnings("deprecation")
 		RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectionKeepAlive(Timeout.ofSeconds(30))
-				.setConnectionRequestTimeout(Timeout.ofSeconds(30))
+				.setConnectTimeout(Timeout.ZERO_MILLISECONDS)
+				.setConnectionRequestTimeout(Timeout.ZERO_MILLISECONDS)
+				.setResponseTimeout(Timeout.ZERO_MILLISECONDS)
+				.setConnectionKeepAlive(TimeValue.ZERO_MILLISECONDS)
 				.build();
 		
 		return HttpClients.custom()
@@ -288,11 +292,7 @@ public class KubernetesClient {
 
 					@Override
 					public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context) {
-						TimeValue keepAlive = super.getKeepAliveDuration(response, context);
-					      if (keepAlive.getDuration() == -1) {
-					         keepAlive = TimeValue.MAX_VALUE;
-					      }
-					      return keepAlive;
+					      return TimeValue.ZERO_MILLISECONDS;
 					}
 					
 				})

@@ -41,6 +41,8 @@ public class WatchFullkindExample extends AbstractClient {
 			public void doClose() {
 				System.out.println("close");
 			}
+			
+			
 
 		};
 		client.watchResourcesByFullkindAndNamespace("Pod", KubernetesConstants.VALUE_ALL_NAMESPACES, watcher);
