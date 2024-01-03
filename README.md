@@ -1,4 +1,4 @@
-# Kubernetes-client-java
+# client-java
 
 We expect to provide a Java client (Please using JDK 17):
 
