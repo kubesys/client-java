@@ -268,22 +268,22 @@ public class KubernetesClient {
 		connManager.setMaxTotal(20);
 		
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
-                .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
+                .setConnectTimeout(Timeout.ofSeconds(10))
+                .setSocketTimeout(Timeout.ofSeconds(10))
                 .build();
 		
 		connManager.setDefaultConnectionConfig(connectionConfig);
 		
 		RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectionKeepAlive(Timeout.ZERO_MILLISECONDS)
-				.setConnectionRequestTimeout(Timeout.ZERO_MILLISECONDS)
+				.setConnectionKeepAlive(Timeout.ofSeconds(30))
+				.setConnectionRequestTimeout(Timeout.ofSeconds(30))
 				.build();
 		
 		return HttpClients.custom()
 				.setDefaultRequestConfig(requestConfig)
 				.setConnectionManager(connManager)
 				.setRetryStrategy(new DefaultHttpRequestRetryStrategy(
-						Integer.MAX_VALUE, TimeValue.ofSeconds(10)))
+						10, TimeValue.ofSeconds(10)))
 				.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy() {
 
 					@Override
@@ -1025,7 +1025,9 @@ public class KubernetesClient {
 	 */
 	Thread watchResource(String watchName, String fullkind, String namespace, String name, KubernetesWatcher watcher)
 			throws Exception {
-		watcher.setRequest(ReqUtil.get(kubernetesAdminConfig, analyzer.getConvertor().watchOneUrl(fullkind, namespace, name)));
+		HttpGet request = ReqUtil.get(kubernetesAdminConfig, analyzer.getConvertor().watchOneUrl(fullkind, namespace, name));
+		request.setHeader("Connection", "keep-alive");
+		watcher.setRequest(request);
 		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
@@ -1072,7 +1074,9 @@ public class KubernetesClient {
 	 */
 	Thread watchResources(String watchName, String fullkind, String namespace, KubernetesWatcher watcher)
 			throws Exception {
-		watcher.setRequest(ReqUtil.get(kubernetesAdminConfig, analyzer.getConvertor().watchAllUrl(fullkind, namespace)));
+		HttpGet request = ReqUtil.get(kubernetesAdminConfig, analyzer.getConvertor().watchAllUrl(fullkind, namespace));
+		request.setHeader("Connection", "keep-alive");
+		watcher.setRequest(request);
 		Thread thread = new Thread(watcher, watchName);
 		thread.start();
 		return thread;
@@ -1088,8 +1092,10 @@ public class KubernetesClient {
 	@Api(desc = "监听需要本Node节点处理的所有容器生命周期", catches = {})
 	public Thread watchPodsOnLocalNode(KubernetesWatcher watcher) throws Exception {
 		String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
-		watcher.setRequest(ReqUtil.get(kubernetesAdminConfig,
-				analyzer.getConvertor().watchAllUrlWithFieldSelector("Pod", "", "spec.nodeName=" + hostname)));
+		HttpGet request = ReqUtil.get(kubernetesAdminConfig,
+				analyzer.getConvertor().watchAllUrlWithFieldSelector("Pod", "", "spec.nodeName=" + hostname));
+		request.setHeader("Connection", "keep-alive");
+		watcher.setRequest(request);
 		Thread thread = new Thread(watcher, "watch-pods-by-hostname");
 		thread.start();
 		return thread;
