@@ -1085,6 +1085,10 @@ public class KubernetesClient {
 	/**
 	 * watch a Kubernetes resources using kind, namespace, and WebSocketListener
 	 * 
+	 * see https://kubernetes.io/docs/concepts/overview/working-with-objects/field-selectors/
+	 * 
+	 * e.g., kubectl get pods --field-selector=status.phase!=Running,spec.restartPolicy=Always
+	 * 
 	 * @param watcher watcher
 	 * @return thread thread
 	 * @throws Exception Kubernetes cannot parsing this jsonStr

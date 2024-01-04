@@ -71,8 +71,8 @@ public final class KubernetesConstants {
 	/**
 	 * HTTP_QUERY_WATCHER_ENABLE
 	 */
-//	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=315360000";
-	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=0";
+	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=315360000";
+//	public static final String HTTP_QUERY_WATCHER_ENABLE     = "?watch=true&timeoutSeconds=0";
 	
 	
 	
