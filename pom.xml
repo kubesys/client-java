@@ -5,26 +5,30 @@
 
 	<groupId>io.github.kubesys</groupId>
 	<artifactId>client-java</artifactId>
-	<version>1.2.2.2</version>
+	<version>1.2.2.3</version>
 	<packaging>jar</packaging>
 
 	<name>client-java</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
+		<!-- project.version -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<jackson.version>2.15.3</jackson.version>
-		<httpclient.version>5.2.1</httpclient.version>
+		<!-- code -->
+		<jackson.version>2.16.1</jackson.version>
+		<httpclient.version>5.3</httpclient.version>
 		
-		<junit.version>5.10.0</junit.version>
+		<!-- test -->
+		<junit.version>5.10.1</junit.version>
 		
+		<!-- build -->
 		<maven.assembly.version>3.6.0</maven.assembly.version>
-		<maven.dependency.version>3.6.0</maven.dependency.version>
-		<maven.compiler.version>3.11.0</maven.compiler.version>
+		<maven.dependency.version>3.6.1</maven.dependency.version>
+		<maven.compiler.version>3.12.1</maven.compiler.version>
 		<maven.resources.version>3.3.1</maven.resources.version>
 		<maven.source.version>3.3.0</maven.source.version>
-		<maven.javadoc.version>3.5.0</maven.javadoc.version>
+		<maven.javadoc.version>3.6.3</maven.javadoc.version>
 		<maven.gpg.version>3.1.0</maven.gpg.version>
 	</properties>
 	
@@ -82,28 +86,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>${maven.assembly.version}</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>io.github.kubesys.mirror.Server</mainClass>
-						</manifest>
-						<manifestEntries>
-							<Class-Path>.</Class-Path>
-						</manifestEntries>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -252,7 +234,6 @@
 
 	<distributionManagement>
         <repository>
-            <!--必须与 settings.xml 的 id 一致-->
             <id>g-ubjg5602-iscas-system-maven</id>
             <name>maven</name>
             <url>https://g-ubjg5602-maven.pkg.coding.net/repository/iscas-system/jars/</url>
