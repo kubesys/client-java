@@ -23,6 +23,10 @@ This project is based on the following softwares.
 |  Support customized Kubernetes resources  |  a lot of development           | a lot of development            |  zero-deployment     |
 |    Works with the other SDKs              |  /                              | /                               |  simple              |     
 
+## Supported
+
+- National Key Research and Development Program of China (2023YFB3308702)
+
 ## Architecture
 
 ![avatar](/docs/arch.png)
