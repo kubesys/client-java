@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -70,14 +69,14 @@ import io.github.kubesys.client.utils.SSLUtil;
 import io.github.kubesys.client.utils.URLUtil;
 
 /**
- * Kubernetes客户端，建立与Kubernetes的连接，
- * 然后对Kubernetes中的Kind资源进行生命周期管理
- * 
- * kind是Kuberentes的重要概念，参见https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/
- * 
- * 参见：
- * - https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27 
- * - https://kubernetes.io/docs/reference/kubernetes-api/
+ * Kubernetes客户端，用于建立与Kubernetes的连接，随后可以对Kubernetes的Kind资源进行生命周期管理。
+ * 其中，kind的定义参见https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/
+ * <br>
+ * <br>
+ * Kubernetes客户端主要支持create、update、delete、get、list和watch5种语义，其设计参见
+ * https://g-ubjg5602.coding.net/p/iscas-system/km/spaces/1326202/pages/K-28
+ * <br>
+ * <br>
  * 
  * @author wuheng@iscas.ac.cn
  * @since 1.0.0
@@ -86,25 +85,34 @@ import io.github.kubesys.client.utils.URLUtil;
 public class KubernetesClient {
 
 	/**
-	 * 日志
+	 * 日志对象
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesClient.class.getName());
 
 
 	/**
-	 * 用于连接Kubernetes api-server的配置文件，安装好Kubernetes后，
+	 * 用于连接api-server的配置文件，安装好Kubernetes后，
 	 * 通常位于/etc/kubernetes/admin.conf 或者 /root/.kube/config
 	 */
 	protected KubernetesAdminConfig kubernetesAdminConfig;
 
 	/**
-	 * 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url，
+	 * 用于自动分析Kubernetes中所有kind资源，以及该资源所对应的Url，
 	 * 参见https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27 
+	 * <br>
+	 * <br>
+	 * 如对于Pod，会至少学习以下的url<br>
+	 * - create: POST /api/v1/namespaces/{namespace}/pods <br>
+	 * - update: PUT /api/v1/namespaces/{namespace}/pods/{name} <br>
+	 * - delete: DELETE /api/v1/namespaces/{namespace}/pods <br>
+	 * - get: GET /api/v1/namespaces/{namespace}/pods /{name}<br>
+	 * - list: GET /api/v1/pods <br>
+	 * - watch: GET /api/v1/watch/pods <br>
 	 */
 	protected KubernetesAnalyzer analyzer;
 	
 	/**
-	 * 用于与Kubernetes进行交互
+	 * 连接Kubernetes的http客户端
 	 */
 	protected final CloseableHttpClient httpClient;
 
@@ -117,7 +125,7 @@ public class KubernetesClient {
 	/**
 	 * 根据配置文件创建Kubernetes客户端
 	 * 
-	 * @throws KubernetesConnectionException KubernetesConnectionException
+	 * @throws KubernetesConnectionException Kubernetes连接异常
 	 */
 	public KubernetesClient() throws KubernetesConnectionException {
 		this(new File(KubernetesConstants.KUBE_CONFIG));
@@ -127,7 +135,7 @@ public class KubernetesClient {
 	 * 根据配置文件创建Kubernetes客户端
 	 * 
 	 * @param file 比如$HOME$/.kube/conf
-	 * @throws KubernetesConnectionException KubernetesConnectionException
+	 * @throws KubernetesConnectionException Kubernetes连接异常
 	 */
 	public KubernetesClient(File file) throws KubernetesConnectionException {
 		this(file, new KubernetesAnalyzer());
@@ -138,14 +146,13 @@ public class KubernetesClient {
 	 * 根据配置文件创建Kubernetes客户端
 	 *  
 	 * @param file     比如$HOME$/.kube/conf
-	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
-	 * @throws KubernetesConnectionException KubernetesConnectionException
+	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的所有Url
+	 * @throws KubernetesConnectionException Kubernetes连接异常
 	 * 
-	 * 一个典型
 	 */
 	public KubernetesClient(File file, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
 		try {
-			this.kubernetesAdminConfig = new KubernetesAdminConfig(new YAMLMapper().readTree(file));
+			this.kubernetesAdminConfig = KubernetesAdminConfig.from(new YAMLMapper().readTree(file));
 			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
 			this.analyzer = analyzer.initIfNeed(this);
 		} catch (Exception ex) {
@@ -242,23 +249,6 @@ public class KubernetesClient {
 	 * 
 	 * 
 	 **********************************************************/
-	// https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
-	/**
-	 * statusDesc
-	 */
-	static Map<Integer, String> statusDesc = new HashMap<>();
-
-	static {
-		statusDesc.put(400, "Bad Request. The server could not parse or understand the request.");
-		statusDesc.put(401, "Unauthorized. A request was received without a known authentication scheme.");
-		statusDesc.put(403,
-				"Bad Request. Forbidden. The request was received and understood, but access is forbidden.");
-		statusDesc.put(409,
-				"Conflict. The request was received, but it was a request to update an older version of the object.");
-		statusDesc.put(422,
-				"Unprocessable entity. The request was parsed correctly but failed some sort of validation.");
-	}
-		
 	
 	/**
 	 * @param kac kac
@@ -267,7 +257,8 @@ public class KubernetesClient {
 	 */
 	protected CloseableHttpClient createDefaultHttpClient(KubernetesAdminConfig kac) throws Exception {
 
-		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
+		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(
+				RegistryBuilder.<ConnectionSocketFactory>create()
 				.register(URIScheme.HTTP.id, 
 						PlainConnectionSocketFactory.getSocketFactory())
 				.register(URIScheme.HTTPS.id,
@@ -304,19 +295,26 @@ public class KubernetesClient {
 
 					@Override
 					public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context) {
-					      return TimeValue.ZERO_MILLISECONDS;
+					    return TimeValue.ZERO_MILLISECONDS;
 					}
 					
 				})
 				.build();
 	}
 	
+	
 	/**
-	 * 200 OK: 请求成功，服务器成功处理了请求并返回所请求的数据。 201 Created: 请求成功，服务器创建了新资源。 204 No
-	 * Content: 请求成功，服务器处理成功，但没有返回数据。 400 Bad Request: 请求无效，服务器无法理解请求。 401
-	 * Unauthorized: 未授权，需要进行身份验证或令牌无效。 403 Forbidden: 请求被拒绝，客户端没有访问资源的权限。 404 Not
-	 * Found: 请求的资源不存在。 409 Conflict: 请求冲突，通常用于表示资源的当前状态与请求的条件不匹配。 500 Internal
-	 * Server Error: 服务器内部错误，表示服务器在处理请求时遇到了问题。
+	 * https://appwrite.io/docs/advanced/platform/response-codes
+	 * 
+	 * 200 OK: 请求成功，服务器成功处理了请求并返回所请求的数据。 <br>
+	 * 201 Created: 请求成功，服务器创建了新资源。 <br>
+	 * 204 No Content: 请求成功，服务器处理成功，但没有返回数据。<br> 
+	 * 400 Bad Request: 请求无效，服务器无法理解请求。 <br>
+	 * 401 Unauthorized: 未授权，需要进行身份验证或令牌无效。 <br> 
+	 * 403 Forbidden: 请求被拒绝，客户端没有访问资源的权限。 <br>
+	 * 404 Not Found: 请求的资源不存在。 <br>
+	 * 409 Conflict: 请求冲突，通常用于表示资源的当前状态与请求的条件不匹配。 <br> 
+	 * 500 Internal Server Error: 服务器内部错误，表示服务器在处理请求时遇到了问题。 <br>
 	 * 
 	 * @param response response
 	 * @return json json
@@ -325,13 +323,6 @@ public class KubernetesClient {
 
 		switch (response.getCode()) {
 		case 200:
-			try {
-				ObjectMapper objectMapper = new ObjectMapper();
-				objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-				return objectMapper.readTree(response.getEntity().getContent());
-			} catch (Exception e) {
-				throw new KubernetesUnknownException(e.toString());
-			}
 		case 201:
 			try {
 				ObjectMapper objectMapper = new ObjectMapper();

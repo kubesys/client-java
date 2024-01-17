@@ -19,6 +19,7 @@ public class WatchFullkindExample extends AbstractClient {
 	
 	public static void main(String[] args) throws Exception {
 		KubernetesClient client = createClient1(null);
+		System.setProperty("org.apache.http.debug", "true");
 		
 		KubernetesWatcher watcher = new KubernetesWatcher(client) {
 			

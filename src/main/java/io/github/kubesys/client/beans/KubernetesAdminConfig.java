@@ -45,14 +45,12 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.github.kubesys.client.exceptions.KubernetesWrongConfigException;
+
 /**
- * Kubernetes的客户端，根据https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/的
- * URL规则生产URL
- * 
- * 对于JSON参数，可参见https://kubernetes.io/docs/reference/kubernetes-api/
+ * Kubernetes的配置文件
  * 
  * @author wuheng@iscas.ac.cn
  * @since 2.0.0
@@ -61,29 +59,32 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class KubernetesAdminConfig {
 
 	/**
-	 * m_logger
+	 * 日志对象
 	 */
 	public static final Logger m_logger = Logger.getLogger(KubernetesAdminConfig.class.getName());
 
 	
-
 	/**
-	 * master IP
+	 * kubernetes的apiserver，如https://127.0.0.1:6443 <br>
+	 * 
+	 * - masterUrl + token <br>
+	 * - masterUrl + username + password <br>
+	 * - masterUrl + caCertData + clientCertData + clientKeyData
 	 */
 	protected String masterUrl;
 
 	/**
-	 * token
+	 * bearer token
 	 */
 	protected String token;
 
 	/**
-	 * username
+	 * basic username
 	 */
 	protected String username;
 
 	/**
-	 * password
+	 * basic password
 	 */
 	protected String password;
 
@@ -102,13 +103,6 @@ public class KubernetesAdminConfig {
 	 */
 	protected String clientKeyData;
 
-	/**
-	 * @param requester requester
-	 * @throws Exception exception
-	 */
-	public KubernetesAdminConfig(KubernetesAdminConfig requester) throws Exception {
-		this(requester.getMasterUrl(), requester.getToken());
-	}
 
 	/**
 	 * @param masterUrl masterUrl
@@ -145,19 +139,6 @@ public class KubernetesAdminConfig {
 		this.caCertData = caCertData;
 		this.clientCertData = clientCertData;
 		this.clientKeyData = clientKeyData;
-	}
-
-	/**
-	 * @param json json
-	 * @throws Exception Exception
-	 */
-	public KubernetesAdminConfig(JsonNode json) throws Exception {
-		JsonNode cluster = json.get("clusters").get(0).get("cluster");
-		this.masterUrl = cluster.get("server").asText();
-		this.caCertData = cluster.get("certificate-authority-data").asText();
-		JsonNode user = json.get("users").get(0).get("user");
-		this.clientCertData = user.get("client-certificate-data").asText();
-		this.clientKeyData = user.get("client-key-data").asText();
 	}
 
 
@@ -245,6 +226,26 @@ public class KubernetesAdminConfig {
 		this.password = password;
 	}
 
+	
+	/**
+	 * 
+	 * @param json 默认为/etc/kubernetes/admin.conf 或者 /root/.kube/config
+	 * @throws KubernetesWrongConfigException 配置文件不对或者格式错误，报空指针异常
+	 */
+	public static KubernetesAdminConfig from(JsonNode json) throws KubernetesWrongConfigException {
+		try {
+			JsonNode cluster = json.get("clusters").get(0).get("cluster");
+			String masterUrl = cluster.get("server").asText();
+			String caCertData = cluster.get("certificate-authority-data").asText();
+			JsonNode user = json.get("users").get(0).get("user");
+			String clientCertData = user.get("client-certificate-data").asText();
+			String clientKeyData = user.get("client-key-data").asText();
+			return new KubernetesAdminConfig(masterUrl, caCertData, clientCertData, clientKeyData);
+		} catch (Exception ex) {
+			throw new KubernetesWrongConfigException(ex.getMessage());
+		}
+	}
+	
 	/**********************************************************************
 	 * 
 	 * I do not known why, just copy from fabric8
@@ -639,5 +640,4 @@ public class KubernetesAdminConfig {
 			}
 		}
 	}
-
 }

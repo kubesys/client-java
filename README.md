@@ -49,7 +49,7 @@ Add this dependency to your project's POM:
 <dependency>
   <groupId>io.github.kubesys</groupId>
   <artifactId>client-java</artifactId>
-  <version>1.2.2.2</version> 
+  <version>1.2.3</version> 
 </dependency>
 ```
 
@@ -138,7 +138,7 @@ kubectl create -f https://raw.githubusercontent.com/kubesys/client-java/master/t
 2. get token
 
 ```kubectl
-kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep iscas-client | awk '{print $1}') | grep "token:" | awk -F":" '{print$2}' | sed 's/ //g'
 ```
 ### get-all-kinds
 
