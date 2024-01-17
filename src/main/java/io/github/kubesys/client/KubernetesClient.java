@@ -273,7 +273,7 @@ public class KubernetesClient {
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
                 .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
                 .setSocketTimeout(Timeout.ZERO_MILLISECONDS)
-                .setTimeToLive(TimeValue.ofDays(365 * 100))
+                .setTimeToLive(TimeValue.ofDays(36500L))
                 .build();
 		
 		connManager.setDefaultConnectionConfig(connectionConfig);

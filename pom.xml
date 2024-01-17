@@ -68,6 +68,15 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<!-- 添加 Sonar 插件 -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>${maven.sonar.version}</version>
+				<configuration>
+					<sonar.host.url>http://139.9.165.93:31040/</sonar.host.url>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -212,17 +221,20 @@
 							</execution>
 						</executions>
 					</plugin>
-					<!-- 添加 Sonar 插件 -->
-					<plugin>
-						<groupId>org.sonarsource.scanner.maven</groupId>
-						<artifactId>sonar-maven-plugin</artifactId>
-						<version>${maven.sonar.version}</version>
-						<configuration>
-							<sonar.host.url>http://139.9.165.93:31040/</sonar.host.url>
-						</configuration>
-					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- 确保没有将 SonarQube 地址硬编码为 localhost:9000 -->
+				<sonar.host.url>http://139.9.165.93:31040/</sonar.host.url>
+				<sonar.login>admin</sonar.login>
+				<sonar.password>Onceas!@#</sonar.password>
+			</properties>
 		</profile>
 	</profiles>
 	<distributionManagement>
