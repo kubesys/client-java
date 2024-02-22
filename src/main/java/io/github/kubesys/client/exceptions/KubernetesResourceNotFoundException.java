@@ -15,7 +15,6 @@
  */
 package io.github.kubesys.client.exceptions;
 
-import io.github.kubesys.client.annotations.Catch;
 
 /**
  * @author  wuheng@iscas.ac.cn
@@ -23,7 +22,6 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 404, desc = "请求的资源不存在")
 public class KubernetesResourceNotFoundException extends RuntimeException {
 
 	/**

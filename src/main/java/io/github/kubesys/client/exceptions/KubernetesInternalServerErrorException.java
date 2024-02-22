@@ -15,7 +15,6 @@
  */
 package io.github.kubesys.client.exceptions;
 
-import io.github.kubesys.client.annotations.Catch;
 
 /**
  * @author  wuheng@iscas.ac.cn
@@ -23,7 +22,6 @@ import io.github.kubesys.client.annotations.Catch;
  * @version 1.0.0
  *
  */
-@Catch(code = 500, desc = "服务器内部错误，表示服务器在处理请求时遇到了问题")
 public class KubernetesInternalServerErrorException extends RuntimeException {
 
 	/**

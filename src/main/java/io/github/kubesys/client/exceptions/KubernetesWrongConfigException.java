@@ -15,15 +15,12 @@
  */
 package io.github.kubesys.client.exceptions;
 
-import io.github.kubesys.client.annotations.Catch;
-
 /**
  * @author  wuheng@iscas.ac.cn
  * @since   2023/07/25
  * @version 1.0.0
  *
  */
-@Catch(code = 502, desc = "Kubernetes配置文件格式错误")
 public class KubernetesWrongConfigException extends RuntimeException {
 
 	/**
