@@ -199,45 +199,6 @@ public class KubernetesClient {
 	}
 
 	
-	/***************************************************************************
-	 * 
-	 * using usename and password 
-	 * 
-	 ***************************************************************************/
-	
-	/**
-	 * 根据用户名密码创建Kubernetes连接
-	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
-	 * 
-	 * @param url      如https://IP:6443/
-	 * @param username basic authing
-	 * @param password basic authing
-	 * @throws KubernetesConnectionException KubernetesConnectionException
-	 */
-	public KubernetesClient(String url, String username, String password) throws KubernetesConnectionException {
-		this(url, username, password, new KubernetesAnalyzer());
-	}
-
-	/**
-	 * 根据用户名密码创建Kubernetes连接
-	 * https://kubernetes.io/docs/reference/access-authn-authz/authentication/
-	 * 
-	 * @param url      default is https://IP:6443/
-	 * @param username basic authing
-	 * @param password basic authing
-	 * @param analyzer 用于自动分析Kubernetes中所有kind资源，以及该资源对应的Url
-	 * @throws KubernetesConnectionException KubernetesConnectionException
-	 */
-	public KubernetesClient(String url, String username, String password, KubernetesAnalyzer analyzer) throws KubernetesConnectionException {
-		try {
-			this.kubernetesAdminConfig = new KubernetesAdminConfig(url, username, password);
-			this.httpClient = createDefaultHttpClient(kubernetesAdminConfig);
-			this.analyzer = analyzer.initIfNeed(this);
-		} catch (Exception ex) {
-			throw new KubernetesConnectionException(ex.toString());
-		}
-	}
-
 	/**********************************************************
 	 * 
 	 * 
