@@ -226,8 +226,8 @@ public class KubernetesClient {
 								kac.trustManagers()))
 				.build());
 		
-		connManager.setDefaultMaxPerRoute(10);
-		connManager.setMaxTotal(20);
+		connManager.setDefaultMaxPerRoute(2);
+		connManager.setMaxTotal(3);
 		
 		ConnectionConfig connectionConfig = ConnectionConfig.custom()
                 .setConnectTimeout(Timeout.ZERO_MILLISECONDS)
