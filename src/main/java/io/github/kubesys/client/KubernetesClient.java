@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -1297,6 +1298,31 @@ public class KubernetesClient {
 		return kubernetesAdminConfig;
 	}
 
+	/**
+	 * 
+	 * @param pod  pod
+	 * @return json json from Kubernetes
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	@Deprecated
+	public String getPodLog(String pod) throws Exception {
+		return getPodLog("default", pod);
+	}
+
+	/**
+	 * 
+	 * @param namespace namespace
+	 * @param pod  pod
+	 * @return json json from Kubernetes
+	 * @throws Exception Kubernetes cannot parsing this jsonStr
+	 */
+	@Deprecated
+	public String getPodLog(String namespace, String pod) throws Exception {
+		final String uri = analyzer.getConvertor().getUrl("Pod", namespace, pod) + "/log";
+		HttpGet request = ReqUtil.get(kubernetesAdminConfig, uri);
+		return IOUtils.toString(httpClient.execute(request).getEntity().getContent());
+	}
+	
 	/**
 	 * create a new HttpCaller for each WatchResource or WatchResources API
 	 * 
